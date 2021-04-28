@@ -10,21 +10,21 @@ Change-Id: I49dba61f332253e291a65e79ca70d9a07d45bb07
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/config/common.mk b/config/common.mk
-index 2fe9cb01..7d971bba 100644
+index 9b85c445..f811cf3c 100644
 --- a/config/common.mk
 +++ b/config/common.mk
-@@ -70,9 +70,9 @@ PRODUCT_COPY_FILES += \
+@@ -51,9 +51,9 @@ PRODUCT_COPY_FILES += \
  PRODUCT_COPY_FILES += \
-     vendor/lineage/config/permissions/org.lineageos.android.xml:$(TARGET_COPY_OUT_SYSTEM)/etc/permissions/org.lineageos.android.xml
- 
+     frameworks/base/data/keyboards/Vendor_045e_Product_028e.kl:system/usr/keylayout/Vendor_045e_Product_0719.kl
+
 -# Enforce privapp-permissions whitelist
 +# Log privapp-permissions whitelist violations
  PRODUCT_SYSTEM_DEFAULT_PROPERTIES += \
 -    ro.control_privapp_permissions=enforce
 +    ro.control_privapp_permissions=log
- 
- # Include AOSP audio files
- include vendor/lineage/config/aosp_audio.mk
+
+ # Power whitelist
+ PRODUCT_COPY_FILES += \
 -- 
 2.17.1
 

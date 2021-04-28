@@ -1,0 +1,25 @@
+From 8707797cc6bec4c145b9c29d0cf65ea6890c557c Mon Sep 17 00:00:00 2001
+From: Alberto Ponces <ponces26@gmail.com>
+Date: Wed, 25 Dec 2019 12:34:05 +0200
+Subject: [PATCH] base: remove securize script
+
+	modified:   base.mk
+---
+ base.mk | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/base.mk b/base.mk
+index ebb2215..5efe128 100644
+--- a/base.mk
++++ b/base.mk
+@@ -162,7 +162,6 @@ PRODUCT_PACKAGES += \
+ 	resetprop_phh
+
+ PRODUCT_COPY_FILES += \
+-	device/phh/treble/phh-securize.sh:system/bin/phh-securize.sh \
+ 	device/phh/treble/files/ota.sh:system/bin/ota.sh \
+
+ PRODUCT_COPY_FILES += \
+-- 
+2.17.1
+
