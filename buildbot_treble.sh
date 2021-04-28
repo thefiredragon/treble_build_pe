@@ -65,6 +65,7 @@ git am $BL/patches/0001-Remove-fsck-SELinux-labels.patch
 git am $BL/patches/0001-base-provide-libnfc-nci.patch
 git am $BL/patches/0001-base-remove-securize-script.patch
 git am $BL/patches/0001-board-add-broken-duplicate-rules-flag.patch
+git am $BL/patches/0001-rw-system-set-fingerprint-props.patch
 cd ../../..
 cd frameworks/av
 git revert 72fb8d96c85fd45e85516b4023cd5116b5d5a8eb --no-edit # camera: Allow devices to load custom CameraParameter code
