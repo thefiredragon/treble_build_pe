@@ -120,20 +120,20 @@ buildSasImage() {
     case $1 in
     "treble_a64_bvN")
         bash lite-adapter.sh 32 $OUT/system.img
-        xz -c s.img -T0 > ~/builds/PixelExperience_arm32_binder64-ab-vndklite-11.0-$BUILD_DATE-UNOFFICIAL.img.xz
-        xz -c $OUT/system.img -T0 > ~/builds/PixelExperience_arm32_binder64-ab-11.0-$BUILD_DATE-UNOFFICIAL.img.xz
+        xz -c s.img -T0 > ~/builds/PixelExperience_Plus_arm32_binder64-ab-vndklite-11.0-$BUILD_DATE-UNOFFICIAL.img.xz
+        xz -c $OUT/system.img -T0 > ~/builds/PixelExperience_Plus_arm32_binder64-ab-11.0-$BUILD_DATE-UNOFFICIAL.img.xz
         ;;
     "treble_arm_bvN")
         bash run.sh 32 $OUT/system.img
-        xz -c s.img -T0 > ~/builds/PixelExperience_arm-aonly-11.0-$BUILD_DATE-UNOFFICIAL.img.xz
-        xz -c $OUT/system.img -T0 > ~/builds/PixelExperience_arm-ab-11.0-$BUILD_DATE-UNOFFICIAL.img.xz
+        xz -c s.img -T0 > ~/builds/PixelExperience_Plus_arm-aonly-11.0-$BUILD_DATE-UNOFFICIAL.img.xz
+        xz -c $OUT/system.img -T0 > ~/builds/PixelExperience_Plus_arm-ab-11.0-$BUILD_DATE-UNOFFICIAL.img.xz
         ;;
     "treble_arm64_bvN")
         bash run.sh 64 $OUT/system.img
-        xz -c s.img -T0 > ~/builds/PixelExperience_arm64-aonly-11.0-$BUILD_DATE-UNOFFICIAL.img.xz
+        xz -c s.img -T0 > ~/builds/PixelExperience_Plus_arm64-aonly-11.0-$BUILD_DATE-UNOFFICIAL.img.xz
         bash lite-adapter.sh 64 $OUT/system.img
-        xz -c s.img -T0 > ~/builds/PixelExperience_arm64-ab-vndklite-11.0-$BUILD_DATE-UNOFFICIAL.img.xz
-        xz -c $OUT/system.img -T0 > ~/builds/PixelExperience_arm64-ab-11.0-$BUILD_DATE-UNOFFICIAL.img.xz
+        xz -c s.img -T0 > ~/builds/PixelExperience_Plus_arm64-ab-vndklite-11.0-$BUILD_DATE-UNOFFICIAL.img.xz
+        xz -c $OUT/system.img -T0 > ~/builds/PixelExperience_Plus_arm64-ab-11.0-$BUILD_DATE-UNOFFICIAL.img.xz
         ;;
     esac
     rm -rf s.img

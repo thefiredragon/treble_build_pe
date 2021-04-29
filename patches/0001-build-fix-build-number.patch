@@ -11,16 +11,16 @@ Change-Id: I55c8897d7d4d5c2a9e62b1a931b3856b2e38956e
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/build/core/main_version.mk b/build/core/main_version.mk
-index 7ebfe945..45ca2ab6 100644
+index d8116cb1..9126b02a 100644
 --- a/build/core/main_version.mk
 +++ b/build/core/main_version.mk
 @@ -32,7 +32,7 @@ CUSTOM_PLATFORM_VERSION := 11.0
  
  TARGET_PRODUCT_SHORT := $(subst aosp_,,$(CUSTOM_BUILD))
  
--CUSTOM_VERSION := PixelExperience_$(CUSTOM_BUILD)-$(CUSTOM_PLATFORM_VERSION)-$(CUSTOM_BUILD_DATE)-$(CUSTOM_BUILD_TYPE)
-+CUSTOM_VERSION := PixelExperience_$(TARGET_PRODUCT)-$(CUSTOM_PLATFORM_VERSION)-$(CUSTOM_BUILD_DATE)-$(CUSTOM_BUILD_TYPE)
- CUSTOM_VERSION_PROP := eleven
+-CUSTOM_VERSION := PixelExperience_Plus_$(CUSTOM_BUILD)-$(CUSTOM_PLATFORM_VERSION)-$(CUSTOM_BUILD_DATE)-$(CUSTOM_BUILD_TYPE)
++CUSTOM_VERSION := PixelExperience_Plus_$(TARGET_PRODUCT)-$(CUSTOM_PLATFORM_VERSION)-$(CUSTOM_BUILD_DATE)-$(CUSTOM_BUILD_TYPE)
+ CUSTOM_VERSION_PROP := eleven_plus
  
  ADDITIONAL_BUILD_PROPERTIES += \
 -- 

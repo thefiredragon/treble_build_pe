@@ -44,20 +44,22 @@ Change-Id: I4650cef96617c32e52d5dd088c8afffb06ab5e1d
  delete mode 100644 packages/SystemUI/src/com/android/systemui/biometrics/FODCircleViewImplCallback.java
 
 diff --git a/core/java/com/android/internal/statusbar/IStatusBar.aidl b/core/java/com/android/internal/statusbar/IStatusBar.aidl
-index 8c2fb33c93d..8c5fdf5822e 100644
+index 44607f7f5fb..83b672e06b0 100644
 --- a/core/java/com/android/internal/statusbar/IStatusBar.aidl
 +++ b/core/java/com/android/internal/statusbar/IStatusBar.aidl
-@@ -227,10 +227,4 @@ oneway interface IStatusBar
-      * display.
+@@ -228,12 +228,6 @@ oneway interface IStatusBar
       */
      void suppressAmbientDisplay(boolean suppress);
--
+ 
 -    /**
 -     *  Used to show or hide in display fingerprint view.
 -     */
 -    void showInDisplayFingerprintView();
 -    void hideInDisplayFingerprintView();
- }
+-
+     /**
+      * Used to block or unblock usage of gestural navigation
+      */
 diff --git a/core/java/com/android/internal/statusbar/IStatusBarService.aidl b/core/java/com/android/internal/statusbar/IStatusBarService.aidl
 index 52239322edb..e2e7c62a60a 100644
 --- a/core/java/com/android/internal/statusbar/IStatusBarService.aidl
@@ -278,10 +280,10 @@ index cc03b4f816a..1db2e32b8cd 100644
  
 diff --git a/packages/SystemUI/src/com/android/systemui/biometrics/FODCircleView.java b/packages/SystemUI/src/com/android/systemui/biometrics/FODCircleView.java
 deleted file mode 100644
-index 4b2270b20ad..00000000000
+index 506a25fcc08..00000000000
 --- a/packages/SystemUI/src/com/android/systemui/biometrics/FODCircleView.java
 +++ /dev/null
-@@ -1,723 +0,0 @@
+@@ -1,760 +0,0 @@
 -/**
 - * Copyright (C) 2019-2020 The LineageOS Project
 - *
@@ -321,6 +323,8 @@ index 4b2270b20ad..00000000000
 -import android.os.Looper;
 -import android.os.RemoteException;
 -import android.os.UserHandle;
+-import android.pocket.IPocketCallback;
+-import android.pocket.PocketManager;
 -import android.provider.Settings;
 -import android.view.Display;
 -import android.view.Gravity;
@@ -476,6 +480,7 @@ index 4b2270b20ad..00000000000
 -            } else {
 -                updateIconDim(false);
 -            }
+-            handlePocketManagerCallback(showing);
 -        }
 -
 -        @Override
@@ -521,6 +526,20 @@ index 4b2270b20ad..00000000000
 -        }
 -    };
 -
+-    private void handlePocketManagerCallback(boolean keyguardShowing){
+-        if (!keyguardShowing){
+-            if (mPocketCallbackAdded){
+-                mPocketCallbackAdded = false;
+-                mPocketManager.removeCallback(mPocketCallback);
+-            }
+-        }else{
+-            if (!mPocketCallbackAdded){
+-                mPocketCallbackAdded = true;
+-                mPocketManager.addCallback(mPocketCallback);
+-            }
+-        }
+-    }
+-
 -    private boolean mCutoutMasked;
 -    private int mStatusbarHeight;
 -    private class CustomSettingsObserver extends ContentObserver {
@@ -556,6 +575,23 @@ index 4b2270b20ad..00000000000
 -    }
 -
 -    private CustomSettingsObserver mCustomSettingsObserver;
+-
+-    private PocketManager mPocketManager;
+-    private boolean mIsDeviceInPocket;
+-    private boolean mPocketCallbackAdded = false;
+-    private final IPocketCallback mPocketCallback = new IPocketCallback.Stub() {
+-
+-        @Override
+-        public void onStateChanged(boolean isDeviceInPocket, int reason) {
+-            boolean wasDeviceInPocket = mIsDeviceInPocket;
+-            if (reason == PocketManager.REASON_SENSOR) {
+-                mIsDeviceInPocket = isDeviceInPocket;
+-            } else {
+-                mIsDeviceInPocket = false;
+-            }
+-        }
+-
+-    };
 -
 -    public FODCircleView(Context context) {
 -        super(context);
@@ -643,6 +679,9 @@ index 4b2270b20ad..00000000000
 -    
 -        updateCutoutFlags();
 -        Dependency.get(ConfigurationController.class).addCallback(this);
+-
+-        // Pocket
+-        mPocketManager = (PocketManager) context.getSystemService(Context.POCKET_SERVICE);
 -    }
 -
 -    private int interpolate(int i, int i2, int i3, int i4, int i5) {
@@ -797,7 +836,7 @@ index 4b2270b20ad..00000000000
 -    }
 -
 -    public void showCircle() {
--        if (mFading || mTouchedOutside) return;
+-        if (mFading || mTouchedOutside || (mIsKeyguard && mIsDeviceInPocket)) return;
 -        mIsCircleShowing = true;
 -
 -        setKeepScreenOn(true);
@@ -1244,7 +1283,7 @@ index ff0c034bfc5..af70e2c6ac1 100644
              // Lock immediately based on setting if secure (user has a pin/pattern/password).
              // This also "locks" the device when not secure to provide easy access to the
 diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/CommandQueue.java b/packages/SystemUI/src/com/android/systemui/statusbar/CommandQueue.java
-index d17997ff27f..96d6ecbcc07 100644
+index 5f3875701e4..39b6aa1a360 100644
 --- a/packages/SystemUI/src/com/android/systemui/statusbar/CommandQueue.java
 +++ b/packages/SystemUI/src/com/android/systemui/statusbar/CommandQueue.java
 @@ -126,8 +126,6 @@ public class CommandQueue extends IStatusBar.Stub implements CallbackController<
@@ -1253,19 +1292,19 @@ index d17997ff27f..96d6ecbcc07 100644
      private static final int MSG_SUPPRESS_AMBIENT_DISPLAY          = 56 << MSG_SHIFT;
 -    private static final int MSG_SHOW_IN_DISPLAY_FINGERPRINT_VIEW  = 57 << MSG_SHIFT;
 -    private static final int MSG_HIDE_IN_DISPLAY_FINGERPRINT_VIEW  = 58 << MSG_SHIFT;
+     private static final int MSG_SET_BLOCKED_GESTURAL_NAVIGATION   = 59 << MSG_SHIFT;
  
      public static final int FLAG_EXCLUDE_NONE = 0;
-     public static final int FLAG_EXCLUDE_SEARCH_PANEL = 1 << 0;
-@@ -270,8 +268,6 @@ public class CommandQueue extends IStatusBar.Stub implements CallbackController<
+@@ -271,8 +269,6 @@ public class CommandQueue extends IStatusBar.Stub implements CallbackController<
          default void onBiometricHelp(String message) { }
          default void onBiometricError(int modality, int error, int vendorCode) { }
          default void hideAuthenticationDialog() { }
 -        default void showInDisplayFingerprintView() { }
 -        default void hideInDisplayFingerprintView() { }
+         default void setBlockedGesturalNavigation(boolean blocked) {}
  
          /**
-          * @see IStatusBar#onDisplayReady(int)
-@@ -860,20 +856,6 @@ public class CommandQueue extends IStatusBar.Stub implements CallbackController<
+@@ -862,20 +858,6 @@ public class CommandQueue extends IStatusBar.Stub implements CallbackController<
          }
      }
  
@@ -1284,9 +1323,9 @@ index d17997ff27f..96d6ecbcc07 100644
 -    }
 -
      @Override
-     public void onDisplayReady(int displayId) {
+     public void setBlockedGesturalNavigation(boolean blocked) {
          synchronized (mLock) {
-@@ -1324,16 +1306,6 @@ public class CommandQueue extends IStatusBar.Stub implements CallbackController<
+@@ -1335,16 +1317,6 @@ public class CommandQueue extends IStatusBar.Stub implements CallbackController<
                          callbacks.suppressAmbientDisplay((boolean) msg.obj);
                      }
                      break;
@@ -1300,9 +1339,9 @@ index d17997ff27f..96d6ecbcc07 100644
 -                        mCallbacks.get(i).hideInDisplayFingerprintView();
 -                    }
 -                    break;
-             }
-         }
-     }
+                 case MSG_SET_BLOCKED_GESTURAL_NAVIGATION:
+                     for (int i = 0; i < mCallbacks.size(); i++) {
+                         mCallbacks.get(i).setBlockedGesturalNavigation((Boolean) msg.obj);
 diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/notification/ActivityLaunchAnimator.java b/packages/SystemUI/src/com/android/systemui/statusbar/notification/ActivityLaunchAnimator.java
 index 1e1655256b1..382715a3fb7 100644
 --- a/packages/SystemUI/src/com/android/systemui/statusbar/notification/ActivityLaunchAnimator.java
@@ -1374,18 +1413,18 @@ index 1e1655256b1..382715a3fb7 100644
                  mCallback.onExpandAnimationFinished(mIsFullScreenLaunch);
                  applyParamsToNotification(null);
 diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/phone/StatusBar.java b/packages/SystemUI/src/com/android/systemui/statusbar/phone/StatusBar.java
-index b6ecc6518d7..ccd14bb6685 100644
+index 6fb988eb400..259a97048f6 100644
 --- a/packages/SystemUI/src/com/android/systemui/statusbar/phone/StatusBar.java
 +++ b/packages/SystemUI/src/com/android/systemui/statusbar/phone/StatusBar.java
-@@ -79,7 +79,6 @@ import android.content.pm.PackageManager.NameNotFoundException;
- import android.content.res.Configuration;
+@@ -83,7 +83,6 @@ import android.content.res.Configuration;
  import android.graphics.Point;
  import android.graphics.PointF;
+ import android.hardware.display.DisplayManager;
 -import android.hardware.fingerprint.IFingerprintService;
  import android.media.AudioAttributes;
  import android.metrics.LogMaker;
  import android.net.Uri;
-@@ -153,8 +152,6 @@ import com.android.systemui.R;
+@@ -159,8 +158,6 @@ import com.android.systemui.R;
  import com.android.systemui.SystemUI;
  import com.android.systemui.SystemUIFactory;
  import com.android.systemui.assist.AssistManager;
@@ -1394,7 +1433,7 @@ index b6ecc6518d7..ccd14bb6685 100644
  import com.android.systemui.broadcast.BroadcastDispatcher;
  import com.android.systemui.bubbles.BubbleController;
  import com.android.systemui.charging.WirelessChargingAnimation;
-@@ -242,7 +239,6 @@ import com.android.internal.util.custom.NavbarUtils;
+@@ -250,7 +247,6 @@ import com.android.internal.util.custom.NavbarUtils;
  import java.io.FileDescriptor;
  import java.io.PrintWriter;
  import java.io.StringWriter;
@@ -1402,7 +1441,7 @@ index b6ecc6518d7..ccd14bb6685 100644
  import java.util.Map;
  import java.util.Optional;
  import java.util.concurrent.Executor;
-@@ -611,33 +607,6 @@ public class StatusBar extends SystemUI implements DemoMode,
+@@ -659,33 +655,6 @@ public class StatusBar extends SystemUI implements DemoMode,
          }
      };
  
@@ -1436,7 +1475,7 @@ index b6ecc6518d7..ccd14bb6685 100644
      private KeyguardUserSwitcher mKeyguardUserSwitcher;
      private final UserSwitcherController mUserSwitcherController;
      private final NetworkController mNetworkController;
-@@ -667,7 +636,6 @@ public class StatusBar extends SystemUI implements DemoMode,
+@@ -718,7 +687,6 @@ public class StatusBar extends SystemUI implements DemoMode,
              new KeyguardUpdateMonitorCallback() {
                  @Override
                  public void onDreamingStateChanged(boolean dreaming) {
@@ -1444,7 +1483,7 @@ index b6ecc6518d7..ccd14bb6685 100644
                      if (dreaming) {
                          maybeEscalateHeadsUp();
                      }
-@@ -692,7 +660,6 @@ public class StatusBar extends SystemUI implements DemoMode,
+@@ -743,7 +711,6 @@ public class StatusBar extends SystemUI implements DemoMode,
      private Lazy<NotificationShadeDepthController> mNotificationShadeDepthControllerLazy;
      private final BubbleController mBubbleController;
      private final BubbleController.BubbleExpandListener mBubbleExpandListener;
@@ -1452,7 +1491,7 @@ index b6ecc6518d7..ccd14bb6685 100644
  
      private ActivityIntentHelper mActivityIntentHelper;
  
-@@ -782,8 +749,7 @@ public class StatusBar extends SystemUI implements DemoMode,
+@@ -833,8 +800,7 @@ public class StatusBar extends SystemUI implements DemoMode,
              DismissCallbackRegistry dismissCallbackRegistry,
              Lazy<NotificationShadeDepthController> notificationShadeDepthControllerLazy,
              StatusBarTouchableRegionManager statusBarTouchableRegionManager,
@@ -1462,7 +1501,7 @@ index b6ecc6518d7..ccd14bb6685 100644
          super(context);
          mNotificationsController = notificationsController;
          mLightBarController = lightBarController;
-@@ -861,7 +827,6 @@ public class StatusBar extends SystemUI implements DemoMode,
+@@ -912,7 +878,6 @@ public class StatusBar extends SystemUI implements DemoMode,
          mIconPolicy = phoneStatusBarPolicy;
          mDismissCallbackRegistry = dismissCallbackRegistry;
          mTunerService = tunerService;
@@ -1470,16 +1509,17 @@ index b6ecc6518d7..ccd14bb6685 100644
  
          mBubbleExpandListener =
                  (isExpanding, key) -> {
-@@ -872,8 +837,6 @@ public class StatusBar extends SystemUI implements DemoMode,
+@@ -922,9 +887,6 @@ public class StatusBar extends SystemUI implements DemoMode,
+ 
  
          DateTimeView.setReceiverHandler(timeTickHandler);
- 
+-
 -        mFingerprintService = IFingerprintService.Stub.asInterface(
 -                ServiceManager.getService(Context.FINGERPRINT_SERVICE));
      }
  
      @Override
-@@ -1061,8 +1024,6 @@ public class StatusBar extends SystemUI implements DemoMode,
+@@ -1121,8 +1083,6 @@ public class StatusBar extends SystemUI implements DemoMode,
                          }
                      }
                  }, OverlayPlugin.class, true /* Allow multiple plugins */);
@@ -1488,7 +1528,7 @@ index b6ecc6518d7..ccd14bb6685 100644
      }
  
      private void initCoreOverlays(){
-@@ -1382,8 +1343,7 @@ public class StatusBar extends SystemUI implements DemoMode,
+@@ -1450,8 +1410,7 @@ public class StatusBar extends SystemUI implements DemoMode,
          mActivityLaunchAnimator = new ActivityLaunchAnimator(
                  mNotificationShadeWindowViewController, this, mNotificationPanelViewController,
                  mNotificationShadeDepthControllerLazy.get(),
@@ -1498,7 +1538,7 @@ index b6ecc6518d7..ccd14bb6685 100644
  
          // TODO: inject this.
          mPresenter = new StatusBarNotificationPresenter(mContext, mNotificationPanelViewController,
-@@ -1894,12 +1854,6 @@ public class StatusBar extends SystemUI implements DemoMode,
+@@ -1966,12 +1925,6 @@ public class StatusBar extends SystemUI implements DemoMode,
              clearNotificationEffects();
          }
  
@@ -1511,7 +1551,7 @@ index b6ecc6518d7..ccd14bb6685 100644
          if (!isExpanded) {
              mRemoteInputManager.onPanelCollapsed();
          }
-@@ -2516,11 +2470,6 @@ public class StatusBar extends SystemUI implements DemoMode,
+@@ -2722,11 +2675,6 @@ public class StatusBar extends SystemUI implements DemoMode,
      @Override
      public void onRecentsAnimationStateChanged(boolean running) {
          setInteracting(StatusBarManager.WINDOW_NAVIGATION_BAR, running);
@@ -1523,7 +1563,7 @@ index b6ecc6518d7..ccd14bb6685 100644
      }
  
      protected BarTransitions getStatusBarTransitions() {
-@@ -4564,18 +4513,4 @@ public class StatusBar extends SystemUI implements DemoMode,
+@@ -4800,18 +4748,4 @@ public class StatusBar extends SystemUI implements DemoMode,
      public void suppressAmbientDisplay(boolean suppressed) {
          mDozeServiceHost.setDozeSuppressed(suppressed);
      }
@@ -1952,7 +1992,7 @@ index a4564790084..114b18debc3 100644
          IBiometricsFingerprint daemon = getFingerprintDaemon();
          if (daemon == null) {
 diff --git a/services/core/java/com/android/server/statusbar/StatusBarManagerService.java b/services/core/java/com/android/server/statusbar/StatusBarManagerService.java
-index b5c748c9ea0..4adfe5854b2 100644
+index 2412209452b..13b9508a9c8 100644
 --- a/services/core/java/com/android/server/statusbar/StatusBarManagerService.java
 +++ b/services/core/java/com/android/server/statusbar/StatusBarManagerService.java
 @@ -747,28 +747,6 @@ public class StatusBarManagerService extends IStatusBarService.Stub implements D
@@ -1981,9 +2021,9 @@ index b5c748c9ea0..4adfe5854b2 100644
 -        }
 -    }
 -
-     // TODO(b/117478341): make it aware of multi-display if needed.
      @Override
-     public void disable(int what, IBinder token, String pkg) {
+     public void setBlockedGesturalNavigation(boolean blocked) {
+         if (mBar != null) {
 -- 
 2.25.1
 
