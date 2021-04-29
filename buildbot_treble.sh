@@ -59,6 +59,9 @@ echo "Applying GSI-specific patches"
 cd bootable/recovery
 git revert c9a3611b0bab1744b3c4321e728c917fcdc2abc3 --no-edit # recovery: Allow custom bootloader msg offset in block misc
 cd ../..
+cd build/make
+git am $BL/patches/0001-build-fix-device-name.patch
+cd ../..
 cd device/phh/treble
 git revert 82b15278bad816632dcaeaed623b569978e9840d --no-edit # Update lineage.mk for LineageOS 16.0
 git am $BL/patches/0001-Remove-fsck-SELinux-labels.patch
