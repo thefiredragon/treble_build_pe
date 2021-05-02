@@ -94,6 +94,9 @@ cd vendor/aosp
 git am $BL/patches/0001-build_soong-Disable-generated_kernel_headers.patch
 git am $BL/patches/0001-build-fix-build-number.patch
 cd ../..
+cd vendor/hardware_overlay
+git am $BL/patches/0001-rework-treble-app.patch
+cd ../..
 echo ""
 
 echo "Applying GSI-specific fixes"
