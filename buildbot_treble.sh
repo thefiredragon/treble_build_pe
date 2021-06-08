@@ -19,6 +19,11 @@ echo "Syncing repos"
 repo sync -c --force-sync --no-clone-bundle --no-tags -j$(nproc --all)
 echo ""
 
+echo "Cloning dependecy repos"
+[ ! -d ./treble_patches ] && git clone https://github.com/ponces/treble_patches -b eleven
+[ ! -d ./sas-creator ] && git clone https://github.com/AndyCGYan/sas-creator
+rm -rf treble_app && git clone https://github.com/phhusson/treble_app
+
 echo "Setting up build environment"
 source build/envsetup.sh &> /dev/null
 echo ""
@@ -90,12 +95,13 @@ cd ../../..
 cd system/sepolicy
 git am $BL/patches/0001-Revert-sepolicy-Relabel-wifi.-properties-as-wifi_pro.patch
 cd ../..
+cd treble_app
+git am $BL/patches/0001-Remove-securize-preference.patch
+git am $BL/patches/0001-Remove-Customization-page.patch
+cd ..
 cd vendor/aosp
 git am $BL/patches/0001-build_soong-Disable-generated_kernel_headers.patch
 git am $BL/patches/0001-build-fix-build-number.patch
-cd ../..
-cd vendor/hardware_overlay
-git am $BL/patches/0001-rework-treble-app.patch
 cd ../..
 echo ""
 
@@ -146,6 +152,14 @@ buildSasImage() {
     cd ..
 }
 
+buildTrebleApp() {
+    cd treble_app
+    bash build.sh
+    cp TrebleApp.apk ../vendor/hardware_overlay/TrebleApp/app.apk
+    cd ..
+}
+
+buildTrebleApp
 buildVariant treble_arm_bvN
 buildVariant treble_a64_bvN
 buildVariant treble_arm64_bvN
