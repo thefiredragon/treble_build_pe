@@ -87,6 +87,7 @@ cd ../../..
 cd system/core
 git am $BL/patches/0001-Revert-init-Add-vendor-specific-initialization-hooks.patch
 git am $BL/patches/0001-Panic-into-recovery-rather-than-bootloader.patch
+git am $BL/patches/0001-Restore-sbin.patch
 git am $BL/patches/0001-fix-offline-charger-v7.patch
 cd ../..
 cd system/hardware/interfaces
