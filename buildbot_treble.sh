@@ -20,7 +20,7 @@ repo sync -c --force-sync --no-clone-bundle --no-tags -j$(nproc --all)
 echo ""
 
 echo "Cloning dependecy repos"
-[ ! -d ./treble_patches ] && git clone https://github.com/ponces/treble_patches -b eleven
+[ ! -d ./treble_patches ] && git clone https://github.com/ponces/treble_patches -b eleven-plus
 [ ! -d ./sas-creator ] && git clone https://github.com/AndyCGYan/sas-creator
 rm -rf treble_app && git clone https://github.com/phhusson/treble_app
 
