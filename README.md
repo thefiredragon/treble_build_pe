@@ -13,12 +13,12 @@ Create a new working directory for your Pixel Experience build and navigate to i
 
 Initialize your Pixel Experience workspace:
 
-    repo init -u https://github.com/PixelExperience/manifest -b eleven
+    repo init -u https://github.com/PixelExperience/manifest -b eleven-plus
 
 Clone the modified treble patches and this repo:
 
-    git clone https://github.com/ponces/treble_patches -b eleven
-    git clone https://github.com/ponces/treble_build_pe -b eleven
+    git clone https://github.com/ponces/treble_patches -b eleven-plus
+    git clone https://github.com/ponces/treble_build_pe -b eleven-plus
 
 Finally, start the build script:
 
