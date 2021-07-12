@@ -278,10 +278,10 @@ index cc03b4f816a..1db2e32b8cd 100644
  
 diff --git a/packages/SystemUI/src/com/android/systemui/biometrics/FODCircleView.java b/packages/SystemUI/src/com/android/systemui/biometrics/FODCircleView.java
 deleted file mode 100644
-index c84f5c7a898..00000000000
+index 17c4bfd5e94..00000000000
 --- a/packages/SystemUI/src/com/android/systemui/biometrics/FODCircleView.java
 +++ /dev/null
-@@ -1,662 +0,0 @@
+@@ -1,657 +0,0 @@
 -/**
 - * Copyright (C) 2019-2020 The LineageOS Project
 - *
@@ -484,11 +484,6 @@ index c84f5c7a898..00000000000
 -            } else {
 -                hide();
 -            }
--        }
--
--        @Override
--        public void onStartedGoingToSleep(int why) {
--            hide();
 -        }
 -
 -        @Override
