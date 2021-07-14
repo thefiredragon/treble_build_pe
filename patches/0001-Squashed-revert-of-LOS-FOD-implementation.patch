@@ -18,6 +18,7 @@ Change-Id: I4650cef96617c32e52d5dd088c8afffb06ab5e1d
  packages/SystemUI/res/values/config.xml       |   1 -
  .../SystemUI/res/values/custom_config.xml     |   4 -
  .../keyguard/KeyguardSecurityContainer.java   |  15 +-
+ .../keyguard/KeyguardUpdateMonitor.java       |   8 +-
  .../systemui/biometrics/FODCircleView.java    | 544 ------------------
  .../biometrics/FODCircleViewImpl.java         | 128 -----
  .../biometrics/FODCircleViewImplCallback.java |  25 -
@@ -35,7 +36,9 @@ Change-Id: I4650cef96617c32e52d5dd088c8afffb06ab5e1d
  .../biometrics/BiometricServiceBase.java      |   2 +-
  .../fingerprint/FingerprintService.java       | 112 ----
  .../statusbar/StatusBarManagerService.java    |  22 -
- 28 files changed, 14 insertions(+), 1073 deletions(-)
+ .../statusbar/UnusedStatusBar.java            |   7 +-
+ .../statusbar/UnusedStatusBarModule.java      |   7 +-
+ 31 files changed, 19 insertions(+), 1088 deletions(-)
  delete mode 100644 packages/SystemUI/res-keyguard/values/custom_dimens.xml
  delete mode 100644 packages/SystemUI/res/drawable-nodpi/fod_icon_pressed.png
  delete mode 100644 packages/SystemUI/res/drawable/fod_icon_default.xml
@@ -276,6 +279,46 @@ index cc03b4f816a..1db2e32b8cd 100644
          return insets.inset(0, 0, 0, inset);
      }
  
+diff --git a/packages/SystemUI/src/com/android/keyguard/KeyguardUpdateMonitor.java b/packages/SystemUI/src/com/android/keyguard/KeyguardUpdateMonitor.java
+index 306beeb9d8b..5358f3ae64b 100644
+--- a/packages/SystemUI/src/com/android/keyguard/KeyguardUpdateMonitor.java
++++ b/packages/SystemUI/src/com/android/keyguard/KeyguardUpdateMonitor.java
+@@ -128,8 +128,6 @@ import javax.inject.Singleton;
+ 
+ import com.android.internal.util.custom.faceunlock.FaceUnlockUtils;
+ 
+-import com.android.internal.util.custom.fod.FodUtils;
+-
+ /**
+  * Watches for updates that may be interesting to the keyguard, and provides
+  * the up to date information as well as a registration for callbacks that care
+@@ -323,7 +323,6 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener, Dumpab
+     };
+ 
+     private final Handler mHandler;
+-    private final boolean mHasFod;
+ 
+     private final Observer<Integer> mRingerModeObserver = new Observer<Integer>() {
+         @Override
+@@ -1722,8 +1720,6 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener, Dumpab
+             }
+         };
+ 
+-        mHasFod = FodUtils.hasFodSupport(mContext);
+-
+         // Since device can't be un-provisioned, we only need to register a content observer
+         // to update mDeviceProvisioned when we are...
+         if (!mDeviceProvisioned) {
+@@ -1889,8 +1885,7 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener, Dumpab
+             return;
+         }
+         mHandler.removeCallbacks(mRetryFingerprintAuthentication);
+-        boolean hideFodForStrongAuth = mHasFod && userNeedsStrongAuth();
+-        boolean shouldListenForFingerprint = !hideFodForStrongAuth && shouldListenForFingerprint();
++        boolean shouldListenForFingerprint = shouldListenForFingerprint();
+         boolean runningOrRestarting = mFingerprintRunningState == BIOMETRIC_STATE_RUNNING
+                 || mFingerprintRunningState == BIOMETRIC_STATE_CANCELLING_RESTARTING;
+         if (runningOrRestarting && !shouldListenForFingerprint) {
 diff --git a/packages/SystemUI/src/com/android/systemui/biometrics/FODCircleView.java b/packages/SystemUI/src/com/android/systemui/biometrics/FODCircleView.java
 deleted file mode 100644
 index 17c4bfd5e94..00000000000
@@ -1911,6 +1954,69 @@ index b5c748c9ea0..4adfe5854b2 100644
      // TODO(b/117478341): make it aware of multi-display if needed.
      @Override
      public void disable(int what, IBinder token, String pkg) {
+diff --git a/packages/CarSystemUI/src/com/android/systemui/car/statusbar/UnusedStatusBar.java b/packages/CarSystemUI/src/com/android/systemui/car/statusbar/UnusedStatusBar.java
+index 6095928c4cf..b7b9431d69d 100644
+--- a/packages/CarSystemUI/src/com/android/systemui/car/statusbar/UnusedStatusBar.java
++++ b/packages/CarSystemUI/src/com/android/systemui/car/statusbar/UnusedStatusBar.java
+@@ -26,7 +26,6 @@ import com.android.keyguard.KeyguardUpdateMonitor;
+ import com.android.keyguard.ViewMediatorCallback;
+ import com.android.systemui.InitController;
+ import com.android.systemui.assist.AssistManager;
+-import com.android.systemui.biometrics.FODCircleViewImpl;
+ import com.android.systemui.broadcast.BroadcastDispatcher;
+ import com.android.systemui.bubbles.BubbleController;
+ import com.android.systemui.colorextraction.SysuiColorExtractor;
+@@ -185,8 +184,7 @@ public class UnusedStatusBar extends StatusBar {
+             DismissCallbackRegistry dismissCallbackRegistry,
+             Lazy<NotificationShadeDepthController> notificationShadeDepthControllerLazy,
+             StatusBarTouchableRegionManager statusBarTouchableRegionManager,
+-            TunerService tunerService,
+-            FODCircleViewImpl fodCircleViewImpl) {
++            TunerService tunerService) {
+         super(context, notificationsController, lightBarController, autoHideController,
+                 keyguardUpdateMonitor, statusBarIconController, pulseExpansionHandler,
+                 notificationWakeUpCoordinator, keyguardBypassController, keyguardStateController,
+@@ -213,8 +211,7 @@ public class UnusedStatusBar extends StatusBar {
+                 userInfoControllerImpl, phoneStatusBarPolicy, keyguardIndicationController,
+                 dismissCallbackRegistry, notificationShadeDepthControllerLazy,
+                 statusBarTouchableRegionManager,
+-                tunerService,
+-                fodCircleViewImpl);
++                tunerService);
+     }
+ 
+     @Override
+diff --git a/packages/CarSystemUI/src/com/android/systemui/car/statusbar/UnusedStatusBarModule.java b/packages/CarSystemUI/src/com/android/systemui/car/statusbar/UnusedStatusBarModule.java
+index 28bcaf6c144..f2cef14b558 100644
+--- a/packages/CarSystemUI/src/com/android/systemui/car/statusbar/UnusedStatusBarModule.java
++++ b/packages/CarSystemUI/src/com/android/systemui/car/statusbar/UnusedStatusBarModule.java
+@@ -30,7 +30,6 @@ import com.android.keyguard.KeyguardUpdateMonitor;
+ import com.android.keyguard.ViewMediatorCallback;
+ import com.android.systemui.InitController;
+ import com.android.systemui.assist.AssistManager;
+-import com.android.systemui.biometrics.FODCircleViewImpl;
+ import com.android.systemui.broadcast.BroadcastDispatcher;
+ import com.android.systemui.bubbles.BubbleController;
+ import com.android.systemui.colorextraction.SysuiColorExtractor;
+@@ -205,8 +204,7 @@ public interface UnusedStatusBarModule {
+             Lazy<NotificationShadeDepthController> notificationShadeDepthController,
+             DismissCallbackRegistry dismissCallbackRegistry,
+             StatusBarTouchableRegionManager statusBarTouchableRegionManager,
+-            TunerService tunerService,
+-            FODCircleViewImpl fodCircleViewImpl) {
++            TunerService tunerService) {
+         return new UnusedStatusBar(
+                 context,
+                 notificationsController,
+@@ -285,7 +283,6 @@ public interface UnusedStatusBarModule {
+                 dismissCallbackRegistry,
+                 notificationShadeDepthController,
+                 statusBarTouchableRegionManager,
+-                tunerService,
+-                fodCircleViewImpl);
++                tunerService);
+     }
+ }
 -- 
 2.25.1
 
