@@ -321,10 +321,10 @@ index 306beeb9d8b..5358f3ae64b 100644
          if (runningOrRestarting && !shouldListenForFingerprint) {
 diff --git a/packages/SystemUI/src/com/android/systemui/biometrics/FODCircleView.java b/packages/SystemUI/src/com/android/systemui/biometrics/FODCircleView.java
 deleted file mode 100644
-index 17c4bfd5e94..00000000000
+index 6a3d90b4afc..00000000000
 --- a/packages/SystemUI/src/com/android/systemui/biometrics/FODCircleView.java
 +++ /dev/null
-@@ -1,657 +0,0 @@
+@@ -1,668 +0,0 @@
 -/**
 - * Copyright (C) 2019-2020 The LineageOS Project
 - *
@@ -363,6 +363,7 @@ index 17c4bfd5e94..00000000000
 -import android.os.UserHandle;
 -import android.provider.Settings;
 -import android.net.Uri;
+-import android.util.DisplayMetrics;
 -import android.view.Display;
 -import android.view.Gravity;
 -import android.view.MotionEvent;
@@ -846,6 +847,16 @@ index 17c4bfd5e94..00000000000
 -        dispatchHide();
 -    }
 -
+-    public int getHeight(boolean includeDecor) {
+-        DisplayMetrics dm = new DisplayMetrics();
+-        if (includeDecor) {
+-            mWindowManager.getDefaultDisplay().getMetrics(dm);
+-        } else {
+-            mWindowManager.getDefaultDisplay().getRealMetrics(dm);
+-        }
+-        return dm.heightPixels - mPositionY + mSize / 2;
+-    }
+-
 -    private void updateAlpha() {
 -        setAlpha(mIsDreaming ? 0.5f : 1.0f);
 -    }
@@ -984,10 +995,10 @@ index 17c4bfd5e94..00000000000
 -}
 diff --git a/packages/SystemUI/src/com/android/systemui/biometrics/FODCircleViewImpl.java b/packages/SystemUI/src/com/android/systemui/biometrics/FODCircleViewImpl.java
 deleted file mode 100644
-index 12e4cbaf8d5..00000000000
+index b30572e1121..00000000000
 --- a/packages/SystemUI/src/com/android/systemui/biometrics/FODCircleViewImpl.java
 +++ /dev/null
-@@ -1,128 +0,0 @@
+@@ -1,132 +0,0 @@
 -/**
 - * Copyright (C) 2019 The Android Open Source Project
 - *
@@ -1088,6 +1099,10 @@ index 12e4cbaf8d5..00000000000
 -            mIsFODVisible = false;
 -            mFodCircleView.hide();
 -        }
+-    }
+-
+-    public int getHeight(boolean includeDecor) {
+-         return mFodCircleView.getHeight(includeDecor);
 -    }
 -
 -    public void registerCallback(FODCircleViewImplCallback callback) {
@@ -1344,7 +1359,7 @@ index 1e1655256b1..382715a3fb7 100644
                  mCallback.onExpandAnimationFinished(mIsFullScreenLaunch);
                  applyParamsToNotification(null);
 diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/phone/StatusBar.java b/packages/SystemUI/src/com/android/systemui/statusbar/phone/StatusBar.java
-index b6ecc6518d7..ccd14bb6685 100644
+index b184ad059e6..2d301bfd0ff 100644
 --- a/packages/SystemUI/src/com/android/systemui/statusbar/phone/StatusBar.java
 +++ b/packages/SystemUI/src/com/android/systemui/statusbar/phone/StatusBar.java
 @@ -79,7 +79,6 @@ import android.content.pm.PackageManager.NameNotFoundException;
@@ -1440,16 +1455,17 @@ index b6ecc6518d7..ccd14bb6685 100644
  
          mBubbleExpandListener =
                  (isExpanding, key) -> {
-@@ -872,8 +837,6 @@ public class StatusBar extends SystemUI implements DemoMode,
+@@ -871,9 +836,6 @@ public class StatusBar extends SystemUI implements DemoMode,
+ 
  
          DateTimeView.setReceiverHandler(timeTickHandler);
- 
+-
 -        mFingerprintService = IFingerprintService.Stub.asInterface(
 -                ServiceManager.getService(Context.FINGERPRINT_SERVICE));
      }
  
      @Override
-@@ -1061,8 +1024,6 @@ public class StatusBar extends SystemUI implements DemoMode,
+@@ -1061,8 +1023,6 @@ public class StatusBar extends SystemUI implements DemoMode,
                          }
                      }
                  }, OverlayPlugin.class, true /* Allow multiple plugins */);
@@ -1458,7 +1474,7 @@ index b6ecc6518d7..ccd14bb6685 100644
      }
  
      private void initCoreOverlays(){
-@@ -1382,8 +1343,7 @@ public class StatusBar extends SystemUI implements DemoMode,
+@@ -1382,8 +1342,7 @@ public class StatusBar extends SystemUI implements DemoMode,
          mActivityLaunchAnimator = new ActivityLaunchAnimator(
                  mNotificationShadeWindowViewController, this, mNotificationPanelViewController,
                  mNotificationShadeDepthControllerLazy.get(),
@@ -1468,7 +1484,7 @@ index b6ecc6518d7..ccd14bb6685 100644
  
          // TODO: inject this.
          mPresenter = new StatusBarNotificationPresenter(mContext, mNotificationPanelViewController,
-@@ -1894,12 +1854,6 @@ public class StatusBar extends SystemUI implements DemoMode,
+@@ -1894,12 +1853,6 @@ public class StatusBar extends SystemUI implements DemoMode,
              clearNotificationEffects();
          }
  
@@ -1481,7 +1497,7 @@ index b6ecc6518d7..ccd14bb6685 100644
          if (!isExpanded) {
              mRemoteInputManager.onPanelCollapsed();
          }
-@@ -2516,11 +2470,6 @@ public class StatusBar extends SystemUI implements DemoMode,
+@@ -2516,11 +2469,6 @@ public class StatusBar extends SystemUI implements DemoMode,
      @Override
      public void onRecentsAnimationStateChanged(boolean running) {
          setInteracting(StatusBarManager.WINDOW_NAVIGATION_BAR, running);
@@ -1493,7 +1509,7 @@ index b6ecc6518d7..ccd14bb6685 100644
      }
  
      protected BarTransitions getStatusBarTransitions() {
-@@ -4564,18 +4513,4 @@ public class StatusBar extends SystemUI implements DemoMode,
+@@ -4564,22 +4512,4 @@ public class StatusBar extends SystemUI implements DemoMode,
      public void suppressAmbientDisplay(boolean suppressed) {
          mDozeServiceHost.setDozeSuppressed(suppressed);
      }
@@ -1510,6 +1526,10 @@ index b6ecc6518d7..ccd14bb6685 100644
 -                  currentActivity.getShortClassName().trim();
 -        }
 -        return null;
+-    }
+-
+-    public int getFodHeight(boolean includeDecor) {
+-        return mFODCircleViewImpl.getHeight(includeDecor);
 -    }
  }
 diff --git a/packages/SystemUI/src/com/google/android/systemui/statusbar/phone/StatusBarGoogle.java b/packages/SystemUI/src/com/google/android/systemui/statusbar/phone/StatusBarGoogle.java
