@@ -7,38 +7,40 @@ Better than having an ever-growing string of revert commands?
 
 Change-Id: I4650cef96617c32e52d5dd088c8afffb06ab5e1d
 ---
- .../internal/statusbar/IStatusBar.aidl        |   6 -
- .../internal/statusbar/IStatusBarService.aidl |   6 -
- data/etc/com.android.systemui.xml             |   1 -
- packages/SystemUI/Android.bp                  |   2 -
- packages/SystemUI/AndroidManifest.xml         |   1 -
- .../res-keyguard/values/custom_dimens.xml     |  20 -
- .../res/drawable-nodpi/fod_icon_pressed.png   | Bin 108 -> 0 bytes
- .../res/drawable/fod_icon_default.xml         |  25 -
- packages/SystemUI/res/values/config.xml       |   1 -
- .../SystemUI/res/values/custom_config.xml     |   4 -
- .../keyguard/KeyguardSecurityContainer.java   |  15 +-
- .../keyguard/KeyguardUpdateMonitor.java       |   8 +-
- .../systemui/biometrics/FODCircleView.java    | 544 ------------------
- .../biometrics/FODCircleViewImpl.java         | 128 -----
- .../biometrics/FODCircleViewImplCallback.java |  25 -
- .../systemui/dagger/SystemUIBinder.java       |   7 -
- .../keyguard/KeyguardViewMediator.java        |  10 +-
- .../systemui/statusbar/CommandQueue.java      |  28 -
- .../notification/ActivityLaunchAnimator.java  |  21 +-
- .../systemui/statusbar/phone/StatusBar.java   |  70 +--
- .../phone/StatusBarGoogle.java                |   7 +-
- .../phone/StatusBarKeyguardViewManager.java   |  11 +-
- .../phone/dagger/StatusBarGoogleModule.java   |   7 +-
- .../ActivityLaunchAnimatorTest.java           |   6 +-
- .../statusbar/phone/StatusBarTest.java        |   5 +-
- services/core/Android.bp                      |   1 -
- .../biometrics/BiometricServiceBase.java      |   2 +-
- .../fingerprint/FingerprintService.java       | 112 ----
- .../statusbar/StatusBarManagerService.java    |  22 -
- .../statusbar/UnusedStatusBar.java            |   7 +-
- .../statusbar/UnusedStatusBarModule.java      |   7 +-
- 31 files changed, 19 insertions(+), 1088 deletions(-)
+ .../internal/statusbar/IStatusBar.aidl           |   6 -
+ .../internal/statusbar/IStatusBarService.aidl    |   6 -
+ data/etc/com.android.systemui.xml                |   1 -
+ packages/SystemUI/Android.bp                     |   2 -
+ packages/SystemUI/AndroidManifest.xml            |   1 -
+ .../res-keyguard/values/custom_dimens.xml        |  20 -
+ .../res/drawable-nodpi/fod_icon_pressed.png      | Bin 108 -> 0 bytes
+ .../res/drawable/fod_icon_default.xml            |  25 -
+ packages/SystemUI/res/values/config.xml          |   1 -
+ .../SystemUI/res/values/custom_config.xml        |   4 -
+ .../keyguard/KeyguardSecurityContainer.java      |  15 +-
+ .../keyguard/KeyguardUpdateMonitor.java          |   8 +-
+ .../systemui/biometrics/FODCircleView.java       | 544 ------------------
+ .../biometrics/FODCircleViewImpl.java            | 128 -----
+ .../biometrics/FODCircleViewImplCallback.java    |  25 -
+ .../systemui/dagger/SystemUIBinder.java          |   7 -
+ .../keyguard/KeyguardViewMediator.java           |  10 +-
+ .../systemui/statusbar/CommandQueue.java         |  28 -
+ .../notification/ActivityLaunchAnimator.java     |  21 +-
+ .../systemui/statusbar/phone/StatusBar.java      |  70 +--
+ .../phone/StatusBarGoogle.java                   |   7 +-
+ .../phone/StatusBarKeyguardViewManager.java      |  11 +-
+ .../phone/dagger/StatusBarGoogleModule.java      |   7 +-
+ .../ActivityLaunchAnimatorTest.java              |   6 +-
+ .../statusbar/phone/StatusBarTest.java           |   5 +-
+ services/core/Android.bp                         |   1 -
+ .../biometrics/BiometricServiceBase.java         |   2 +-
+ .../fingerprint/FingerprintService.java          | 112 ----
+ .../statusbar/StatusBarManagerService.java       |  22 -
+ .../statusbar/UnusedStatusBar.java               |   7 +-
+ .../statusbar/UnusedStatusBarModule.java         |   7 +-
+ .../biometrics/AuthBiometricFingerprintView.java |  13 -
+ .../biometrics/AuthBiometricView.java            |  30 +-
+ 33 files changed, 22 insertions(+), 1128 deletions(-)
  delete mode 100644 packages/SystemUI/res-keyguard/values/custom_dimens.xml
  delete mode 100644 packages/SystemUI/res/drawable-nodpi/fod_icon_pressed.png
  delete mode 100644 packages/SystemUI/res/drawable/fod_icon_default.xml
@@ -2037,6 +2039,113 @@ index 28bcaf6c144..f2cef14b558 100644
 +                tunerService);
      }
  }
+diff --git a/packages/SystemUI/src/com/android/systemui/biometrics/AuthBiometricFingerprintView.java b/packages/SystemUI/src/com/android/systemui/biometrics/AuthBiometricFingerprintView.java
+index c2671733ba0..45ee4ad9ae5 100644
+--- a/packages/SystemUI/src/com/android/systemui/biometrics/AuthBiometricFingerprintView.java
++++ b/packages/SystemUI/src/com/android/systemui/biometrics/AuthBiometricFingerprintView.java
+@@ -22,7 +22,6 @@ import android.graphics.drawable.AnimatedVectorDrawable;
+ import android.graphics.drawable.Drawable;
+ import android.util.AttributeSet;
+ import android.util.Log;
+-import android.view.View;
+ 
+ import com.android.systemui.R;
+ 
+@@ -77,18 +76,6 @@ public class AuthBiometricFingerprintView extends AuthBiometricView {
+         showTouchSensorString();
+     }
+ 
+-    @Override
+-    void onFinishInflateInternal() {
+-        super.onFinishInflateInternal();
+-        if (mHasFod) {
+-            mIconView.setVisibility(View.INVISIBLE);
+-            mIconView.setPadding(0, 0, 0, 0);
+-            // Add IndicatorView above the biometric icon
+-            removeView(mIndicatorView);
+-            addView(mIndicatorView, indexOfChild(mIconView));
+-        }
+-    }
+-
+     private void showTouchSensorString() {
+         mIndicatorView.setText(R.string.fingerprint_dialog_touch_sensor);
+         mIndicatorView.setTextColor(mTextColorHint);
+diff --git a/packages/SystemUI/src/com/android/systemui/biometrics/AuthBiometricView.java b/packages/SystemUI/src/com/android/systemui/biometrics/AuthBiometricView.java
+index 17ea9a12694..113bf394aa4 100644
+--- a/packages/SystemUI/src/com/android/systemui/biometrics/AuthBiometricView.java
++++ b/packages/SystemUI/src/com/android/systemui/biometrics/AuthBiometricView.java
+@@ -24,7 +24,6 @@ import android.annotation.IntDef;
+ import android.annotation.NonNull;
+ import android.annotation.Nullable;
+ import android.content.Context;
+-import android.content.pm.PackageManager;
+ import android.hardware.biometrics.BiometricPrompt;
+ import android.os.Bundle;
+ import android.os.Handler;
+@@ -41,8 +40,6 @@ import android.widget.LinearLayout;
+ import android.widget.TextView;
+ 
+ import com.android.internal.annotations.VisibleForTesting;
+-import com.android.systemui.statusbar.phone.StatusBar;
+-import com.android.systemui.Dependency;
+ import com.android.systemui.R;
+ 
+ import java.lang.annotation.Retention;
+@@ -50,8 +47,6 @@ import java.lang.annotation.RetentionPolicy;
+ import java.util.ArrayList;
+ import java.util.List;
+ 
+-import com.android.internal.util.custom.fod.FodUtils;
+-
+ /**
+  * Contains the Biometric views (title, subtitle, icon, buttons, etc) and its controllers.
+  */
+@@ -197,8 +192,6 @@ public abstract class AuthBiometricView extends LinearLayout {
+     protected boolean mDialogSizeAnimating;
+     protected Bundle mSavedState;
+ 
+-    protected boolean mHasFod;
+-
+     /**
+      * Delay after authentication is confirmed, before the dialog should be animated away.
+      */
+@@ -261,10 +254,6 @@ public abstract class AuthBiometricView extends LinearLayout {
+ 
+         mAccessibilityManager = context.getSystemService(AccessibilityManager.class);
+ 
+-        PackageManager packageManager = context.getPackageManager();
+-        mHasFod = packageManager.hasSystemFeature(PackageManager.FEATURE_FINGERPRINT) &&
+-                FodUtils.hasFodSupport(context);
+-
+         mResetErrorRunnable = () -> {
+             updateState(getStateForAfterError());
+             handleResetAfterError();
+@@ -734,22 +723,9 @@ public abstract class AuthBiometricView extends LinearLayout {
+             final View child = getChildAt(i);
+ 
+             if (child.getId() == R.id.biometric_icon) {
+-                if (this instanceof AuthBiometricFingerprintView && mHasFod) {
+-                    final int buttonBarHeight =
+-                            findViewById(R.id.button_bar).getLayoutParams().height;
+-                    // The view is invisible, so it still takes space and
+-                    // we use that to adjust for the FOD icon
+-                    final int fodHeight = Dependency.get(StatusBar.class).getFodHeight(true) -
+-                            buttonBarHeight - findViewById(R.id.button_bar).getPaddingTop();
+-
+-                    child.measure(
+-                            MeasureSpec.makeMeasureSpec(newWidth, MeasureSpec.AT_MOST),
+-                            MeasureSpec.makeMeasureSpec(fodHeight, MeasureSpec.EXACTLY));
+-                } else {
+-                    child.measure(
+-                            MeasureSpec.makeMeasureSpec(newWidth, MeasureSpec.AT_MOST),
+-                            MeasureSpec.makeMeasureSpec(height, MeasureSpec.AT_MOST));
+-                }
++                child.measure(
++                        MeasureSpec.makeMeasureSpec(newWidth, MeasureSpec.AT_MOST),
++                        MeasureSpec.makeMeasureSpec(height, MeasureSpec.AT_MOST));
+             } else if (child.getId() == R.id.button_bar) {
+                 child.measure(
+                         MeasureSpec.makeMeasureSpec(newWidth, MeasureSpec.EXACTLY),
 -- 
 2.25.1
 
