@@ -5,7 +5,7 @@ Subject: [PATCH] rw-system: set fingerprint props.
 
 Change-Id: I55c8897d7d4d5c2a9e62b1a931b3856b2e38956e
 ---
- main_version.mk | 64 +-
+ rw-system.sh | 64 +-
  1 file changed, 12 insertions(+), 52 deletions(-)
 
 diff --git a/rw-system.sh b/rw-system.sh
