@@ -10,7 +10,7 @@ Change-Id: I2f52595409f0d43b148063d5fd90c80d1182ff8c
  1 file changed, 7 insertions(+), 1 deletion(-)
 
 diff --git a/telephony/java/android/telephony/TelephonyManager.java b/telephony/java/android/telephony/TelephonyManager.java
-index 35e263036694..b41a046fb95e 100644
+index 10c3e6db5205..09acdea73c1f 100644
 --- a/telephony/java/android/telephony/TelephonyManager.java
 +++ b/telephony/java/android/telephony/TelephonyManager.java
 @@ -10114,7 +10114,13 @@ public class TelephonyManager {

@@ -9,7 +9,7 @@ Subject: [PATCH 03/40] We might not have a mFlashlight at this state, but
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/services/camera/libcameraservice/CameraService.cpp b/services/camera/libcameraservice/CameraService.cpp
-index 83c4f32d5b..7c67d6500c 100644
+index 7bbc5bc54d..941297de5d 100644
 --- a/services/camera/libcameraservice/CameraService.cpp
 +++ b/services/camera/libcameraservice/CameraService.cpp
 @@ -337,7 +337,7 @@ void CameraService::addStates(const String8 id) {

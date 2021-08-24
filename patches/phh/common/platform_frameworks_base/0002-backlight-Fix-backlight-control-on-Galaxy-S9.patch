@@ -50,10 +50,10 @@ Change-Id: I35c35fabff8b275f35671dcb8578b96dcad526f1
 Change-Id: I4e85178327d2bb63d5d0a37786058843662a89ba
 ---
  .../android/server/lights/LightsService.java  | 49 ++++++++++++++++++-
- 1 file changed, 49 insertions(+), 1 deletion(-)
+ 1 file changed, 48 insertions(+), 1 deletion(-)
 
 diff --git a/services/core/java/com/android/server/lights/LightsService.java b/services/core/java/com/android/server/lights/LightsService.java
-index 16e42d21224..92a3de36b26 100644
+index c4f8441a995b..9f1642049d7c 100644
 --- a/services/core/java/com/android/server/lights/LightsService.java
 +++ b/services/core/java/com/android/server/lights/LightsService.java
 @@ -32,6 +32,7 @@ import android.os.Looper;
@@ -64,7 +64,13 @@ index 16e42d21224..92a3de36b26 100644
  import android.os.Trace;
  import android.provider.Settings;
  import android.util.Slog;
-@@ -306,7 +306,7 @@ public class LightsService extends SystemService {
+@@ -301,12 +302,13 @@ public class LightsService extends SystemService {
+                             + ": brightness=" + brightness);
+                     return;
+                 }
++
+                 // Ideally, we'd like to set the brightness mode through the SF/HWC as well, but
+                 // right now we just fall back to the old path through Lights brightessMode is
                  // anything but USER or the device shouldBeInLowPersistenceMode().
                  if (brightnessMode == BRIGHTNESS_MODE_USER && !shouldBeInLowPersistenceMode()
                          && mHwLight.type == LightsManager.LIGHT_ID_BACKLIGHT
@@ -73,7 +79,7 @@ index 16e42d21224..92a3de36b26 100644
                      // New system
                      // TODO: the last check should be mSurfaceControlMaximumBrightness != 0; the
                      // reason we enforce 255 right now is to stay consistent with the old path. In
-@@ -321,6 +321,51 @@ public class LightsService extends SystemService {
+@@ -321,6 +323,51 @@ public class LightsService extends SystemService {
                      // Old system
                      int brightnessInt = BrightnessSynchronizer.brightnessFloatToInt(
                              getContext(), brightness);

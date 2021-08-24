@@ -18,7 +18,7 @@ Change-Id: I01ae01af099a4ec8fe3d4525edecc233a477ff60
  1 file changed, 64 insertions(+)
 
 diff --git a/init/property_service.cpp b/init/property_service.cpp
-index 89944ca80..03d18c85f 100644
+index a89504e59..ce83605da 100644
 --- a/init/property_service.cpp
 +++ b/init/property_service.cpp
 @@ -976,6 +976,69 @@ static void property_derive_build_fingerprint() {

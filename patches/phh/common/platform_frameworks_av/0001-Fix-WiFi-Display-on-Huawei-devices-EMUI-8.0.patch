@@ -11,7 +11,7 @@ Thanks to Chris Vandomelen for pointing that out.
  1 file changed, 2 insertions(+), 3 deletions(-)
 
 diff --git a/media/libstagefright/ACodec.cpp b/media/libstagefright/ACodec.cpp
-index 3163316403..c925c064ef 100644
+index 8e480bff14..25b641d6e3 100644
 --- a/media/libstagefright/ACodec.cpp
 +++ b/media/libstagefright/ACodec.cpp
 @@ -4432,9 +4432,8 @@ status_t ACodec::setupAVCEncoderParameters(const sp<AMessage> &msg) {

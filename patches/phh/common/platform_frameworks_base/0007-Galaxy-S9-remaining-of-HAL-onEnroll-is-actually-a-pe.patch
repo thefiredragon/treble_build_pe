@@ -10,7 +10,7 @@ Change-Id: I8a586163eca93ae3c5bd968d1e7ddbf994ddcc91
  1 file changed, 7 insertions(+), 1 deletion(-)
 
 diff --git a/services/core/java/com/android/server/biometrics/fingerprint/FingerprintService.java b/services/core/java/com/android/server/biometrics/fingerprint/FingerprintService.java
-index 114b18debc3..8ca772ed49f 100644
+index a90fee6788a8..7ab2a44bcc09 100644
 --- a/services/core/java/com/android/server/biometrics/fingerprint/FingerprintService.java
 +++ b/services/core/java/com/android/server/biometrics/fingerprint/FingerprintService.java
 @@ -661,7 +661,13 @@ public class FingerprintService extends BiometricServiceBase {

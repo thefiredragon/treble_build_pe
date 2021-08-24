@@ -13,7 +13,7 @@ Change-Id: Id474540c33c594cc4010a1a398d82bff8aadaeea
  4 files changed, 199 insertions(+), 7 deletions(-)
 
 diff --git a/media/libstagefright/ACodec.cpp b/media/libstagefright/ACodec.cpp
-index c925c064ef..b9d0f5bb72 100644
+index 25b641d6e3..344eb8fd4c 100644
 --- a/media/libstagefright/ACodec.cpp
 +++ b/media/libstagefright/ACodec.cpp
 @@ -1166,6 +1166,9 @@ status_t ACodec::configureOutputBuffersFromNativeWindow(

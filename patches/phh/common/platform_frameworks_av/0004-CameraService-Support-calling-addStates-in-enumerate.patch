@@ -22,7 +22,7 @@ Change-Id: Ife25b9753fdb679ab0c77f385e1b8527551a4711
  1 file changed, 16 insertions(+)
 
 diff --git a/services/camera/libcameraservice/CameraService.cpp b/services/camera/libcameraservice/CameraService.cpp
-index 7c67d6500c..237473a312 100644
+index 941297de5d..883bf24725 100644
 --- a/services/camera/libcameraservice/CameraService.cpp
 +++ b/services/camera/libcameraservice/CameraService.cpp
 @@ -221,6 +221,20 @@ status_t CameraService::enumerateProviders() {

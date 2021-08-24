@@ -10,7 +10,7 @@ Change-Id: I0984518531011276acf21c4f226dea35a7f9373f
  1 file changed, 3 insertions(+)
 
 diff --git a/lmkd.cpp b/lmkd.cpp
-index b065bbf..21905b4 100644
+index 3515fdb..25f5990 100644
 --- a/lmkd.cpp
 +++ b/lmkd.cpp
 @@ -3021,6 +3021,9 @@ static int init(void) {

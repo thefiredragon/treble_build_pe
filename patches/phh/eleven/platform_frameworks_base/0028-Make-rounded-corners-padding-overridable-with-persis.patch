@@ -11,7 +11,7 @@ Subject: [PATCH 28/50] Make rounded corners padding overridable with
  3 files changed, 15 insertions(+), 6 deletions(-)
 
 diff --git a/packages/SystemUI/src/com/android/systemui/qs/QuickStatusBarHeader.java b/packages/SystemUI/src/com/android/systemui/qs/QuickStatusBarHeader.java
-index 58c723c58da..364135a5962 100644
+index 58c723c58daa..364135a5962d 100644
 --- a/packages/SystemUI/src/com/android/systemui/qs/QuickStatusBarHeader.java
 +++ b/packages/SystemUI/src/com/android/systemui/qs/QuickStatusBarHeader.java
 @@ -32,6 +32,7 @@ import android.graphics.Rect;
@@ -36,7 +36,7 @@ index 58c723c58da..364135a5962 100644
  
          // Update height for a few views, especially due to landscape mode restricting space.
 diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/phone/KeyguardStatusBarView.java b/packages/SystemUI/src/com/android/systemui/statusbar/phone/KeyguardStatusBarView.java
-index f69435777bc..82e6910149a 100644
+index 8636cb29811c..146653aadf19 100644
 --- a/packages/SystemUI/src/com/android/systemui/statusbar/phone/KeyguardStatusBarView.java
 +++ b/packages/SystemUI/src/com/android/systemui/statusbar/phone/KeyguardStatusBarView.java
 @@ -25,6 +25,7 @@ import android.content.res.Resources;
@@ -61,7 +61,7 @@ index f69435777bc..82e6910149a 100644
      }
  
 diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/phone/PhoneStatusBarView.java b/packages/SystemUI/src/com/android/systemui/statusbar/phone/PhoneStatusBarView.java
-index 2e120e8aabb..ef52cce94be 100644
+index 7c41bcd09b57..91f7bd0c7a5d 100644
 --- a/packages/SystemUI/src/com/android/systemui/statusbar/phone/PhoneStatusBarView.java
 +++ b/packages/SystemUI/src/com/android/systemui/statusbar/phone/PhoneStatusBarView.java
 @@ -25,6 +25,7 @@ import android.content.Context;

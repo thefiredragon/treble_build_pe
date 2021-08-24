@@ -19,7 +19,7 @@ Change-Id: I464255b5a3af8d75d72b1772ab55aa655f395a60
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/services/camera/libcameraservice/CameraService.cpp b/services/camera/libcameraservice/CameraService.cpp
-index 24288d6baf..83c4f32d5b 100644
+index e2fcb5a97c..7bbc5bc54d 100644
 --- a/services/camera/libcameraservice/CameraService.cpp
 +++ b/services/camera/libcameraservice/CameraService.cpp
 @@ -301,7 +301,7 @@ status_t CameraService::getSystemCameraKind(const String8& cameraId, SystemCamer

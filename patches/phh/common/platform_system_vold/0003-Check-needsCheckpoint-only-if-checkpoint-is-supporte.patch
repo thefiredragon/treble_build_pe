@@ -13,7 +13,7 @@ Change-Id: I2dafcbca7e994d7a3ac36ef3698590db2ab482fa
  1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/cryptfs.cpp b/cryptfs.cpp
-index 33f0913..7db1ef6 100644
+index 8b7ac0a..9fc1364 100644
 --- a/cryptfs.cpp
 +++ b/cryptfs.cpp
 @@ -1963,7 +1963,9 @@ static int cryptfs_restart_internal(int restart_main) {

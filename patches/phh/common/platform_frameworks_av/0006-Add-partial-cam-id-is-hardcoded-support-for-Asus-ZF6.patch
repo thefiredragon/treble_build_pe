@@ -11,15 +11,15 @@ Change-Id: Iea6e1370780a1d16f728748d1d948d092532d8fe
  2 files changed, 29 insertions(+)
 
 diff --git a/services/camera/libcameraservice/CameraService.cpp b/services/camera/libcameraservice/CameraService.cpp
-index 6a5926576a..ab6a8b5686 100644
+index 883bf24725..e56309b466 100644
 --- a/services/camera/libcameraservice/CameraService.cpp
 +++ b/services/camera/libcameraservice/CameraService.cpp
 @@ -28,6 +28,7 @@
  #include <iostream>
  #include <fstream>
  #endif
-+#include <sys/wait.h>
  #include <sys/types.h>
++#include <sys/wait.h>
  #include <inttypes.h>
  #include <pthread.h>
 @@ -143,6 +144,7 @@ Mutex CameraService::sProxyMutex;
@@ -76,7 +76,7 @@ index 6a5926576a..ab6a8b5686 100644
      sCameraService->logDisconnected(mCameraIdStr, mClientPid, String8(mClientPackageName));
      sCameraService->mCameraProviderManager->removeRef(CameraProviderManager::DeviceMode::CAMERA,
 diff --git a/services/camera/libcameraservice/CameraService.h b/services/camera/libcameraservice/CameraService.h
-index a192202199..456c0feea2 100644
+index 5c4c96bae7..530fef31e0 100644
 --- a/services/camera/libcameraservice/CameraService.h
 +++ b/services/camera/libcameraservice/CameraService.h
 @@ -203,6 +203,9 @@ public:

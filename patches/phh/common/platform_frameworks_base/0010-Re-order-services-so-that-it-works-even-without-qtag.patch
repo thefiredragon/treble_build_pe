@@ -9,7 +9,7 @@ Change-Id: I0c0f527b3ae151d45c68f7ac6c205da3f34e74df
  1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/services/core/java/com/android/server/net/NetworkPolicyManagerService.java b/services/core/java/com/android/server/net/NetworkPolicyManagerService.java
-index ffa518e266d9..f6bcdf778810 100644
+index 42bd8c512806..f7de2b0f78c2 100644
 --- a/services/core/java/com/android/server/net/NetworkPolicyManagerService.java
 +++ b/services/core/java/com/android/server/net/NetworkPolicyManagerService.java
 @@ -739,6 +739,10 @@ public class NetworkPolicyManagerService extends INetworkPolicyManager.Stub {

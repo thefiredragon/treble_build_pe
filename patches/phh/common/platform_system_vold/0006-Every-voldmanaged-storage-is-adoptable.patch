@@ -8,7 +8,7 @@ Subject: [PATCH 6/7] Every voldmanaged storage is adoptable
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/main.cpp b/main.cpp
-index 2ddb958..77c8ab5 100644
+index ebe5510..113d9b9 100644
 --- a/main.cpp
 +++ b/main.cpp
 @@ -255,7 +255,7 @@ static int process_config(VolumeManager* vm, bool* has_adoptable, bool* has_quot

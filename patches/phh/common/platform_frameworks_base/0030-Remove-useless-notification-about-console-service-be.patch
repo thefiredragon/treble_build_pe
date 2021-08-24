@@ -9,7 +9,7 @@ Subject: [PATCH 30/50] Remove useless notification about "console" service
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/services/core/java/com/android/server/am/ActivityManagerService.java b/services/core/java/com/android/server/am/ActivityManagerService.java
-index 3f4878e38029..19c0c0aa26d3 100644
+index 0ae9cc279e68..07fd9ba79846 100644
 --- a/services/core/java/com/android/server/am/ActivityManagerService.java
 +++ b/services/core/java/com/android/server/am/ActivityManagerService.java
 @@ -5563,7 +5563,7 @@ public class ActivityManagerService extends IActivityManager.Stub

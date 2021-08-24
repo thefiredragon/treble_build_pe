@@ -8,7 +8,7 @@ Subject: [PATCH 15/40] Fix for some Huawei camera
  1 file changed, 5 insertions(+), 4 deletions(-)
 
 diff --git a/services/camera/libcameraservice/CameraService.cpp b/services/camera/libcameraservice/CameraService.cpp
-index 5d062a5fb3..97e9825c51 100644
+index e56309b466..e02626fcda 100644
 --- a/services/camera/libcameraservice/CameraService.cpp
 +++ b/services/camera/libcameraservice/CameraService.cpp
 @@ -16,7 +16,7 @@

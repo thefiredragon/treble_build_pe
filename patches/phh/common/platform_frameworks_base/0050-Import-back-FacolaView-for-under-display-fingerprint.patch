@@ -12,7 +12,7 @@ Tested, working-ish on OnePlus Nord2
  create mode 100644 services/core/java/com/android/server/biometrics/fingerprint/FacolaView.java
 
 diff --git a/services/core/Android.bp b/services/core/Android.bp
-index da4718b68e5..9ea5699d9a2 100644
+index 7585d6ba9c60..0d75dbd29b4d 100644
 --- a/services/core/Android.bp
 +++ b/services/core/Android.bp
 @@ -140,6 +140,12 @@ java_library_static {
@@ -738,7 +738,7 @@ index 000000000000..1b052db6fea3
 +
 +}
 diff --git a/services/core/java/com/android/server/biometrics/fingerprint/FingerprintService.java b/services/core/java/com/android/server/biometrics/fingerprint/FingerprintService.java
-index 1281fb15849..ba45a76726e 100644
+index def1a8735903..7143655d5dae 100644
 --- a/services/core/java/com/android/server/biometrics/fingerprint/FingerprintService.java
 +++ b/services/core/java/com/android/server/biometrics/fingerprint/FingerprintService.java
 @@ -126,6 +126,7 @@ public class FingerprintService extends BiometricServiceBase {
@@ -749,10 +749,11 @@ index 1281fb15849..ba45a76726e 100644
      private final class FingerprintAuthClient extends AuthenticationClientImpl {
          private final boolean mDetectOnly;
  
-@@ -187,6 +188,33 @@ public class FingerprintService extends BiometricServiceBase {
+@@ -186,6 +187,34 @@ public class FingerprintService extends BiometricServiceBase {
+
          boolean isDetectOnly() {
              return mDetectOnly;
-         }
++        }
 +
 +        @Override
 +        public boolean onAcquired(int acquiredInfo, int vendorCode) {
@@ -769,6 +770,7 @@ index 1281fb15849..ba45a76726e 100644
 +            return result;
 +        }
 +
++
 +        @Override
 +        public int start() {
 +            mFacola.show();
@@ -779,10 +781,9 @@ index 1281fb15849..ba45a76726e 100644
 +        public int stop(boolean initiatedByClient) {
 +            mFacola.hide();
 +            return super.stop(initiatedByClient);
-+        }
+         }
      }
  
-     /**
 @@ -216,6 +244,7 @@ public class FingerprintService extends BiometricServiceBase {
                  final IFingerprintServiceReceiver receiver, final int flags,
                  final String opPackageName) {

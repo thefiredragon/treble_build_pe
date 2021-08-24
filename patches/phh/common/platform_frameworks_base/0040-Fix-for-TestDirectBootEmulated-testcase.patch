@@ -16,7 +16,7 @@ Change-Id: I5be2ceb61d9ef47219862e75cc8ec03ab5513426
  1 file changed, 6 insertions(+)
 
 diff --git a/services/core/java/com/android/server/StorageManagerService.java b/services/core/java/com/android/server/StorageManagerService.java
-index 87afdac45dae..179899ee6067 100644
+index 2fd22fde1a75..2154825214b3 100644
 --- a/services/core/java/com/android/server/StorageManagerService.java
 +++ b/services/core/java/com/android/server/StorageManagerService.java
 @@ -3295,6 +3295,12 @@ class StorageManagerService extends IStorageManager.Stub
