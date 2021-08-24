@@ -17,7 +17,7 @@ Clone this repo:
 
 Finally, start the build script:
 
-    bash treble_build_pe/buildbot_treble.sh [eleven|eleven-plus]
+    bash treble_build_pe/build.sh [eleven|eleven-plus]
 
 Be sure to update the cloned repos from time to time!
 
