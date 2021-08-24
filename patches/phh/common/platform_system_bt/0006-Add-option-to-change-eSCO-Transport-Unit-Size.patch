@@ -13,11 +13,11 @@ This applies to mSBC T2, T1 and CVSD codecs
  1 file changed, 8 insertions(+), 1 deletion(-)
 
 diff --git a/device/src/esco_parameters.cc b/device/src/esco_parameters.cc
-index 7f550a142..99e1c2a8f 100644
+index cf1fea211..ea28dfa68 100644
 --- a/device/src/esco_parameters.cc
 +++ b/device/src/esco_parameters.cc
-@@ -20,7 +20,9 @@
- 
+@@ -21,7 +21,9 @@
+ #include "bt_target.h"
  #include "device/include/esco_parameters.h"
  
 -static const enh_esco_params_t default_esco_parameters[ESCO_NUM_CODECS] = {
@@ -27,7 +27,7 @@ index 7f550a142..99e1c2a8f 100644
      // CVSD
      {.transmit_bandwidth = TXRX_64KBITS_RATE,
       .receive_bandwidth = TXRX_64KBITS_RATE,
-@@ -143,5 +145,10 @@ enh_esco_params_t esco_parameters_for_codec(esco_codec_t codec) {
+@@ -144,5 +146,10 @@ enh_esco_params_t esco_parameters_for_codec(esco_codec_t codec) {
    CHECK(codec >= 0) << "codec index " << (int)codec << "< 0";
    CHECK(codec < ESCO_NUM_CODECS) << "codec index " << (int)codec << " > "
                                   << ESCO_NUM_CODECS;

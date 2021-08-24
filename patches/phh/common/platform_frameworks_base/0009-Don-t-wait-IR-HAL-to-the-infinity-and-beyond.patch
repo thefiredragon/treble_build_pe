@@ -13,7 +13,7 @@ diff --git a/services/core/java/com/android/server/ConsumerIrService.java b/serv
 index 2ed6c77baa0..82ec033bc30 100644
 --- a/services/core/java/com/android/server/ConsumerIrService.java
 +++ b/services/core/java/com/android/server/ConsumerIrService.java
-@@ -46,13 +46,6 @@ public class ConsumerIrService extends IConsumerIrService.Stub {
+@@ -46,11 +46,6 @@ public class ConsumerIrService extends IConsumerIrService.Stub {
          mWakeLock.setReferenceCounted(true);
  
          mHasNativeHal = halOpen();
@@ -21,8 +21,6 @@ index 2ed6c77baa0..82ec033bc30 100644
 -            if (!mHasNativeHal) {
 -                throw new RuntimeException("FEATURE_CONSUMER_IR present, but no IR HAL loaded!");
 -            }
--        } else if (mHasNativeHal) {
--            throw new RuntimeException("IR HAL present, but FEATURE_CONSUMER_IR is not set!");
 -        }
      }
  

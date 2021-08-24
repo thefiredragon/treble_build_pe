@@ -12,13 +12,13 @@ Tested, working-ish on OnePlus Nord2
  create mode 100644 services/core/java/com/android/server/biometrics/fingerprint/FacolaView.java
 
 diff --git a/services/core/Android.bp b/services/core/Android.bp
-index 7585d6ba9c60..0d75dbd29b4d 100644
+index da4718b68e5..9ea5699d9a2 100644
 --- a/services/core/Android.bp
 +++ b/services/core/Android.bp
-@@ -138,6 +138,12 @@ java_library_static {
-         "netd_aidl_interfaces-platform-java",
+@@ -140,6 +140,12 @@ java_library_static {
          "overlayable_policy_aidl-java",
          "SurfaceFlingerProperties",
+         "faceunlock_framework",
 +        "vendor.goodix.extend.service-V2.0-java",
 +        "vendor.goodix.hardware.biometrics.fingerprint-V2.1-java",
 +        "vendor.samsung.hardware.biometrics.fingerprint-V2.1-java",
@@ -738,7 +738,7 @@ index 000000000000..1b052db6fea3
 +
 +}
 diff --git a/services/core/java/com/android/server/biometrics/fingerprint/FingerprintService.java b/services/core/java/com/android/server/biometrics/fingerprint/FingerprintService.java
-index def1a8735903..7143655d5dae 100644
+index 1281fb15849..ba45a76726e 100644
 --- a/services/core/java/com/android/server/biometrics/fingerprint/FingerprintService.java
 +++ b/services/core/java/com/android/server/biometrics/fingerprint/FingerprintService.java
 @@ -126,6 +126,7 @@ public class FingerprintService extends BiometricServiceBase {
@@ -749,13 +749,12 @@ index def1a8735903..7143655d5dae 100644
      private final class FingerprintAuthClient extends AuthenticationClientImpl {
          private final boolean mDetectOnly;
  
-@@ -186,6 +187,34 @@ public class FingerprintService extends BiometricServiceBase {
- 
+@@ -187,6 +188,33 @@ public class FingerprintService extends BiometricServiceBase {
          boolean isDetectOnly() {
              return mDetectOnly;
-+        }
+         }
 +
-+	        @Override
++        @Override
 +        public boolean onAcquired(int acquiredInfo, int vendorCode) {
 +            boolean result = super.onAcquired(acquiredInfo, vendorCode);
 +            if(result) mFacola.hide();
@@ -770,7 +769,6 @@ index def1a8735903..7143655d5dae 100644
 +            return result;
 +        }
 +
-+
 +        @Override
 +        public int start() {
 +            mFacola.show();
@@ -781,40 +779,41 @@ index def1a8735903..7143655d5dae 100644
 +        public int stop(boolean initiatedByClient) {
 +            mFacola.hide();
 +            return super.stop(initiatedByClient);
-         }
++        }
      }
  
-@@ -216,6 +245,7 @@ public class FingerprintService extends BiometricServiceBase {
+     /**
+@@ -216,6 +244,7 @@ public class FingerprintService extends BiometricServiceBase {
                  final IFingerprintServiceReceiver receiver, final int flags,
                  final String opPackageName) {
              checkPermission(MANAGE_FINGERPRINT);
-+	    mFacola.show();
++            mFacola.show();
  
              final boolean restricted = isRestricted();
              final int groupId = userId; // default group for fingerprint enrollment
-@@ -707,6 +737,9 @@ public class FingerprintService extends BiometricServiceBase {
+@@ -707,6 +736,9 @@ public class FingerprintService extends BiometricServiceBase {
          public void onError(final long deviceId, final int error, final int vendorCode) {
              mHandler.post(() -> {
                  FingerprintService.super.handleError(deviceId, error, vendorCode);
-+		if ( error == BiometricConstants.BIOMETRIC_ERROR_CANCELED) {
-+			mFacola.hide();
-+		}
++                if (error == BiometricConstants.BIOMETRIC_ERROR_CANCELED) {
++                    mFacola.hide();
++                }
                  // TODO: this chunk of code should be common to all biometric services
                  if (error == BiometricConstants.BIOMETRIC_ERROR_HW_UNAVAILABLE) {
                      // If we get HW_UNAVAILABLE, try to connect again later...
-@@ -794,6 +827,7 @@ public class FingerprintService extends BiometricServiceBase {
+@@ -794,6 +826,7 @@ public class FingerprintService extends BiometricServiceBase {
                  Slog.w(TAG, "enroll(): no fingerprint HAL!");
                  return ERROR_ESRCH;
              }
-+	    mFacola.show();
++            mFacola.show();
              return daemon.enroll(cryptoToken, groupId, timeout);
          }
  
-@@ -813,6 +847,7 @@ public class FingerprintService extends BiometricServiceBase {
-         context.registerReceiver(mLockoutReceiver, new IntentFilter(getLockoutResetIntent()),
+@@ -814,6 +847,7 @@ public class FingerprintService extends BiometricServiceBase {
                  getLockoutBroadcastPermission(), null /* handler */);
+ 
          mLockPatternUtils = new LockPatternUtils(context);
-+	mFacola = new FacolaView(context);
++        mFacola = new FacolaView(context);
      }
  
      @Override
