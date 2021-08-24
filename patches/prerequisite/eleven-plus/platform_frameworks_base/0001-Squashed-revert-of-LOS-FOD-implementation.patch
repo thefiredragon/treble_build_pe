@@ -350,10 +350,10 @@ index 3fe3d863666..c124ee6840e 100644
  
 diff --git a/packages/SystemUI/src/com/android/systemui/biometrics/FODCircleView.java b/packages/SystemUI/src/com/android/systemui/biometrics/FODCircleView.java
 deleted file mode 100644
-index 654d5c45460..00000000000
+index 8f90e5d7668..00000000000
 --- a/packages/SystemUI/src/com/android/systemui/biometrics/FODCircleView.java
 +++ /dev/null
-@@ -1,693 +0,0 @@
+@@ -1,704 +0,0 @@
 -/**
 - * Copyright (C) 2019-2020 The LineageOS Project
 - *
@@ -394,6 +394,7 @@ index 654d5c45460..00000000000
 -import android.pocket.PocketManager;
 -import android.provider.Settings;
 -import android.net.Uri;
+-import android.util.DisplayMetrics;
 -import android.view.Display;
 -import android.view.Gravity;
 -import android.view.MotionEvent;
@@ -911,6 +912,16 @@ index 654d5c45460..00000000000
 -        dispatchHide();
 -    }
 -
+-    public int getHeight(boolean includeDecor) {
+-        DisplayMetrics dm = new DisplayMetrics();
+-        if (includeDecor) {
+-            mWindowManager.getDefaultDisplay().getMetrics(dm);
+-        } else {
+-            mWindowManager.getDefaultDisplay().getRealMetrics(dm);
+-        }
+-        return dm.heightPixels - mPositionY + mSize / 2;
+-    }
+-
 -    private void updateAlpha() {
 -        setAlpha(mIsDreaming ? 0.5f : 1.0f);
 -    }
@@ -1049,10 +1060,10 @@ index 654d5c45460..00000000000
 -}
 diff --git a/packages/SystemUI/src/com/android/systemui/biometrics/FODCircleViewImpl.java b/packages/SystemUI/src/com/android/systemui/biometrics/FODCircleViewImpl.java
 deleted file mode 100644
-index 12e4cbaf8d5..00000000000
+index b30572e1121..00000000000
 --- a/packages/SystemUI/src/com/android/systemui/biometrics/FODCircleViewImpl.java
 +++ /dev/null
-@@ -1,128 +0,0 @@
+@@ -1,132 +0,0 @@
 -/**
 - * Copyright (C) 2019 The Android Open Source Project
 - *
@@ -1153,6 +1164,10 @@ index 12e4cbaf8d5..00000000000
 -            mIsFODVisible = false;
 -            mFodCircleView.hide();
 -        }
+-    }
+-
+-    public int getHeight(boolean includeDecor) {
+-         return mFodCircleView.getHeight(includeDecor);
 -    }
 -
 -    public void registerCallback(FODCircleViewImplCallback callback) {
@@ -1409,7 +1424,7 @@ index 1e1655256b1..382715a3fb7 100644
                  mCallback.onExpandAnimationFinished(mIsFullScreenLaunch);
                  applyParamsToNotification(null);
 diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/phone/StatusBar.java b/packages/SystemUI/src/com/android/systemui/statusbar/phone/StatusBar.java
-index 6fb988eb400..259a97048f6 100644
+index 6058ff0d07f..259a97048f6 100644
 --- a/packages/SystemUI/src/com/android/systemui/statusbar/phone/StatusBar.java
 +++ b/packages/SystemUI/src/com/android/systemui/statusbar/phone/StatusBar.java
 @@ -83,7 +83,6 @@ import android.content.res.Configuration;
@@ -1559,7 +1574,7 @@ index 6fb988eb400..259a97048f6 100644
      }
  
      protected BarTransitions getStatusBarTransitions() {
-@@ -4800,18 +4748,4 @@ public class StatusBar extends SystemUI implements DemoMode,
+@@ -4800,22 +4748,4 @@ public class StatusBar extends SystemUI implements DemoMode,
      public void suppressAmbientDisplay(boolean suppressed) {
          mDozeServiceHost.setDozeSuppressed(suppressed);
      }
@@ -1576,6 +1591,10 @@ index 6fb988eb400..259a97048f6 100644
 -                  currentActivity.getShortClassName().trim();
 -        }
 -        return null;
+-    }
+-
+-    public int getFodHeight(boolean includeDecor) {
+-        return mFODCircleViewImpl.getHeight(includeDecor);
 -    }
  }
 diff --git a/packages/SystemUI/src/com/google/android/systemui/statusbar/phone/StatusBarGoogle.java b/packages/SystemUI/src/com/google/android/systemui/statusbar/phone/StatusBarGoogle.java
