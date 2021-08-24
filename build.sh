@@ -40,6 +40,10 @@ echo "Setting up build environment"
 source build/envsetup.sh &> /dev/null
 echo ""
 
+echo "Applying prerequisite patches"
+bash $BL/apply-patches.sh $BL prerequisite $BRANCH
+echo ""
+
 echo "Applying PHH patches"
 rm -f device/*/sepolicy/common/private/genfs_contexts
 cd device/phh/treble
@@ -51,22 +55,6 @@ echo ""
 
 echo "Applying personal patches"
 bash $BL/apply-patches.sh $BL personal $BRANCH
-echo ""
-
-echo "Applying GSI-specific patches"
-cd bootable/recovery
-git revert c9a3611b0bab1744b3c4321e728c917fcdc2abc3 --no-edit # recovery: Allow custom bootloader msg offset in block misc
-cd ../..
-cd frameworks/av
-git revert 72fb8d96c85fd45e85516b4023cd5116b5d5a8eb --no-edit # camera: Allow devices to load custom CameraParameter code
-cd ../..
-cd frameworks/native
-git revert 542069c3aa6d003887b4abba3c0f494e8271085f --no-edit # surfaceflinger: Add support for extension lib
-git revert 581c22f979af05e48ad4843cdfa9605186d286da --no-edit # Add suspend_resume trace events to the atrace 'freq' category.
-cd ../..
-cd packages/apps/Bluetooth
-git revert bba4192627ca9987c0128f9774d79ffb17ece2f5 --no-edit # Bluetooth: Reset packages/apps/Bluetooth to upstream
-cd ../../..
 echo ""
 
 echo "Applying GSI-specific fixes"
