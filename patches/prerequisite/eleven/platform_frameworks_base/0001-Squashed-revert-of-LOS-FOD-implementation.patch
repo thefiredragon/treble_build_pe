@@ -18,7 +18,7 @@ Change-Id: I4650cef96617c32e52d5dd088c8afffb06ab5e1d
  packages/SystemUI/res/values/config.xml          |   1 -
  .../SystemUI/res/values/custom_config.xml        |   4 -
  .../keyguard/KeyguardSecurityContainer.java      |  15 +-
- .../keyguard/KeyguardUpdateMonitor.java          |   8 +-
+ .../keyguard/KeyguardUpdateMonitor.java          |   7 +-
  .../systemui/biometrics/FODCircleView.java       | 544 ------------------
  .../biometrics/FODCircleViewImpl.java            | 128 -----
  .../biometrics/FODCircleViewImplCallback.java    |  25 -
