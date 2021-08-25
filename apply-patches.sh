@@ -13,8 +13,6 @@ for b in $branches;do
 		[ "$p" == treble/app ] && p=treble_app
 		pushd $p
 		for patch in $patches/patches/$tree/$b/$project/*.patch;do
-			git clean -q -fdx
-			git reset -q --hard
 			git am $patch || exit
 		done
 		popd
