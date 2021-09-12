@@ -1,13 +1,13 @@
-From 0b2cba3481e11b62a98bdc6590641dd5c5e685e1 Mon Sep 17 00:00:00 2001
+From 3959166887fc1872dfdbf79ff525f951d694432d Mon Sep 17 00:00:00 2001
 From: Alberto Ponces <ponces26@gmail.com>
 Date: Sat, 3 Oct 2020 14:28:35 -0700
-Subject: [PATCH] build: fix device name.
+Subject: [PATCH 2/2] build: fix device name.
 
 This is only valid for GSI images.
 
 Change-Id: I55c8897d7d4d5c2a9e62b1a931b3856b2e38956e
 ---
- buildinfo.sh | 2 +-
+ tools/buildinfo.sh | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/tools/buildinfo.sh b/tools/buildinfo.sh

@@ -1,7 +1,7 @@
-From 3fb27b3b3ab30a86432d2ca1f8fe5c3802793866 Mon Sep 17 00:00:00 2001
+From 891efc41a6407acef020a6a806810dc33320a57e Mon Sep 17 00:00:00 2001
 From: Andy CrossGate Yan <GeForce8800Ultra@gmail.com>
 Date: Wed, 23 Oct 2019 09:38:16 +0000
-Subject: [PATCH] Remove fsck SELinux labels
+Subject: [PATCH 1/7] Remove fsck SELinux labels
 
 These are covered by LOS sepolicy
 
@@ -11,7 +11,7 @@ Change-Id: I7c63c9aed39afc07b8c80918053154113f848cd9
  1 file changed, 3 deletions(-)
 
 diff --git a/sepolicy/file_contexts b/sepolicy/file_contexts
-index 6da14ac..dfea075 100644
+index 4ae5095..5e39d5b 100644
 --- a/sepolicy/file_contexts
 +++ b/sepolicy/file_contexts
 @@ -6,9 +6,6 @@
@@ -25,5 +25,5 @@ index 6da14ac..dfea075 100644
  
  /sec_storage(/.*)?      u:object_r:teecd_data_file:s0
 -- 
-2.17.1
+2.25.1
 

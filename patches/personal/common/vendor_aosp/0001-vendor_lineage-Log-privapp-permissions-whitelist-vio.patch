@@ -1,8 +1,8 @@
-From 7a633a53d8e20e2d976597a332bf5ba855ec1f75 Mon Sep 17 00:00:00 2001
+From d2a4937cbdede661d81bfe75ee9d28676a1e982c Mon Sep 17 00:00:00 2001
 From: Andy CrossGate Yan <GeForce8800Ultra@gmail.com>
 Date: Thu, 5 Sep 2019 02:08:22 +0000
-Subject: [PATCH] vendor_lineage: Log privapp-permissions whitelist violations
- instead
+Subject: [PATCH 1/2] vendor_lineage: Log privapp-permissions whitelist
+ violations instead
 
 Change-Id: I49dba61f332253e291a65e79ca70d9a07d45bb07
 ---
@@ -10,21 +10,21 @@ Change-Id: I49dba61f332253e291a65e79ca70d9a07d45bb07
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/config/common.mk b/config/common.mk
-index 9b85c445..f811cf3c 100644
+index b9466244..170aa322 100644
 --- a/config/common.mk
 +++ b/config/common.mk
-@@ -51,9 +51,9 @@ PRODUCT_COPY_FILES += \
+@@ -54,9 +54,9 @@ PRODUCT_COPY_FILES += \
  PRODUCT_COPY_FILES += \
      frameworks/base/data/keyboards/Vendor_045e_Product_028e.kl:system/usr/keylayout/Vendor_045e_Product_0719.kl
-
+ 
 -# Enforce privapp-permissions whitelist
 +# Log privapp-permissions whitelist violations
  PRODUCT_SYSTEM_DEFAULT_PROPERTIES += \
 -    ro.control_privapp_permissions=enforce
 +    ro.control_privapp_permissions=log
-
+ 
  # Power whitelist
  PRODUCT_COPY_FILES += \
 -- 
-2.17.1
+2.25.1
 

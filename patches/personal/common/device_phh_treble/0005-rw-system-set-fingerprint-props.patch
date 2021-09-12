@@ -1,18 +1,18 @@
-From 0b2cba3481e11b62a98bdc6590641dd5c5e685e1 Mon Sep 17 00:00:00 2001
+From 961f7fce5b25fcb669b306d2aa6848c664682a89 Mon Sep 17 00:00:00 2001
 From: Alberto Ponces <ponces26@gmail.com>
 Date: Sat, 3 Oct 2020 14:28:35 -0700
-Subject: [PATCH] rw-system: set fingerprint props.
+Subject: [PATCH 5/7] rw-system: set fingerprint props.
 
 Change-Id: I55c8897d7d4d5c2a9e62b1a931b3856b2e38956e
 ---
- rw-system.sh | 64 +-
- 1 file changed, 12 insertions(+), 52 deletions(-)
+ rw-system.sh | 63 ++++++++++------------------------------------------
+ 1 file changed, 12 insertions(+), 51 deletions(-)
 
 diff --git a/rw-system.sh b/rw-system.sh
-index fab15cd..af5207d 100644
+index 2145711..615a721 100644
 --- a/rw-system.sh
 +++ b/rw-system.sh
-@@ -645,58 +645,19 @@ fi
+@@ -661,58 +661,19 @@ fi
  
  setprop ctl.stop console
  dmesg -n 1

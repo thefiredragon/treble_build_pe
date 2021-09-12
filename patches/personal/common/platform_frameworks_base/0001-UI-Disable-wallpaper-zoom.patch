@@ -1,7 +1,7 @@
-From ecc6f5becba220a7de969bce9b17809898bf031a Mon Sep 17 00:00:00 2001
+From 32e1e69c091c28021d77d9d30c33cde959868232 Mon Sep 17 00:00:00 2001
 From: Andy CrossGate Yan <GeForce8800Ultra@gmail.com>
 Date: Sun, 10 Jan 2021 11:44:29 +0000
-Subject: [PATCH] UI: Disable wallpaper zoom
+Subject: [PATCH 1/2] UI: Disable wallpaper zoom
 
 It does little more than inducing motion sickness
 
@@ -11,10 +11,10 @@ Change-Id: I78cc5484930b27f172cd8d8a5bd9042dce3478d0
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/core/res/res/values/config.xml b/core/res/res/values/config.xml
-index b61b26a0e7f..0ed13dd2a89 100644
+index 46b2d60bd06..778f77c2d74 100644
 --- a/core/res/res/values/config.xml
 +++ b/core/res/res/values/config.xml
-@@ -4353,7 +4353,7 @@
+@@ -4359,7 +4359,7 @@
      <string name="config_customSessionPolicyProvider"></string>
  
      <!-- The max scale for the wallpaper when it's zoomed in -->

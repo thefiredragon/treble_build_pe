@@ -1,4 +1,4 @@
-From 44c6b955f1b787984bcddb53d35bf8eda20e02d1 Mon Sep 17 00:00:00 2001
+From ad636226ded175de95e8854108e8ae0e4cc649a1 Mon Sep 17 00:00:00 2001
 From: Andy CrossGate Yan <GeForce8800Ultra@gmail.com>
 Date: Sun, 8 Aug 2021 01:43:40 +0000
 Subject: [PATCH] Revert "recovery: Allow custom bootloader msg offset in block

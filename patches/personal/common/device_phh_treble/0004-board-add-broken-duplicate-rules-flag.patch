@@ -1,7 +1,7 @@
-From 0b2cba3481e11b62a98bdc6590641dd5c5e685e1 Mon Sep 17 00:00:00 2001
+From c63da0854ea85b24ac7a6915d91d99082583cb94 Mon Sep 17 00:00:00 2001
 From: Alberto Ponces <ponces26@gmail.com>
 Date: Sat, 3 Oct 2020 14:28:35 -0700
-Subject: [PATCH] board: add broken duplicate rules flag.
+Subject: [PATCH 4/7] board: add broken duplicate rules flag.
 
 This will prevent "overriding commands" errors.
 
@@ -16,7 +16,7 @@ index 0da1061..a56cd9b 100644
 +++ b/board-base.mk
 @@ -4,3 +4,4 @@ TARGET_EXFAT_DRIVER := exfat
  DEVICE_FRAMEWORK_MANIFEST_FILE := device/phh/treble/framework_manifest.xml
-
+ 
  BOARD_ROOT_EXTRA_FOLDERS += bt_firmware sec_storage efs
 +BUILD_BROKEN_DUP_RULES := true
 -- 

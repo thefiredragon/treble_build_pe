@@ -1,4 +1,4 @@
-From 0b1838a0019eae94f2c2e1d9931bbdb33ac28dad Mon Sep 17 00:00:00 2001
+From 8383c36a099d0461ae308d2214d9cebbcf25a53f Mon Sep 17 00:00:00 2001
 From: Andy CrossGate Yan <GeForce8800Ultra@gmail.com>
 Date: Sun, 8 Aug 2021 01:43:40 +0000
 Subject: [PATCH] Revert "Bluetooth: Reset packages/apps/Bluetooth to upstream"

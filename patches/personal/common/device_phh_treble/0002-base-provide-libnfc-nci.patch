@@ -1,7 +1,7 @@
-From 8707797cc6bec4c145b9c29d0cf65ea6890c557c Mon Sep 17 00:00:00 2001
+From 733911489af7e658d91ec579ee316c9eba29985c Mon Sep 17 00:00:00 2001
 From: Alberto Ponces <ponces26@gmail.com>
 Date: Wed, 25 Dec 2019 12:34:05 +0200
-Subject: [PATCH] base: provide libnfc-nci
+Subject: [PATCH 2/7] base: provide libnfc-nci
 
 	modified:   base.mk
 ---
@@ -9,7 +9,7 @@ Subject: [PATCH] base: provide libnfc-nci
  1 file changed, 1 insertion(+)
 
 diff --git a/base.mk b/base.mk
-index 43f3707..ebb2215 100644
+index 301fee9..87730fd 100644
 --- a/base.mk
 +++ b/base.mk
 @@ -50,6 +50,7 @@ PRODUCT_COPY_FILES += \
@@ -21,5 +21,5 @@ index 43f3707..ebb2215 100644
  	device/phh/treble/nfc/libnfc-nci-huawei.conf:system/phh/libnfc-nci-huawei.conf
  
 -- 
-2.17.1
+2.25.1
 

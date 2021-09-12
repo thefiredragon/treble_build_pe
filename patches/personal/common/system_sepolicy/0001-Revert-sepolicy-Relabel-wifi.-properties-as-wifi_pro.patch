@@ -1,4 +1,4 @@
-From 7f50c607a9e3bae747ff33566da624abc50024d3 Mon Sep 17 00:00:00 2001
+From 967e656e5e01eb4018a7608b325d316cf00ac863 Mon Sep 17 00:00:00 2001
 From: Andy CrossGate Yan <GeForce8800Ultra@gmail.com>
 Date: Mon, 5 Oct 2020 01:29:18 +0000
 Subject: [PATCH] Revert "sepolicy: Relabel wifi. properties as wifi_prop"
@@ -12,10 +12,10 @@ Change-Id: I0446540331684eb57f7e17bcc3273d6247915854
  2 files changed, 4 deletions(-)
 
 diff --git a/private/property_contexts b/private/property_contexts
-index 7908bb107..49cc8a2cd 100644
+index a4fab1f22..cf0a2dee5 100644
 --- a/private/property_contexts
 +++ b/private/property_contexts
-@@ -169,7 +169,6 @@ dalvik.                 u:object_r:dalvik_prop:s0
+@@ -171,7 +171,6 @@ dalvik.                 u:object_r:dalvik_prop:s0
  ro.dalvik.              u:object_r:dalvik_prop:s0
  
  # Shared between system server and wificond
@@ -24,7 +24,7 @@ index 7908bb107..49cc8a2cd 100644
  
  # Lowpan properties
 diff --git a/private/system_server.te b/private/system_server.te
-index 66c46ed97..2373e9617 100644
+index 3c1d192d7..b63b47d3d 100644
 --- a/private/system_server.te
 +++ b/private/system_server.te
 @@ -676,9 +676,6 @@ get_prop(system_server, mock_ota_prop)

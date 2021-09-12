@@ -1,4 +1,4 @@
-From 15c6984df105af4e92c20c33ef53451eb99524a9 Mon Sep 17 00:00:00 2001
+From b3d7f9ef20e332ad0dea981d8564f06cf94258ce Mon Sep 17 00:00:00 2001
 From: Andy CrossGate Yan <GeForce8800Ultra@gmail.com>
 Date: Sun, 8 Aug 2021 01:43:40 +0000
 Subject: [PATCH] Revert "Add suspend_resume trace events to the atrace 'freq'

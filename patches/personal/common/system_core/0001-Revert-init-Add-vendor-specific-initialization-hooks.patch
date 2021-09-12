@@ -1,18 +1,17 @@
-From 3ecc72b4917790fa43867ce19438874a109de5d6 Mon Sep 17 00:00:00 2001
+From c2aaa043c484d7dd7b34056aae57de2462bcaca2 Mon Sep 17 00:00:00 2001
 From: Andy CrossGate Yan <GeForce8800Ultra@gmail.com>
 Date: Sat, 19 Dec 2020 15:57:27 +0000
-Subject: [PATCH] Revert "init: Add vendor-specific initialization hooks."
+Subject: [PATCH 1/4] Revert "init: Add vendor-specific initialization hooks."
 
 This reverts commit 7bc78d1354cd2e8df1ba693c627d5be39206e375.
 
 Change-Id: I0c3241ef3626bc989b34723e30b2339e4a62399d
 ---
  init/Android.bp           |  9 ---------
- init/NOTICE               | 26 --------------------------
  init/property_service.cpp |  4 ----
  init/vendor_init.cpp      | 37 -------------------------------------
  init/vendor_init.h        | 33 ---------------------------------
- 5 files changed, 109 deletions(-)
+ 4 files changed, 83 deletions(-)
  delete mode 100644 init/vendor_init.cpp
  delete mode 100644 init/vendor_init.h
 
@@ -44,7 +43,7 @@ index 3bf0cb124..d399f65dd 100644
      ],
      srcs: init_common_sources + init_device_sources,
 diff --git a/init/property_service.cpp b/init/property_service.cpp
-index 89944ca80..2cafc512b 100644
+index 2c6f97971..8dd4647e2 100644
 --- a/init/property_service.cpp
 +++ b/init/property_service.cpp
 @@ -70,7 +70,6 @@
@@ -55,7 +54,7 @@ index 89944ca80..2cafc512b 100644
  
  using namespace std::literals;
  
-@@ -1015,9 +1014,6 @@ void PropertyLoadBootDefaults() {
+@@ -1078,9 +1077,6 @@ void PropertyLoadBootDefaults() {
          }
      }
  

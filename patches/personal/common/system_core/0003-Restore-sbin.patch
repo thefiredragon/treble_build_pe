@@ -1,7 +1,7 @@
-From 398f1882e09c12509c819a4568fb6b65f571418f Mon Sep 17 00:00:00 2001
+From 00a339ac6afb0cda711e0d2f7b38d386e16691fd Mon Sep 17 00:00:00 2001
 From: Andy CrossGate Yan <GeForce8800Ultra@gmail.com>
 Date: Sun, 10 Jan 2021 05:10:39 +0000
-Subject: [PATCH] Restore /sbin
+Subject: [PATCH 3/4] Restore /sbin
 
 This reverts "Do not create /sbin" and "Remove sbin from fs_config.cpp" and adds /sbin to the PATH.
 
@@ -68,7 +68,7 @@ index 7d383f522..6d518dcb3 100644
      ln -sf /system/bin $(TARGET_ROOT_OUT)/bin; \
      ln -sf /system/etc $(TARGET_ROOT_OUT)/etc; \
 diff --git a/rootdir/init.environ.rc.in b/rootdir/init.environ.rc.in
-index fdaaf1abe..b34145829 100644
+index fdaaf1abe..72ba861a8 100644
 --- a/rootdir/init.environ.rc.in
 +++ b/rootdir/init.environ.rc.in
 @@ -10,6 +10,7 @@ on early-init

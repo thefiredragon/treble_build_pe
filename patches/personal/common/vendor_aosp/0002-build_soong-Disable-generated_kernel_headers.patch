@@ -1,7 +1,7 @@
-From f0b8b09faba7f40bfe376a7c6d3a0f81e7d587c4 Mon Sep 17 00:00:00 2001
+From e660f22fa44eb6d7051c64d4334e12cc96201e55 Mon Sep 17 00:00:00 2001
 From: AndyCGYan <GeForce8800Ultra@gmail.com>
 Date: Sun, 3 Mar 2019 14:07:33 +0800
-Subject: [PATCH] build_soong: Disable generated_kernel_headers
+Subject: [PATCH 2/2] build_soong: Disable generated_kernel_headers
 
 ...but done in a way so that there's no need to remove generated_kernel_headers from individual projects - thanks @ExpressLuke
 
@@ -11,7 +11,7 @@ Change-Id: I630857cec208f1830e776bf5031d7bb9bc4435d0
  1 file changed, 12 deletions(-)
 
 diff --git a/build/soong/Android.bp b/build/soong/Android.bp
-index 24801b16..49668996 100644
+index 08448db9..85b3e567 100644
 --- a/build/soong/Android.bp
 +++ b/build/soong/Android.bp
 @@ -20,9 +20,6 @@ bootstrap_go_package {
@@ -24,7 +24,7 @@ index 24801b16..49668996 100644
      // Directories that can be imported by a cc_* module generated_headers property
      export_include_dirs: [
          "usr/audio/include/uapi",
-@@ -30,15 +27,6 @@ custom_generator {
+@@ -31,15 +28,6 @@ custom_generator {
          "usr/include/audio/include/uapi",
          "usr/techpack/audio/include",
      ],
