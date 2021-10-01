@@ -57,13 +57,6 @@ echo "Applying personal patches"
 bash $BL/apply-patches.sh $BL personal $BRANCH
 echo ""
 
-echo "Applying GSI-specific fixes"
-mkdir -p device/generic/common/nfc
-curl "https://android.googlesource.com/device/generic/common/+/refs/tags/android-11.0.0_r35/nfc/libnfc-nci.conf?format=TEXT"| base64 --decode > device/generic/common/nfc/libnfc-nci.conf
-mkdir -p device/sample/etc
-cp vendor/aosp/prebuilt/common/etc/apns-conf.xml device/sample/etc/apns-full-conf.xml
-echo ""
-
 echo "CHECK PATCH STATUS NOW!"
 sleep 5
 echo ""
