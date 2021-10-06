@@ -1,4 +1,4 @@
-From 33aa198b099d6c7ca490a59f939d23f5513fb791 Mon Sep 17 00:00:00 2001
+From 157c7c13ad3c0f3c088a782201abcf09d95caa6a Mon Sep 17 00:00:00 2001
 From: Pierre-Hugues Husson <phh@phh.me>
 Date: Sun, 19 Aug 2018 22:59:06 +0200
 Subject: [PATCH 02/40] ::Kirin:: Remove lock to prevent self-lock

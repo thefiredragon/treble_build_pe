@@ -1,4 +1,4 @@
-From 61bba92524f751de389699189de7ea8656131a98 Mon Sep 17 00:00:00 2001
+From 28843920f7c53a0240d17d998f15ed3c6a3534d4 Mon Sep 17 00:00:00 2001
 From: Pierre-Hugues Husson <phh@phh.me>
 Date: Mon, 26 Oct 2020 23:23:24 +0100
 Subject: [PATCH 3/3] Ignore vndk lite when looking for ld.config

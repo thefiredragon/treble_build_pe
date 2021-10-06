@@ -1,7 +1,7 @@
-From f9c9698b5775754e96eecdc67266b3bfd2c40634 Mon Sep 17 00:00:00 2001
+From a8ac2ce422e4ff1497dca083f95af698b641d210 Mon Sep 17 00:00:00 2001
 From: Pierre-Hugues Husson <phh@phh.me>
 Date: Sat, 13 Mar 2021 13:21:46 -0500
-Subject: [PATCH 42/50] On Samsung R vendor, there is still the ISehMiscPower
+Subject: [PATCH 42/51] On Samsung R vendor, there is still the ISehMiscPower
  HIDL HAL, but there is also the AOSP's AIDL HAL. It was previously assumed
  this wouldn't happen, fix this assumption.
 

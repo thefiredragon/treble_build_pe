@@ -1,4 +1,4 @@
-From 3e820a221e87abed76bc42fb8392e8345a6dbd40 Mon Sep 17 00:00:00 2001
+From 162ab3a9cfc3bab7e888ad2e14ee1fbdaadd88dc Mon Sep 17 00:00:00 2001
 From: Pierre-Hugues Husson <phh@phh.me>
 Date: Tue, 14 Aug 2018 21:48:19 +0200
 Subject: [PATCH] Act as usb device when there is no hal, but we believe we are

@@ -1,7 +1,7 @@
-From 1b2469010d0b2d5968013d5ff5314e167d17258c Mon Sep 17 00:00:00 2001
+From 1faf0844e4d3242998d21e9e00be17502586a151 Mon Sep 17 00:00:00 2001
 From: Pierre-Hugues Husson <phh@phh.me>
 Date: Sat, 20 Mar 2021 14:30:17 +0100
-Subject: [PATCH 43/50] Handle another type of Samsung proximity sensor: Hover
+Subject: [PATCH 43/51] Handle another type of Samsung proximity sensor: Hover
  Proximity Sensor, with yet another behavior (seen on S20 FE)
 
 ---

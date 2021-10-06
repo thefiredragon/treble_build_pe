@@ -1,4 +1,4 @@
-From b96c5dc598484c85c5e2f773caadd00af4374954 Mon Sep 17 00:00:00 2001
+From abbe19b1a17f07e800424c73a9b4e68afdc2d8e9 Mon Sep 17 00:00:00 2001
 From: Pierre-Hugues Husson <phh@phh.me>
 Date: Sun, 20 Sep 2020 20:53:14 +0200
 Subject: [PATCH 1/2] Disable vndk.lite

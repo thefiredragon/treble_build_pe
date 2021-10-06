@@ -1,4 +1,4 @@
-From 7f4d2925bdb8f611e9c0b8c6bc137588388c776b Mon Sep 17 00:00:00 2001
+From cf18cc500d01c59185d631b9562971611ec7d7aa Mon Sep 17 00:00:00 2001
 From: Pierre-Hugues Husson <phh@phh.me>
 Date: Mon, 26 Oct 2020 23:16:30 +0100
 Subject: [PATCH 09/14] Apply associated display for joysticks
@@ -11,7 +11,7 @@ Change-Id: I5f6c237e6bf53312aff3dc02a46ce1c779063203
  3 files changed, 105 insertions(+), 1 deletion(-)
 
 diff --git a/services/inputflinger/reader/mapper/JoystickInputMapper.cpp b/services/inputflinger/reader/mapper/JoystickInputMapper.cpp
-index 030a84672..929bfc5f9 100644
+index 030a846727..929bfc5f97 100644
 --- a/services/inputflinger/reader/mapper/JoystickInputMapper.cpp
 +++ b/services/inputflinger/reader/mapper/JoystickInputMapper.cpp
 @@ -196,6 +196,8 @@ void JoystickInputMapper::configure(nsecs_t when, const InputReaderConfiguration
@@ -33,7 +33,7 @@ index 030a84672..929bfc5f9 100644
                            &pointerProperties, &pointerCoords, 0, 0,
                            AMOTION_EVENT_INVALID_CURSOR_POSITION,
 diff --git a/services/inputflinger/reader/mapper/JoystickInputMapper.h b/services/inputflinger/reader/mapper/JoystickInputMapper.h
-index 823a096d6..cf864ba75 100644
+index 823a096d68..cf864ba750 100644
 --- a/services/inputflinger/reader/mapper/JoystickInputMapper.h
 +++ b/services/inputflinger/reader/mapper/JoystickInputMapper.h
 @@ -105,6 +105,8 @@ private:
@@ -46,7 +46,7 @@ index 823a096d6..cf864ba75 100644
  
  } // namespace android
 diff --git a/services/inputflinger/tests/InputReader_test.cpp b/services/inputflinger/tests/InputReader_test.cpp
-index c457a1525..c9b704993 100644
+index c457a1525f..c9b704993f 100644
 --- a/services/inputflinger/tests/InputReader_test.cpp
 +++ b/services/inputflinger/tests/InputReader_test.cpp
 @@ -20,6 +20,7 @@

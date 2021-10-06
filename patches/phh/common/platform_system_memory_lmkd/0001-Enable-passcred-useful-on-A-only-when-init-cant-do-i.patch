@@ -1,4 +1,4 @@
-From 40fa07e9cd8809261280d90c1b9b91ae1683e2cc Mon Sep 17 00:00:00 2001
+From 012ea01fb17dc398d53cf31841ce090977b53887 Mon Sep 17 00:00:00 2001
 From: Pierre-Hugues Husson <phh@phh.me>
 Date: Mon, 28 Sep 2020 22:03:00 +0200
 Subject: [PATCH] Enable passcred (useful on A-only when init cant do it for

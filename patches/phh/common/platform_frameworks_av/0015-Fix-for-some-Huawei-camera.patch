@@ -1,4 +1,4 @@
-From 19311ffc518f687688dd8e6a72decddba6e6d4cf Mon Sep 17 00:00:00 2001
+From 475788de85da8b2823a1ebedc4d6a5a43005a7cc Mon Sep 17 00:00:00 2001
 From: Pierre-Hugues Husson <phh@phh.me>
 Date: Tue, 3 Dec 2019 14:04:17 +0100
 Subject: [PATCH 15/40] Fix for some Huawei camera

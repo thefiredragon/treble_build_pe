@@ -1,7 +1,7 @@
-From 0385f7be53c3db550a7c05d8501a66afff2837e3 Mon Sep 17 00:00:00 2001
+From 06b7a932cdfcf4470e74dd91b4fe3e4bcb7454c6 Mon Sep 17 00:00:00 2001
 From: Andy CrossGate Yan <GeForce8800Ultra@gmail.com>
 Date: Mon, 30 Mar 2020 10:07:00 +0000
-Subject: [PATCH 19/50] Support Huawei light HAL
+Subject: [PATCH 19/51] Support Huawei light HAL
 
 For https://github.com/phhusson/treble_experimentations/issues/1204
 

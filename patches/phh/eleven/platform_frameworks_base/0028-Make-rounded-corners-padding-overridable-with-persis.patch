@@ -1,7 +1,7 @@
-From 9c50eb6ceeb6d0ef0aaaf3209e1fe1f616dc5e59 Mon Sep 17 00:00:00 2001
+From d3a7ce0e4ab2fb7a53ed017a721bacfc5bb63196 Mon Sep 17 00:00:00 2001
 From: Pierre-Hugues Husson <phh@phh.me>
 Date: Sun, 6 Dec 2020 12:20:08 +0100
-Subject: [PATCH 28/50] Make rounded corners padding overridable with
+Subject: [PATCH 28/51] Make rounded corners padding overridable with
  persist.sys.phh.rounded_corners_padding
 
 ---

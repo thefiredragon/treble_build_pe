@@ -1,4 +1,4 @@
-From f0f6686208fbbef14080f8105fa8f729f80c98dd Mon Sep 17 00:00:00 2001
+From b782c09616ba19e7bad09a17463e0351ee31b088 Mon Sep 17 00:00:00 2001
 From: Pierre-Hugues Husson <phh@phh.me>
 Date: Sat, 12 Sep 2020 12:32:50 +0200
 Subject: [PATCH 13/40] [audiopolicy] No longer make re-assigning legacy audio

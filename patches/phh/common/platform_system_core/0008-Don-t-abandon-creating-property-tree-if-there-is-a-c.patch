@@ -1,4 +1,4 @@
-From 708369239ff56edfd25567ef087a2c4a87518fee Mon Sep 17 00:00:00 2001
+From 3e848476f5ea3347685b9b105cded27bc001cf7f Mon Sep 17 00:00:00 2001
 From: Pierre-Hugues Husson <phh@phh.me>
 Date: Sun, 18 Oct 2020 18:14:47 +0200
 Subject: [PATCH 08/12] Don't abandon creating property tree if there is a

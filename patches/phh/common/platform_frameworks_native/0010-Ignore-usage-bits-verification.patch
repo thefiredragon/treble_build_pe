@@ -1,4 +1,4 @@
-From b60c3c876f696e769ee7615789a5a888dfe54678 Mon Sep 17 00:00:00 2001
+From c2e50139c9bfe75b187faa8dc660cce4199c9e07 Mon Sep 17 00:00:00 2001
 From: Pierre-Hugues Husson <phh@phh.me>
 Date: Sun, 19 Aug 2018 23:07:24 +0200
 Subject: [PATCH 10/14] Ignore usage bits verification
@@ -11,7 +11,7 @@ Change-Id: I40c1d588c1fa104d844322b469f76e52bee1495a
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/libs/ui/Gralloc2.cpp b/libs/ui/Gralloc2.cpp
-index 040a62b54..01dba7689 100644
+index 040a62b542..01dba7689d 100644
 --- a/libs/ui/Gralloc2.cpp
 +++ b/libs/ui/Gralloc2.cpp
 @@ -108,7 +108,7 @@ status_t Gralloc2Mapper::validateBufferDescriptorInfo(

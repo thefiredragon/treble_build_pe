@@ -1,7 +1,7 @@
-From 5a1381be972fe3f0d5ad2672de806d3b224cbf12 Mon Sep 17 00:00:00 2001
+From 03dc57ba3f97ba3a4555913517f68a797a87a02f Mon Sep 17 00:00:00 2001
 From: N Harish <kqn736@zebra.com>
 Date: Mon, 25 Jan 2021 17:22:33 +0530
-Subject: [PATCH 40/50] Fix for TestDirectBootEmulated testcase
+Subject: [PATCH 40/51] Fix for TestDirectBootEmulated testcase
 
 In case of emulated FBE the secrets are empty hence add this
 exception to prevent from unlocking userkey.

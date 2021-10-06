@@ -1,4 +1,4 @@
-From 062f9351754956f72add60f9cec4b316b89dfeb0 Mon Sep 17 00:00:00 2001
+From 47cf491327f448d4ffbafdaae30dbba165361bf1 Mon Sep 17 00:00:00 2001
 From: Pierre-Hugues Husson <phh@phh.me>
 Date: Wed, 14 Aug 2019 23:37:10 +0200
 Subject: [PATCH 02/14] On Samsung, we need to send a hack-message to HAL to
@@ -11,7 +11,7 @@ Change-Id: Id6a1fa48340de61c418493668e9abd22c2599376
  2 files changed, 5 insertions(+), 1 deletion(-)
 
 diff --git a/opengl/libs/EGL/egl_platform_entries.cpp b/opengl/libs/EGL/egl_platform_entries.cpp
-index 1c6380f6f..6e810e592 100644
+index 1c6380f6f1..6e810e5923 100644
 --- a/opengl/libs/EGL/egl_platform_entries.cpp
 +++ b/opengl/libs/EGL/egl_platform_entries.cpp
 @@ -457,7 +457,7 @@ EGLBoolean eglGetConfigAttribImpl(EGLDisplay dpy, EGLConfig config,
@@ -24,7 +24,7 @@ index 1c6380f6f..6e810e592 100644
      if (colorspace == EGL_GL_COLORSPACE_LINEAR_KHR) {
          if(samsungColorspace)
 diff --git a/services/sensorservice/SensorDevice.cpp b/services/sensorservice/SensorDevice.cpp
-index e35559417..99b10faf5 100644
+index e355594176..99b10faf50 100644
 --- a/services/sensorservice/SensorDevice.cpp
 +++ b/services/sensorservice/SensorDevice.cpp
 @@ -34,7 +34,9 @@

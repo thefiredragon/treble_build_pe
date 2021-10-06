@@ -1,4 +1,4 @@
-From 7537e47f89e9ccbedb6ca91c691daf9af86a16db Mon Sep 17 00:00:00 2001
+From 5932755f17ea21910e71fbc0036ea04dbfd15d4f Mon Sep 17 00:00:00 2001
 From: Pierre-Hugues Husson <phh@phh.me>
 Date: Mon, 16 Sep 2019 13:49:05 +0200
 Subject: [PATCH 3/7] Check needsCheckpoint only if checkpoint is supported

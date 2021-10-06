@@ -1,7 +1,7 @@
-From 2a057b2ddf12a94b1369ee0c2be482ca407de0a9 Mon Sep 17 00:00:00 2001
+From f35aa54cd9563e053ffaf288881d66e0aeac06f5 Mon Sep 17 00:00:00 2001
 From: Pierre-Hugues Husson <phh@phh.me>
 Date: Mon, 21 Sep 2020 10:30:18 +0200
-Subject: [PATCH 23/50] On old inits (A-only devices), multi-sim basedband
+Subject: [PATCH 23/51] On old inits (A-only devices), multi-sim basedband
  property too long, catch that and make it shorter
 
 Change-Id: I2f52595409f0d43b148063d5fd90c80d1182ff8c

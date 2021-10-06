@@ -1,7 +1,7 @@
-From 6ce77569d0bb7ae8621e3aa281bc8f7af1102df8 Mon Sep 17 00:00:00 2001
+From 5b46b8046da4309851c681e84ca9296732ec0698 Mon Sep 17 00:00:00 2001
 From: Pierre-Hugues Husson <phh@phh.me>
 Date: Tue, 2 Jul 2019 21:19:29 +0200
-Subject: [PATCH 12/50] Make Samsung fingerprint broken HAL overridable
+Subject: [PATCH 12/51] Make Samsung fingerprint broken HAL overridable
 
 Change-Id: I8be38daa7c80fdb61e9209f12215e6daea171d03
 ---

@@ -1,4 +1,4 @@
-From 48da9b9078dbde9a80f9b3bae22cd3d2ccc0ba35 Mon Sep 17 00:00:00 2001
+From 418c700e3c14314fdb101cbc14f82952f2c3f4e9 Mon Sep 17 00:00:00 2001
 From: Andreas Schneider <asn@cryptomilk.org>
 Date: Mon, 7 Jun 2021 13:23:02 -0400
 Subject: [PATCH] On Samsung devices, we need to tell Audio HAL if we're

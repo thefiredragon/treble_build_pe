@@ -1,4 +1,4 @@
-From 854066444a07f2a4085ed18dcd782d962ffda282 Mon Sep 17 00:00:00 2001
+From 66e0c0d6eef02893b2ab43238a823ad1db94043b Mon Sep 17 00:00:00 2001
 From: Peter Cai <peter@typeblog.net>
 Date: Wed, 14 Apr 2021 10:20:22 +0800
 Subject: [PATCH 38/40] Revert "AudioPolicyManager: retry with SW bridge if

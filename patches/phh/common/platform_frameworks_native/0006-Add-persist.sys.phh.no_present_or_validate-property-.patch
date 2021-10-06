@@ -1,4 +1,4 @@
-From 16e0410a148e32e630b0d4d9d41d2e17b4b5e680 Mon Sep 17 00:00:00 2001
+From c3f7b48c019ef91ed17df43039b891474d8cb755 Mon Sep 17 00:00:00 2001
 From: Pierre-Hugues Husson <phh@phh.me>
 Date: Wed, 30 Sep 2020 22:41:39 +0200
 Subject: [PATCH 06/14] Add persist.sys.phh.no_present_or_validate property to
@@ -10,7 +10,7 @@ Change-Id: I5f0c6c5e129bc21348d6f279d3ba455a5a0f008b
  1 file changed, 12 insertions(+), 1 deletion(-)
 
 diff --git a/services/surfaceflinger/DisplayHardware/HWComposer.cpp b/services/surfaceflinger/DisplayHardware/HWComposer.cpp
-index 7a2f0f34e..1ea104521 100644
+index 7a2f0f34ee..1ea1045214 100644
 --- a/services/surfaceflinger/DisplayHardware/HWComposer.cpp
 +++ b/services/surfaceflinger/DisplayHardware/HWComposer.cpp
 @@ -34,6 +34,7 @@

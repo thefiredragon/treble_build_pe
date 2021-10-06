@@ -1,4 +1,4 @@
-From 9baa78c7bd75638e1b9ebd4377596e997275927d Mon Sep 17 00:00:00 2001
+From 4f6797017b45624bcbdbf0e158482ee1b93985a1 Mon Sep 17 00:00:00 2001
 From: Pierre-Hugues Husson <phh@phh.me>
 Date: Sat, 7 Aug 2021 11:11:39 +0200
 Subject: [PATCH 40/40] When aux cameras are enabled, ignore "system only"

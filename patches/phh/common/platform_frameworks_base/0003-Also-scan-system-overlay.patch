@@ -1,7 +1,7 @@
-From e9085086e8a9d2a7b6616a92d340de0e8b4ba679 Mon Sep 17 00:00:00 2001
+From 1ee9700fc1c8ed6acae2c8d0e38b8b5e9bb4f3e6 Mon Sep 17 00:00:00 2001
 From: Pierre-Hugues Husson <phh@phh.me>
 Date: Tue, 1 May 2018 17:47:36 +0200
-Subject: [PATCH 03/50] Also scan /system/overlay
+Subject: [PATCH 03/51] Also scan /system/overlay
 
 Change-Id: Ib0223560606b80cdaaa986b159b34b4db0154589
 ---

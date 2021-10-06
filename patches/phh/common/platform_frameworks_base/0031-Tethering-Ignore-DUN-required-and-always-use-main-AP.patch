@@ -1,7 +1,7 @@
-From 6ab8e0ee4edc4d0355bf608cb3cb749a2f52b458 Mon Sep 17 00:00:00 2001
+From 138657dc46f76b9f3008b33b20b5c631c6a3ec9c Mon Sep 17 00:00:00 2001
 From: Pierre-Hugues Husson <phh@phh.me>
 Date: Sun, 13 Dec 2020 01:38:50 +0100
-Subject: [PATCH 31/50] [Tethering] Ignore DUN required and always use main APN
+Subject: [PATCH 31/51] [Tethering] Ignore DUN required and always use main APN
 
 ---
  .../android/networkstack/tethering/TetheringConfiguration.java  | 2 +-

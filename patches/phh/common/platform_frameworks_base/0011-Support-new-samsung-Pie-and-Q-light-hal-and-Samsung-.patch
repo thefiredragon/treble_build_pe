@@ -1,7 +1,7 @@
-From 34f436f357bcb286023e54902492e3e93e60fda3 Mon Sep 17 00:00:00 2001
+From 6e98eff8e8d7df05b979d9f1f091998154d372e7 Mon Sep 17 00:00:00 2001
 From: Pierre-Hugues Husson <phh@phh.me>
 Date: Sun, 24 Mar 2019 23:05:14 +0100
-Subject: [PATCH 11/50] Support new samsung Pie and Q light hal and Samsung
+Subject: [PATCH 11/51] Support new samsung Pie and Q light hal and Samsung
  Power HALs
 
 ---

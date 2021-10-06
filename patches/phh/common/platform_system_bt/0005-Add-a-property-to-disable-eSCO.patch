@@ -1,4 +1,4 @@
-From 05ddaf3ef4419a5750029169e4dc328ac6501bf6 Mon Sep 17 00:00:00 2001
+From 94805881ca506b556a45c7de38ee30fba8c9ed19 Mon Sep 17 00:00:00 2001
 From: Pierre-Hugues Husson <phh@phh.me>
 Date: Mon, 7 Jun 2021 17:09:13 -0400
 Subject: [PATCH 5/6] Add a property to disable eSCO
