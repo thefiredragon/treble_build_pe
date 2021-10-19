@@ -1,0 +1,26 @@
+From e197448f32641750f92f6745fe07354453a25fcf Mon Sep 17 00:00:00 2001
+From: Alberto Ponces <ponces26@gmail.com>
+Date: Tue, 19 Oct 2021 18:18:17 +0100
+Subject: [PATCH 4/4] aosp: Disable inline kernel building
+
+Change-Id: If4d5b3ce5198298c4960f5f263339021574c9dc1
+---
+ build/tasks/kernel.mk | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/build/tasks/kernel.mk b/build/tasks/kernel.mk
+index 7797d8ed..bb0c57bd 100644
+--- a/build/tasks/kernel.mk
++++ b/build/tasks/kernel.mk
+@@ -65,7 +65,7 @@
+ #   NEED_KERNEL_MODULE_VENDOR_OVERLAY  = Optional, if true, install kernel
+ #                                          modules in vendor_overlay instead of vendor
+ 
+-ifneq ($(TARGET_NO_KERNEL),true)
++ifneq ($(TARGET_NO_KERNEL),false)
+ 
+ ## Externally influenced variables
+ KERNEL_SRC := $(TARGET_KERNEL_SOURCE)
+-- 
+2.25.1
+
