@@ -9,7 +9,7 @@ First, create a new working directory for your Pixel Experience build and naviga
 
 Initialize your Pixel Experience workspace:
 
-    repo init -u https://github.com/PixelExperience/manifest -b [eleven|eleven-plus]
+    repo init -u https://github.com/PixelExperience/manifest -b twelve
 
 Clone this repo:
 
@@ -17,7 +17,7 @@ Clone this repo:
 
 Finally, start the build script:
 
-    bash treble_build_pe/build.sh [eleven|eleven-plus]
+    bash treble_build_pe/build.sh
 
 Be sure to update the cloned repos from time to time!
 

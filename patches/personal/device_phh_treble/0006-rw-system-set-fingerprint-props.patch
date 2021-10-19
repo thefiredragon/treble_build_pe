@@ -1,0 +1,87 @@
+From 961f7fce5b25fcb669b306d2aa6848c664682a89 Mon Sep 17 00:00:00 2001
+From: Alberto Ponces <ponces26@gmail.com>
+Date: Sat, 3 Oct 2020 14:28:35 -0700
+Subject: [PATCH 6/8] rw-system: set fingerprint props
+
+Change-Id: I55c8897d7d4d5c2a9e62b1a931b3856b2e38956e
+---
+ rw-system.sh | 63 ++++++++++------------------------------------------
+ 1 file changed, 12 insertions(+), 51 deletions(-)
+
+diff --git a/rw-system.sh b/rw-system.sh
+index a49e8f5..fe86a11 100644
+--- a/rw-system.sh
++++ b/rw-system.sh
+@@ -666,58 +666,18 @@ fi
+
+ setprop ctl.stop console
+ dmesg -n 1
+-if [ -f /system/phh/secure ];then
+-    copyprop() {
+-        p="$(getprop "$2")"
+-        if [ "$p" ]; then
+-            resetprop_phh "$1" "$(getprop "$2")"
+-        fi
+-    }
+-
+-    copyprop ro.build.device ro.vendor.build.device
+-    copyprop ro.system.build.fingerprint ro.vendor.build.fingerprint
+-    copyprop ro.bootimage.build.fingerprint ro.vendor.build.fingerprint
+-    copyprop ro.build.fingerprint ro.vendor.build.fingerprint
+-    copyprop ro.build.device ro.vendor.product.device
+-    copyprop ro.product.system.device ro.vendor.product.device
+-    copyprop ro.product.device ro.vendor.product.device
+-    copyprop ro.product.system.device ro.product.vendor.device
+-    copyprop ro.product.device ro.product.vendor.device
+-    copyprop ro.product.system.name ro.vendor.product.name
+-    copyprop ro.product.name ro.vendor.product.name
+-    copyprop ro.product.system.name ro.product.vendor.device
+-    copyprop ro.product.name ro.product.vendor.device
+-    copyprop ro.system.product.brand ro.vendor.product.brand
+-    copyprop ro.product.brand ro.vendor.product.brand
+-    copyprop ro.product.system.model ro.vendor.product.model
+-    copyprop ro.product.model ro.vendor.product.model
+-    copyprop ro.product.system.model ro.product.vendor.model
+-    copyprop ro.product.model ro.product.vendor.model
+-    copyprop ro.build.product ro.vendor.product.model
+-    copyprop ro.build.product ro.product.vendor.model
+-    copyprop ro.system.product.manufacturer ro.vendor.product.manufacturer
+-    copyprop ro.product.manufacturer ro.vendor.product.manufacturer
+-    copyprop ro.system.product.manufacturer ro.product.vendor.manufacturer
+-    copyprop ro.product.manufacturer ro.product.vendor.manufacturer
+-    (getprop ro.vendor.build.security_patch; getprop ro.keymaster.xxx.security_patch) |sort |tail -n 1 |while read v;do
+-        [ -n "$v" ] && resetprop_phh ro.build.version.security_patch "$v"
+-    done
++copyprop() {
++    p="$(getprop "$2")"
++    if [ "$p" ]; then
++        resetprop_phh "$1" "$(getprop "$2")"
++    fi
++}
+
+-    resetprop_phh ro.build.tags release-keys
+-    resetprop_phh ro.boot.vbmeta.device_state locked
+-    resetprop_phh ro.boot.verifiedbootstate green
+-    resetprop_phh ro.boot.flash.locked 1
+-    resetprop_phh ro.boot.veritymode enforcing
+-    resetprop_phh ro.boot.warranty_bit 0
+-    resetprop_phh ro.warranty_bit 0
+-    resetprop_phh ro.debuggable 0
+-    resetprop_phh ro.secure 1
+-    resetprop_phh ro.build.type user
+-    resetprop_phh ro.build.selinux 0
+-
+-    resetprop_phh ro.adb.secure 1
+-    setprop ctl.restart adbd
+-fi
++copyprop ro.system.build.fingerprint ro.vendor.build.fingerprint
++copyprop ro.system_ext.build.fingerprint ro.vendor.build.fingerprint
++copyprop ro.product.build.fingerprint ro.vendor.build.fingerprint
++copyprop ro.build.fingerprint ro.vendor.build.fingerprint
++copyprop ro.bootimage.build.fingerprint ro.vendor.build.fingerprint
+
+ for abi in "" 64;do
+     f=/vendor/lib$abi/libstagefright_foundation.so
+-- 
+2.25.1
+

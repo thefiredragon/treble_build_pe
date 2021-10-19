@@ -1,6 +1,6 @@
 #!/bin/bash
 echo ""
-echo "Pixel Experience 11 Treble Buildbot"
+echo "Pixel Experience 12 Treble Buildbot"
 echo "ATTENTION: this script syncs repo on each run"
 echo "Executing in 5 seconds - CTRL-C to exit"
 echo ""
@@ -19,9 +19,6 @@ echo\
 START=`date +%s`
 BUILD_DATE="$(date +%Y%m%d)"
 BL=$PWD/treble_build_pe
-BRANCH=$1
-[ "$BRANCH" == "" ] && BRANCH="eleven"
-[ "$BRANCH" == "eleven" ] && BUILD="PixelExperience" || BUILD="PixelExperience_Plus"
 
 echo "Preparing local manifest"
 mkdir -p .repo/local_manifests
@@ -32,16 +29,11 @@ echo "Syncing repos"
 repo sync -c --force-sync --no-clone-bundle --no-tags -j$(nproc --all)
 echo ""
 
-echo "Cloning dependecy repos"
-[ ! -d sas-creator ] && git clone https://github.com/AndyCGYan/sas-creator
+echo "Cloning Treble App repo"
 rm -rf treble_app && git clone https://github.com/phhusson/treble_app
 
 echo "Setting up build environment"
 source build/envsetup.sh &> /dev/null
-echo ""
-
-echo "Applying prerequisite patches"
-bash $BL/apply-patches.sh $BL prerequisite $BRANCH
 echo ""
 
 echo "Applying PHH patches"
@@ -50,11 +42,11 @@ cd device/phh/treble
 cp $BL/pe.mk .
 bash generate.sh pe
 cd ../../..
-bash $BL/apply-patches.sh $BL phh $BRANCH
+bash $BL/apply-patches.sh $BL phh
 echo ""
 
 echo "Applying personal patches"
-bash $BL/apply-patches.sh $BL personal $BRANCH
+bash $BL/apply-patches.sh $BL personal
 echo ""
 
 echo "CHECK PATCH STATUS NOW!"
@@ -76,46 +68,12 @@ buildVariant() {
     make installclean
     make -j$(nproc --all) systemimage
     make vndk-test-sepolicy
-    mv $OUT/system.img ~/builds/system-"$1".img
-}
-
-buildSasImages() {
-    cd sas-creator
-    BASE_IMAGE=~/builds/system-treble_arm_bvN.img
-    if [ -f $BASE_IMAGE ]
-    then
-        sudo bash run.sh 32 $BASE_IMAGE
-        xz -c s.img -T0 > ~/builds/"$BUILD"_arm-aonly-11.0-$BUILD_DATE-UNOFFICIAL.img.xz
-        xz -c $BASE_IMAGE -T0 > ~/builds/"$BUILD"_arm-ab-11.0-$BUILD_DATE-UNOFFICIAL.img.xz
-        rm -rf $BASE_IMAGE
-    fi
-    BASE_IMAGE=~/builds/system-treble_a64_bvN.img
-    if [ -f $BASE_IMAGE ]
-    then
-        sudo bash lite-adapter.sh 32 $BASE_IMAGE
-        xz -c s.img -T0 > ~/builds/"$BUILD"_arm32_binder64-ab-vndklite-11.0-$BUILD_DATE-UNOFFICIAL.img.xz
-        xz -c $BASE_IMAGE -T0 > ~/builds/"$BUILD"_arm32_binder64-ab-11.0-$BUILD_DATE-UNOFFICIAL.img.xz
-        rm -rf $BASE_IMAGE
-    fi
-    BASE_IMAGE=~/builds/system-treble_arm64_bvN.img
-    if [ -f $BASE_IMAGE ]
-    then
-        sudo bash run.sh 64 $BASE_IMAGE
-        xz -c s.img -T0 > ~/builds/"$BUILD"_arm64-aonly-11.0-$BUILD_DATE-UNOFFICIAL.img.xz
-        sudo bash lite-adapter.sh 64 $BASE_IMAGE
-        xz -c s.img -T0 > ~/builds/"$BUILD"_arm64-ab-vndklite-11.0-$BUILD_DATE-UNOFFICIAL.img.xz
-        xz -c $BASE_IMAGE -T0 > ~/builds/"$BUILD"_arm64-ab-11.0-$BUILD_DATE-UNOFFICIAL.img.xz
-        rm -rf $BASE_IMAGE
-    fi
-    cd ..
+    xz -c $OUT/system.img -T0 > ~/builds/PixelExperience_arm64-ab-12.0-$BUILD_DATE-UNOFFICIAL.img.xz
 }
 
 buildTrebleApp
-buildVariant treble_arm_bvN
-buildVariant treble_a64_bvN
 buildVariant treble_arm64_bvN
-buildSasImages
-ls ~/builds | grep $BUILD
+ls ~/builds | grep PixelExperience
 
 END=`date +%s`
 ELAPSEDM=$(($(($END-$START))/60))
