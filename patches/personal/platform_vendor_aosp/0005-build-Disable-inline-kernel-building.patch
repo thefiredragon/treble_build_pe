@@ -1,0 +1,42 @@
+From f9a585a7a61eae3ec0a9e482269424668a27c8d3 Mon Sep 17 00:00:00 2001
+From: Alberto Ponces <ponces26@gmail.com>
+Date: Wed, 20 Oct 2021 15:54:26 +0100
+Subject: [PATCH 5/5] build: Disable inline kernel building
+
+Change-Id: I4c01aa093474a8017366bd5e98586c58b2cd6452
+---
+ build/tasks/kernel.mk | 2 ++
+ config/common.mk      | 2 ++
+ 2 files changed, 4 insertions(+)
+
+diff --git a/build/tasks/kernel.mk b/build/tasks/kernel.mk
+index 7797d8ed..bfa106dc 100644
+--- a/build/tasks/kernel.mk
++++ b/build/tasks/kernel.mk
+@@ -66,6 +66,7 @@
+ #                                          modules in vendor_overlay instead of vendor
+ 
+ ifneq ($(TARGET_NO_KERNEL),true)
++ifneq ($(TARGET_NO_KERNEL_OVERRIDE),true)
+ 
+ ## Externally influenced variables
+ KERNEL_SRC := $(TARGET_KERNEL_SOURCE)
+@@ -515,4 +516,5 @@ dtboimage: $(INSTALLED_DTBOIMAGE_TARGET)
+ .PHONY: dtbimage
+ dtbimage: $(INSTALLED_DTBIMAGE_TARGET)
+ 
++endif # TARGET_NO_KERNEL_OVERRIDE
+ endif # TARGET_NO_KERNEL
+diff --git a/config/common.mk b/config/common.mk
+index a969b6af..2e9d5354 100644
+--- a/config/common.mk
++++ b/config/common.mk
+@@ -213,3 +213,5 @@ $(call inherit-product, vendor/aosp/config/ota.mk)
+ $(call inherit-product, vendor/aosp/config/rro_overlays.mk)
+ 
+ -include $(WORKSPACE)/build_env/image-auto-bits.mk
++
++TARGET_NO_KERNEL_OVERRIDE := true
+-- 
+2.25.1
+
