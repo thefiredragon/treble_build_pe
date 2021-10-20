@@ -1,7 +1,7 @@
 From 334d60742ffd8ecc81ade84afb760d606f5d8763 Mon Sep 17 00:00:00 2001
 From: Alberto Ponces <ponces26@gmail.com>
 Date: Mon, 18 Oct 2021 20:49:46 +0100
-Subject: [PATCH 2/2] A40: fix corner radius overlay
+Subject: [PATCH] A40: fix corner radius overlay
 
 ---
  Samsung/A40/res/values/notch.xml | 2 +-

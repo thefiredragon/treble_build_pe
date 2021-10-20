@@ -1,7 +1,7 @@
 From e197448f32641750f92f6745fe07354453a25fcf Mon Sep 17 00:00:00 2001
 From: Alberto Ponces <ponces26@gmail.com>
 Date: Tue, 19 Oct 2021 18:18:17 +0100
-Subject: [PATCH 4/4] aosp: Disable inline kernel building
+Subject: [PATCH 4/5] aosp: Disable inline kernel building
 
 Change-Id: If4d5b3ce5198298c4960f5f263339021574c9dc1
 ---
