@@ -18,9 +18,3 @@ Clone this repo:
 Finally, start the build script:
 
     bash treble_build_pe/build.sh
-
-Be sure to update the cloned repos from time to time!
-
----
-
-Note: A-only and VNDKLite targets are now generated from AB images - refer to [sas-creator](https://github.com/phhusson/sas-creator).
