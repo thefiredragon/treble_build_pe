@@ -9,7 +9,7 @@ First, create a new working directory for your Pixel Experience build and naviga
 
 Initialize your Pixel Experience workspace:
 
-    repo init -u https://github.com/PixelExperience/manifest -b twelve
+    repo init -u https://github.com/PixelExperience-Staging/manifest -b twelve
 
 Clone this repo:
 
