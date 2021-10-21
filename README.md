@@ -13,7 +13,7 @@ Initialize your Pixel Experience workspace:
 
 Clone this repo:
 
-    git clone https://github.com/ponces/treble_build_pe
+    git clone https://github.com/ponces/treble_build_pe -b eleven
 
 Finally, start the build script:
 
