@@ -1,0 +1,44 @@
+From e77a70549640e4681ee12544d2750ca17f824e54 Mon Sep 17 00:00:00 2001
+From: Alberto Ponces <ponces26@gmail.com>
+Date: Sun, 24 Oct 2021 05:03:35 +0100
+Subject: [PATCH 2/2] PixelPropsUtils: Fix SafetyNet
+
+Change-Id: I31d21758b7cd41940bc283534523aab2dc4d145e
+---
+ .../android/internal/util/custom/PixelPropsUtils.java | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
+
+diff --git a/core/java/com/android/internal/util/custom/PixelPropsUtils.java b/core/java/com/android/internal/util/custom/PixelPropsUtils.java
+index fbce2d67..e48a67ce 100644
+--- a/core/java/com/android/internal/util/custom/PixelPropsUtils.java
++++ b/core/java/com/android/internal/util/custom/PixelPropsUtils.java
+@@ -41,14 +41,15 @@ public class PixelPropsUtils {
+ 
+     static {
+         propsToKeep = new HashMap<>();
++        propsToKeep.put(PACKAGE_GMS, new ArrayList<String>(Arrays.asList("MODEL")));
+         propsToKeep.put("com.google.android.settings.intelligence", new ArrayList<String>(Arrays.asList("FINGERPRINT")));
+         propsToChange = new HashMap<>();
+         propsToChange.put("BRAND", "google");
+         propsToChange.put("MANUFACTURER", "Google");
+-        propsToChange.put("DEVICE", "raven");
+-        propsToChange.put("PRODUCT", "raven");
+-        propsToChange.put("MODEL", "Pixel 6 Pro");
+-        propsToChange.put("FINGERPRINT", "google/raven/raven:12/SD1A.210817.015.A4/7697517:userdebug/dev-keys");
++        propsToChange.put("DEVICE", "redfin");
++        propsToChange.put("PRODUCT", "redfin");
++        propsToChange.put("MODEL", "Pixel 5");
++        propsToChange.put("FINGERPRINT", "google/redfin/redfin:12/SPB5.210812.002/7671067:user/release-keys");
+     }
+ 
+     public static void setProps(String packageName) {
+@@ -101,4 +102,4 @@ public class PixelPropsUtils {
+             throw new UnsupportedOperationException();
+         }
+     }
+-}
+\ No newline at end of file
++}
+-- 
+2.25.1
+
