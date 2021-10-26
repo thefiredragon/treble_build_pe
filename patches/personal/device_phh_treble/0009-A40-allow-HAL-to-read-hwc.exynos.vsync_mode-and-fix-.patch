@@ -1,0 +1,50 @@
+From 99534c3d486b21095a14523afe42b4681c73d0e1 Mon Sep 17 00:00:00 2001
+From: Alberto Ponces <ponces26@gmail.com>
+Date: Tue, 26 Oct 2021 22:16:04 +0100
+Subject: [PATCH 9/9] A40: allow HAL to read hwc.exynos.vsync_mode and fix screen
+ flickering
+
+---
+ rw-system.sh               | 4 ----
+ sepolicy/property_contexts | 2 ++
+ sepolicy/samsung.te        | 3 +++
+ 3 files changed, 5 insertions(+), 4 deletions(-)
+ create mode 100644 sepolicy/property_contexts
+
+diff --git a/rw-system.sh b/rw-system.sh
+index fe86a11..b03d5e9 100644
+--- a/rw-system.sh
++++ b/rw-system.sh
+@@ -513,10 +513,6 @@ if busybox_phh unzip -p /vendor/app/ims/ims.apk classes.dex | grep -qF -e Landro
+     mount -o bind /system/phh/empty /vendor/app/ims/ims.apk
+ fi
+ 
+-if getprop ro.hardware | grep -qF exynos; then
+-    setprop debug.sf.latch_unsignaled 1
+-fi
+-
+ if getprop ro.product.model | grep -qF ANE; then
+     setprop debug.sf.latch_unsignaled 1
+ fi
+diff --git a/sepolicy/property_contexts b/sepolicy/property_contexts
+new file mode 100644
+index 0000000..9902145
+--- /dev/null
++++ b/sepolicy/property_contexts
+@@ -0,0 +1,2 @@
++# Hwc
++hwc.exynos.vsync_mode      u:object_r:vendor_hwc_prop:s0
+diff --git a/sepolicy/samsung.te b/sepolicy/samsung.te
+index 63f4edc..8c2b81b 100644
+--- a/sepolicy/samsung.te
++++ b/sepolicy/samsung.te
+@@ -2,3 +2,6 @@ type boot_prop, property_type;
+ 
+ set_prop(system_server, boot_prop);
+ 
++type hal_graphics_composer_default, domain;
++type vendor_hwc_prop, property_type;
++get_prop(hal_graphics_composer_default, vendor_hwc_prop);
+-- 
+2.25.1
+

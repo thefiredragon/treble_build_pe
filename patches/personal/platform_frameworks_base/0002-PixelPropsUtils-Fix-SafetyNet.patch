@@ -9,7 +9,7 @@ Change-Id: I31d21758b7cd41940bc283534523aab2dc4d145e
  1 file changed, 6 insertions(+), 5 deletions(-)
 
 diff --git a/core/java/com/android/internal/util/custom/PixelPropsUtils.java b/core/java/com/android/internal/util/custom/PixelPropsUtils.java
-index fbce2d67..e48a67ce 100644
+index fbce2d67..e8b3dab4 100644
 --- a/core/java/com/android/internal/util/custom/PixelPropsUtils.java
 +++ b/core/java/com/android/internal/util/custom/PixelPropsUtils.java
 @@ -41,14 +41,15 @@ public class PixelPropsUtils {
@@ -28,7 +28,7 @@ index fbce2d67..e48a67ce 100644
 +        propsToChange.put("DEVICE", "redfin");
 +        propsToChange.put("PRODUCT", "redfin");
 +        propsToChange.put("MODEL", "Pixel 5");
-+        propsToChange.put("FINGERPRINT", "google/redfin/redfin:12/SPB5.210812.002/7671067:user/release-keys");
++        propsToChange.put("FINGERPRINT", "google/redfin/redfin:12/SP1A.210812.015/7679548:user/release-keys");
      }
  
      public static void setProps(String packageName) {

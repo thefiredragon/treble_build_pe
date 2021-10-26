@@ -1,0 +1,46 @@
+From 11e10f904bda3594f2b35a8897a32cc0d2febc79 Mon Sep 17 00:00:00 2001
+From: binzhang <binzhang@codeaurora.org>
+Date: Fri, 17 Sep 2021 12:56:50 +0800
+Subject: [PATCH] sf: Avoiding unnecessary frame skip to reduce jank.
+
+The candidate of present fence is switched dynamically between
+front/back buffer, based on current design, it will introduce in
+big side effect especially for app launching, app resume cases,
+sometimes the timestamp of the candidate fence is not signaled,
+but the other candidate has fence signaled already. Then previous
+logic is not well handled to pick up the right present fence candidate.
+Then frame is skipped.
+
+This change is to use the legacy logic to pick up fence candidate.
+It can avoid such abnormal frame skip behavior.
+
+Change-Id: I055942d9ae9ac6c96eba403aa4bc1979cf128ce8
+CRs-Fixed: 3035044
+Reviewed-on: https://review.statixos.com/c/android_frameworks_native/+/5905
+Reviewed-by: Sourajit Karmakar <sourajit@live.com>
+Tested-by: Sourajit Karmakar <sourajit@live.com>
+---
+ services/surfaceflinger/SurfaceFlinger.cpp | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
+
+diff --git a/services/surfaceflinger/SurfaceFlinger.cpp b/services/surfaceflinger/SurfaceFlinger.cpp
+index 3c71ab1..9e9f8cf 100644
+--- a/services/surfaceflinger/SurfaceFlinger.cpp
++++ b/services/surfaceflinger/SurfaceFlinger.cpp
+@@ -1826,11 +1826,8 @@ void SurfaceFlinger::setVsyncEnabled(bool enabled) {
+ }
+ 
+ SurfaceFlinger::FenceWithFenceTime SurfaceFlinger::previousFrameFence() {
+-    const auto now = systemTime();
+-    const auto vsyncPeriod = mScheduler->getDisplayStatInfo(now).vsyncPeriod;
+-    const bool expectedPresentTimeIsTheNextVsync = mExpectedPresentTime - now <= vsyncPeriod;
+-    return expectedPresentTimeIsTheNextVsync ? mPreviousPresentFences[0]
+-                                             : mPreviousPresentFences[1];
++     return mVsyncModulator->getVsyncConfig().sfOffset >= 0 ? mPreviousPresentFences[0]
++                                                           : mPreviousPresentFences[1];
+ }
+ 
+ bool SurfaceFlinger::previousFramePending(int graceTimeMs) {
+-- 
+2.25.1
+
