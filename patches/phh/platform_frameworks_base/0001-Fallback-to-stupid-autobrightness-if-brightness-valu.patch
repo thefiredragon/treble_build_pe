@@ -14,7 +14,7 @@ Change-Id: Ieb679b34239013a5e31b34cb010b12febd9ef6d9
  1 file changed, 6 insertions(+), 1 deletion(-)
 
 diff --git a/services/core/java/com/android/server/display/DisplayDeviceConfig.java b/services/core/java/com/android/server/display/DisplayDeviceConfig.java
-index 4c9d0f26..4ad21835 100644
+index 4c9d0f2691b3..4ad21835c1ad 100644
 --- a/services/core/java/com/android/server/display/DisplayDeviceConfig.java
 +++ b/services/core/java/com/android/server/display/DisplayDeviceConfig.java
 @@ -172,7 +172,12 @@ public class DisplayDeviceConfig {
@@ -32,5 +32,5 @@ index 4c9d0f26..4ad21835 100644
              config = getConfigFromPmValues(context);
          }
 -- 
-2.25.1
+2.29.2
 

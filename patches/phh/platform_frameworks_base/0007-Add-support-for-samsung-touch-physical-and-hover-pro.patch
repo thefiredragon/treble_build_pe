@@ -10,7 +10,7 @@ Change-Id: I7a0f8b4665c802140d19197d850b77b2a7ac1865
  1 file changed, 35 insertions(+)
 
 diff --git a/services/core/java/com/android/server/display/DisplayPowerController.java b/services/core/java/com/android/server/display/DisplayPowerController.java
-index abbe13ac..7ee297c6 100644
+index abbe13ac260f..7ee297c60539 100644
 --- a/services/core/java/com/android/server/display/DisplayPowerController.java
 +++ b/services/core/java/com/android/server/display/DisplayPowerController.java
 @@ -1671,6 +1671,27 @@ final class DisplayPowerController implements AutomaticBrightnessController.Call
@@ -63,5 +63,5 @@ index abbe13ac..7ee297c6 100644
                  boolean positive = distance >= 0.0f && distance < mProximityThreshold;
                  handleProximitySensorEvent(time, positive);
 -- 
-2.25.1
+2.29.2
 

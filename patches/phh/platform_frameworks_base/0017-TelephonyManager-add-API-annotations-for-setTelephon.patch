@@ -14,7 +14,7 @@ Subject: [PATCH 17/24] TelephonyManager: add API annotations for
  1 file changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/telephony/java/android/telephony/TelephonyManager.java b/telephony/java/android/telephony/TelephonyManager.java
-index 674d09c3..a7f32cb0 100644
+index 674d09c3bfd8..a7f32cb0cd4b 100644
 --- a/telephony/java/android/telephony/TelephonyManager.java
 +++ b/telephony/java/android/telephony/TelephonyManager.java
 @@ -7469,7 +7469,7 @@ public class TelephonyManager {
@@ -37,5 +37,5 @@ index 674d09c3..a7f32cb0 100644
              value = "";
          }
 -- 
-2.25.1
+2.29.2
 

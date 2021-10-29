@@ -12,7 +12,7 @@ Change-Id: I481c1c8849b2f22a7cdfb2896a6d3c2e7e3b44d9
  3 files changed, 14 insertions(+), 5 deletions(-)
 
 diff --git a/packages/SystemUI/src/com/android/systemui/qs/QuickStatusBarHeader.java b/packages/SystemUI/src/com/android/systemui/qs/QuickStatusBarHeader.java
-index 77906abc..8cbfefcb 100644
+index 77906abce625..8cbfefcb4fea 100644
 --- a/packages/SystemUI/src/com/android/systemui/qs/QuickStatusBarHeader.java
 +++ b/packages/SystemUI/src/com/android/systemui/qs/QuickStatusBarHeader.java
 @@ -22,6 +22,7 @@ import android.content.res.Configuration;
@@ -37,7 +37,7 @@ index 77906abc..8cbfefcb 100644
          int qsOffsetHeight = resources.getDimensionPixelSize(
                  com.android.internal.R.dimen.quick_qs_offset_height);
 diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/phone/KeyguardStatusBarView.java b/packages/SystemUI/src/com/android/systemui/statusbar/phone/KeyguardStatusBarView.java
-index e272d271..ed0abcce 100644
+index e272d2713e2a..ed0abcce5b06 100644
 --- a/packages/SystemUI/src/com/android/systemui/statusbar/phone/KeyguardStatusBarView.java
 +++ b/packages/SystemUI/src/com/android/systemui/statusbar/phone/KeyguardStatusBarView.java
 @@ -30,6 +30,7 @@ import android.graphics.Color;
@@ -62,7 +62,7 @@ index e272d271..ed0abcce 100644
  
      // Set hidden status bar items
 diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/phone/StatusBarContentInsetsProvider.kt b/packages/SystemUI/src/com/android/systemui/statusbar/phone/StatusBarContentInsetsProvider.kt
-index fe1f63a3..3ee8c688 100644
+index fe1f63a34acd..3ee8c688376d 100644
 --- a/packages/SystemUI/src/com/android/systemui/statusbar/phone/StatusBarContentInsetsProvider.kt
 +++ b/packages/SystemUI/src/com/android/systemui/statusbar/phone/StatusBarContentInsetsProvider.kt
 @@ -25,6 +25,7 @@ import android.view.DisplayCutout
@@ -85,5 +85,5 @@ index fe1f63a3..3ee8c688 100644
          val minDotWidth = rotatedResources
                  .getDimensionPixelSize(R.dimen.ongoing_appops_dot_min_padding)
 -- 
-2.25.1
+2.29.2
 

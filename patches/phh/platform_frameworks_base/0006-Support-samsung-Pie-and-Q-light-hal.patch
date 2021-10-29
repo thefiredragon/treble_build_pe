@@ -10,7 +10,7 @@ Change-Id: I01f94acd7d0672733e48854d80368f9ac6f861c6
  2 files changed, 53 insertions(+)
 
 diff --git a/services/core/jni/Android.bp b/services/core/jni/Android.bp
-index 53401fd4..59256cc7 100644
+index 53401fd47178..59256cc73df1 100644
 --- a/services/core/jni/Android.bp
 +++ b/services/core/jni/Android.bp
 @@ -183,6 +183,8 @@ cc_defaults {
@@ -23,7 +23,7 @@ index 53401fd4..59256cc7 100644
  
      static_libs: [
 diff --git a/services/core/jni/com_android_server_lights_LightsService.cpp b/services/core/jni/com_android_server_lights_LightsService.cpp
-index 26f6d742..268b59a5 100644
+index 26f6d7428fcc..268b59a58010 100644
 --- a/services/core/jni/com_android_server_lights_LightsService.cpp
 +++ b/services/core/jni/com_android_server_lights_LightsService.cpp
 @@ -22,6 +22,10 @@
@@ -101,5 +101,5 @@ index 26f6d742..268b59a5 100644
      LightState state = constructState(
          colorARGB, flashMode, onMS, offMS, brightnessMode);
 -- 
-2.25.1
+2.29.2
 

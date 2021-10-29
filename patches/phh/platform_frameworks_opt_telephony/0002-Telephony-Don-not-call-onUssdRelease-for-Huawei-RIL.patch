@@ -13,7 +13,7 @@ Change-Id: I69faed1c51d4582834879975d6ab13daf7f48ad4
  1 file changed, 5 insertions(+), 1 deletion(-)
 
 diff --git a/src/java/com/android/internal/telephony/GsmCdmaPhone.java b/src/java/com/android/internal/telephony/GsmCdmaPhone.java
-index a034392ce..c82af4c43 100644
+index a034392cee..c82af4c432 100644
 --- a/src/java/com/android/internal/telephony/GsmCdmaPhone.java
 +++ b/src/java/com/android/internal/telephony/GsmCdmaPhone.java
 @@ -2723,7 +2723,11 @@ public class GsmCdmaPhone extends Phone {
@@ -30,5 +30,5 @@ index a034392ce..c82af4c43 100644
                  found.onUssdFinishedError();
              } else {
 -- 
-2.25.1
+2.29.2
 

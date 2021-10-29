@@ -23,5 +23,5 @@ index ed0c0cc51..7fc59e043 100644
              } else {
                  Log.i(TAG, "Starting supplicant using init");
 -- 
-2.25.1
+2.29.2
 

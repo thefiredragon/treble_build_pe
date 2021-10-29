@@ -36,7 +36,7 @@ Change-Id: Ied7d6ce0b83a2d2345c3abba0429998d86494a88
  4 files changed, 57 insertions(+), 3 deletions(-)
 
 diff --git a/core/api/current.txt b/core/api/current.txt
-index 1de47b54..52c7ea2e 100644
+index 1de47b548a5c..52c7ea2e1321 100644
 --- a/core/api/current.txt
 +++ b/core/api/current.txt
 @@ -84,6 +84,7 @@ package android {
@@ -56,7 +56,7 @@ index 1de47b54..52c7ea2e 100644
      field public static final String MICROPHONE = "android.permission-group.MICROPHONE";
      field public static final String NEARBY_DEVICES = "android.permission-group.NEARBY_DEVICES";
 diff --git a/core/res/AndroidManifest.xml b/core/res/AndroidManifest.xml
-index bad79eb1..e4475497 100644
+index bad79eb13749..e4475497b12e 100644
 --- a/core/res/AndroidManifest.xml
 +++ b/core/res/AndroidManifest.xml
 @@ -3186,6 +3186,21 @@
@@ -82,7 +82,7 @@ index bad79eb1..e4475497 100644
           {@link android.content.pm.PackageManager#addPackageToPreferred}
           for details. -->
 diff --git a/core/res/res/values/strings.xml b/core/res/res/values/strings.xml
-index a99a2200..81ca9b23 100644
+index a99a22009e3b..81ca9b23ae70 100644
 --- a/core/res/res/values/strings.xml
 +++ b/core/res/res/values/strings.xml
 @@ -880,6 +880,18 @@
@@ -105,7 +105,7 @@ index a99a2200..81ca9b23 100644
      <string name="permlab_statusBar">disable or modify status bar</string>
      <!-- Description of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
 diff --git a/services/core/java/com/android/server/pm/PackageManagerService.java b/services/core/java/com/android/server/pm/PackageManagerService.java
-index c4775463..e26cd6a4 100644
+index c4775463ee75..e26cd6a4c16f 100644
 --- a/services/core/java/com/android/server/pm/PackageManagerService.java
 +++ b/services/core/java/com/android/server/pm/PackageManagerService.java
 @@ -3299,6 +3299,29 @@ public class PackageManagerService extends IPackageManager.Stub
@@ -157,5 +157,5 @@ index c4775463..e26cd6a4 100644
                  if (packageInfo == null) {
                      return null;
 -- 
-2.25.1
+2.29.2
 

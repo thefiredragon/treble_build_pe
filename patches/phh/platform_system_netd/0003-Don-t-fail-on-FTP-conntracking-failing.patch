@@ -41,5 +41,5 @@ index 7b106933..0c666b9c 100644
              StringPrintf("%s %s -i %s -o %s -m state --state ESTABLISHED,RELATED -g %s", op,
                           LOCAL_FORWARD, extIface, intIface, LOCAL_TETHER_COUNTERS_CHAIN),
 -- 
-2.25.1
+2.29.2
 

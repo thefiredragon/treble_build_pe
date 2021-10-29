@@ -10,7 +10,7 @@ Change-Id: Ia562bafd8c620d00c17e8eb338e4701c6c4a3c3a
  1 file changed, 1 insertion(+)
 
 diff --git a/core/java/android/view/KeyEvent.java b/core/java/android/view/KeyEvent.java
-index cda9b233..bb35e317 100644
+index cda9b233576c..bb35e3172165 100644
 --- a/core/java/android/view/KeyEvent.java
 +++ b/core/java/android/view/KeyEvent.java
 @@ -1988,6 +1988,7 @@ public class KeyEvent extends InputEvent implements Parcelable {
@@ -22,5 +22,5 @@ index cda9b233..bb35e317 100644
              case KeyEvent.KEYCODE_STEM_1:
              case KeyEvent.KEYCODE_STEM_2:
 -- 
-2.25.1
+2.29.2
 

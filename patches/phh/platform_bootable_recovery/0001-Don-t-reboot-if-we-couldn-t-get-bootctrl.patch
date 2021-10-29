@@ -9,7 +9,7 @@ Change-Id: Id1793660bd1c97ab369607f58a772ca3512ec1af
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/update_verifier/update_verifier.cpp b/update_verifier/update_verifier.cpp
-index a042f90..ea3645a 100644
+index a042f900..ea3645af 100644
 --- a/update_verifier/update_verifier.cpp
 +++ b/update_verifier/update_verifier.cpp
 @@ -310,7 +310,7 @@ int update_verifier(int argc, char** argv) {
@@ -22,5 +22,5 @@ index a042f90..ea3645a 100644
  
    uint32_t current_slot = module->getCurrentSlot();
 -- 
-2.25.1
+2.29.2
 

@@ -11,7 +11,7 @@ This reverts commit debb4616ef67f9ed5054eca51ec58592358ff55f.
  1 file changed, 69 insertions(+)
 
 diff --git a/telephony/java/android/telephony/TelephonyManager.java b/telephony/java/android/telephony/TelephonyManager.java
-index 255a6126..7243221f 100644
+index 255a61266ebf..7243221f0998 100644
 --- a/telephony/java/android/telephony/TelephonyManager.java
 +++ b/telephony/java/android/telephony/TelephonyManager.java
 @@ -7405,6 +7405,75 @@ public class TelephonyManager {
@@ -91,5 +91,5 @@ index 255a6126..7243221f 100644
       * Inserts or updates a list property. Expands the list if its length is not enough.
       */
 -- 
-2.25.1
+2.29.2
 

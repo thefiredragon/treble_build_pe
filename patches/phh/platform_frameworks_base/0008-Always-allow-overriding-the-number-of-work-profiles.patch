@@ -9,7 +9,7 @@ Change-Id: I6eb09aa71663c6fbe7563e3038bffcabdba0ff6a
  1 file changed, 2 insertions(+), 6 deletions(-)
 
 diff --git a/services/core/java/com/android/server/pm/UserManagerService.java b/services/core/java/com/android/server/pm/UserManagerService.java
-index d4feb3a7..c12596c1 100644
+index d4feb3a728c8..c12596c127c8 100644
 --- a/services/core/java/com/android/server/pm/UserManagerService.java
 +++ b/services/core/java/com/android/server/pm/UserManagerService.java
 @@ -5818,12 +5818,8 @@ public class UserManagerService extends IUserManager.Stub {
@@ -28,5 +28,5 @@ index d4feb3a7..c12596c1 100644
          return defaultMax;
      }
 -- 
-2.25.1
+2.29.2
 

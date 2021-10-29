@@ -15,7 +15,7 @@ Change-Id: I4d97cbc32490949e83272b81ec6320a5483310b1
  1 file changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/services/core/java/com/android/server/power/PowerManagerService.java b/services/core/java/com/android/server/power/PowerManagerService.java
-index 2b059549..b3aec36c 100644
+index 2b0595492f8a..b3aec36c8fbd 100644
 --- a/services/core/java/com/android/server/power/PowerManagerService.java
 +++ b/services/core/java/com/android/server/power/PowerManagerService.java
 @@ -988,9 +988,11 @@ public final class PowerManagerService extends SystemService
@@ -33,5 +33,5 @@ index 2b059549..b3aec36c 100644
                      mContext.getResources().getInteger(com.android.internal.R.integer
                              .config_screenBrightnessSettingMaximum));
 -- 
-2.25.1
+2.29.2
 

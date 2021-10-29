@@ -9,7 +9,7 @@ Change-Id: I0c0f527b3ae151d45c68f7ac6c205da3f34e74df
  1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/services/core/java/com/android/server/net/NetworkPolicyManagerService.java b/services/core/java/com/android/server/net/NetworkPolicyManagerService.java
-index 84be7f58..58f7f7da 100644
+index 84be7f5809e6..58f7f7dacc6d 100644
 --- a/services/core/java/com/android/server/net/NetworkPolicyManagerService.java
 +++ b/services/core/java/com/android/server/net/NetworkPolicyManagerService.java
 @@ -845,6 +845,10 @@ public class NetworkPolicyManagerService extends INetworkPolicyManager.Stub {
@@ -35,5 +35,5 @@ index 84be7f58..58f7f7da 100644
                  synchronized (mNetworkPoliciesSecondLock) {
                      updatePowerSaveWhitelistUL();
 -- 
-2.25.1
+2.29.2
 
