@@ -157,13 +157,13 @@ index 0000000..a7b0198
 +    </modules>
 +</audioPolicyConfiguration>
 diff --git a/rw-system.sh b/rw-system.sh
-index fe86a11..525fbea 100644
+index a2114a5..dd28310 100644
 --- a/rw-system.sh
 +++ b/rw-system.sh
-@@ -908,3 +908,7 @@ fi
- 
- # Disable secondary watchdogs
- echo -n V > /dev/watchdog1
+@@ -914,3 +914,7 @@ if [ "$vndk" -le 30 ];then
+ 	# Don't override vendor value, merely add a fallback
+ 	setprop ro.surface_flinger.use_color_management false
+ fi
 +
 +if getprop ro.vendor.build.fingerprint | grep -qi samsung/a40; then
 +    mount /system/phh/audio_policy_configuration_sec_a40.xml /vendor/etc/audio_policy_configuration_sec.xml
