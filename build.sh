@@ -29,7 +29,8 @@ echo "Syncing repos"
 repo sync -c --force-sync --no-clone-bundle --no-tags -j$(nproc --all)
 echo ""
 
-echo "Cloning Treble App repo"
+echo "Cloning dependency repos"
+[ ! -d sas-creator ] && git clone https://github.com/AndyCGYan/sas-creator
 rm -rf treble_app && git clone https://github.com/phhusson/treble_app
 
 echo "Setting up build environment"
@@ -68,11 +69,34 @@ buildVariant() {
     make installclean
     make -j$(nproc --all) systemimage
     make vndk-test-sepolicy
-    xz -c $OUT/system.img -T0 > ~/builds/PixelExperience_arm64-ab-12.0-$BUILD_DATE-UNOFFICIAL.img.xz
+    rm -rf out/target/product/phhgsi*
+}
+
+buildSasImages() {
+    cd sas-creator
+    BASE_IMAGE=~/builds/system-treble_a64_bvN.img
+    if [ -f $BASE_IMAGE ]
+    then
+        sudo bash lite-adapter.sh 32 $BASE_IMAGE
+        xz -c s.img -T0 > ~/builds/PixelExperience_arm32_binder64-ab-vndklite-11.0-$BUILD_DATE-UNOFFICIAL.img.xz
+        xz -c $BASE_IMAGE -T0 > ~/builds/PixelExperience_arm32_binder64-ab-11.0-$BUILD_DATE-UNOFFICIAL.img.xz
+        rm -rf $BASE_IMAGE
+    fi
+    BASE_IMAGE=~/builds/system-treble_arm64_bvN.img
+    if [ -f $BASE_IMAGE ]
+    then
+        sudo bash lite-adapter.sh 64 $BASE_IMAGE
+        xz -c s.img -T0 > ~/builds/PixelExperience_arm64-ab-vndklite-11.0-$BUILD_DATE-UNOFFICIAL.img.xz
+        xz -c $BASE_IMAGE -T0 > ~/builds/PixelExperience_arm64-ab-11.0-$BUILD_DATE-UNOFFICIAL.img.xz
+        rm -rf $BASE_IMAGE
+    fi
+    cd ..
 }
 
 buildTrebleApp
+buildVariant treble_a64_bvN
 buildVariant treble_arm64_bvN
+buildSasImages
 ls ~/builds | grep PixelExperience
 
 END=`date +%s`
