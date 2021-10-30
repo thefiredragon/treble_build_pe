@@ -7,10 +7,6 @@ First, create a new working directory for your Pixel Experience build and naviga
 
     mkdir pixel; cd pixel
 
-Initialize your Pixel Experience workspace:
-
-    repo init -u https://github.com/PixelExperience-Staging/manifest -b twelve
-
 Clone this repo:
 
     git clone https://github.com/ponces/treble_build_pe -b twelve-staging
