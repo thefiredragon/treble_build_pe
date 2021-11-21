@@ -1,0 +1,173 @@
+From 1a43038412cf0bde7b9af6b9c1d86ef180979de4 Mon Sep 17 00:00:00 2001
+From: Alberto Ponces <ponces26@gmail.com>
+Date: Wed, 27 Oct 2021 23:58:59 +0100
+Subject: [PATCH 9/9] A40: Fix audio policy
+
+---
+ base.mk                                      |   3 +
+ files/audio_policy_configuration_sec_a40.xml | 129 +++++++++++++++++++
+ rw-system.sh                                 |   4 +
+ 3 files changed, 136 insertions(+)
+ create mode 100644 files/audio_policy_configuration_sec_a40.xml
+
+diff --git a/base.mk b/base.mk
+index f52b722..b2cc58a 100644
+--- a/base.mk
++++ b/base.mk
+@@ -204,3 +204,6 @@ PRODUCT_PACKAGES += \
+ 	oplus-alert-slider
+ 
+ include build/make/target/product/gsi_release.mk
++
++PRODUCT_COPY_FILES += \
++	device/phh/treble/files/audio_policy_configuration_sec_a40.xml:system/phh/audio_policy_configuration_sec_a40.xml
+diff --git a/files/audio_policy_configuration_sec_a40.xml b/files/audio_policy_configuration_sec_a40.xml
+new file mode 100644
+index 0000000..a7b0198
+--- /dev/null
++++ b/files/audio_policy_configuration_sec_a40.xml
+@@ -0,0 +1,129 @@
++<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
++<audioPolicyConfiguration version="1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
++    <globalConfiguration speaker_drc_enabled="false"/>
++
++    <modules>
++        <module name="primary" halVersion="3.0">
++            <attachedDevices>
++                <item>Earpiece</item>
++                <item>Speaker</item>
++                <item>Built-In Mic</item>
++                <item>Built-In Back Mic</item>
++                <item>Built-In 2 Mic</item>
++                <item>Voice Call Mic</item>
++            </attachedDevices>
++
++            <defaultOutputDevice>Speaker</defaultOutputDevice>
++
++            <mixPorts>
++                <mixPort name="primary-out" flags="AUDIO_OUTPUT_FLAG_PRIMARY|AUDIO_OUTPUT_FLAG_DEEP_BUFFER" role="source">
++                    <profile name="" format="AUDIO_FORMAT_PCM_16_BIT"
++                             samplingRates="48000" channelMasks="AUDIO_CHANNEL_OUT_STEREO"/>
++                </mixPort>
++
++                <mixPort name="fast" flags="AUDIO_OUTPUT_FLAG_FAST" role="source">
++                    <profile name="" format="AUDIO_FORMAT_PCM_16_BIT"
++                             samplingRates="48000" channelMasks="AUDIO_CHANNEL_OUT_STEREO"/>
++                </mixPort>
++
++                <mixPort name="primary-in" role="sink">
++                    <profile name="" format="AUDIO_FORMAT_PCM_16_BIT"
++                             samplingRates="8000,11025,12000,16000,22050,24000,32000,44100,48000"
++                             channelMasks="AUDIO_CHANNEL_IN_MONO,AUDIO_CHANNEL_IN_STEREO,AUDIO_CHANNEL_IN_FRONT_BACK,AUDIO_CHANNEL_IN_VOICE_UPLINK,AUDIO_CHANNEL_IN_VOICE_DNLINK"/>
++                </mixPort>
++            </mixPorts>
++
++            <devicePorts>
++                <devicePort tagName="Earpiece" type="AUDIO_DEVICE_OUT_EARPIECE" role="sink">
++                    <profile name="" format="AUDIO_FORMAT_PCM_16_BIT"
++                             samplingRates="48000" channelMasks="AUDIO_CHANNEL_OUT_MONO"/>
++                </devicePort>
++                <devicePort tagName="Speaker" type="AUDIO_DEVICE_OUT_SPEAKER" role="sink" address="">
++                    <profile name="" format="AUDIO_FORMAT_PCM_16_BIT"
++                             samplingRates="48000" channelMasks="AUDIO_CHANNEL_OUT_STEREO"/>
++                </devicePort>
++                <devicePort tagName="Wired Headset" type="AUDIO_DEVICE_OUT_WIRED_HEADSET" role="sink">
++                    <profile name="" format="AUDIO_FORMAT_PCM_16_BIT"
++                             samplingRates="48000" channelMasks="AUDIO_CHANNEL_OUT_STEREO"/>
++                </devicePort>
++                <devicePort tagName="Wired Headphones" type="AUDIO_DEVICE_OUT_WIRED_HEADPHONE" role="sink">
++                    <profile name="" format="AUDIO_FORMAT_PCM_16_BIT"
++                             samplingRates="48000" channelMasks="AUDIO_CHANNEL_OUT_STEREO"/>
++                </devicePort>
++                <devicePort tagName="BT SCO" type="AUDIO_DEVICE_OUT_BLUETOOTH_SCO" role="sink">
++                    <profile name="" format="AUDIO_FORMAT_PCM_16_BIT"
++                             samplingRates="48000" channelMasks="AUDIO_CHANNEL_OUT_STEREO"/>
++                </devicePort>
++                <devicePort tagName="BT SCO Headset" type="AUDIO_DEVICE_OUT_BLUETOOTH_SCO_HEADSET" role="sink">
++                    <profile name="" format="AUDIO_FORMAT_PCM_16_BIT"
++                             samplingRates="48000" channelMasks="AUDIO_CHANNEL_OUT_STEREO"/>
++                </devicePort>
++                <devicePort tagName="BT SCO Car Kit" type="AUDIO_DEVICE_OUT_BLUETOOTH_SCO_CARKIT" role="sink">
++                    <profile name="" format="AUDIO_FORMAT_PCM_16_BIT"
++                             samplingRates="48000" channelMasks="AUDIO_CHANNEL_OUT_STEREO"/>
++                </devicePort>
++
++                <devicePort tagName="Built-In Mic" type="AUDIO_DEVICE_IN_BUILTIN_MIC" role="source">
++                    <profile name="" format="AUDIO_FORMAT_PCM_16_BIT"
++                             samplingRates="8000,11025,12000,16000,22050,24000,32000,44100,48000"
++                             channelMasks="AUDIO_CHANNEL_IN_MONO,AUDIO_CHANNEL_IN_STEREO,AUDIO_CHANNEL_IN_FRONT_BACK,AUDIO_CHANNEL_IN_VOICE_UPLINK,AUDIO_CHANNEL_IN_VOICE_DNLINK"/>
++                </devicePort>
++                <devicePort tagName="Built-In Back Mic" type="AUDIO_DEVICE_IN_BACK_MIC" role="source">
++                    <profile name="" format="AUDIO_FORMAT_PCM_16_BIT"
++                             samplingRates="8000,11025,12000,16000,22050,24000,32000,44100,48000"
++                             channelMasks="AUDIO_CHANNEL_IN_MONO,AUDIO_CHANNEL_IN_STEREO,AUDIO_CHANNEL_IN_FRONT_BACK,AUDIO_CHANNEL_IN_VOICE_UPLINK,AUDIO_CHANNEL_IN_VOICE_DNLINK"/>
++                </devicePort>
++                <devicePort tagName="Built-In 2 Mic" type="AUDIO_DEVICE_IN_2MIC" role="source">
++                    <profile name="" format="AUDIO_FORMAT_PCM_16_BIT"
++                             samplingRates="8000,11025,12000,16000,22050,24000,32000,44100,48000"
++                             channelMasks="AUDIO_CHANNEL_IN_MONO,AUDIO_CHANNEL_IN_STEREO,AUDIO_CHANNEL_IN_FRONT_BACK,AUDIO_CHANNEL_IN_VOICE_UPLINK,AUDIO_CHANNEL_IN_VOICE_DNLINK"/>
++                </devicePort>
++                <devicePort tagName="Wired Headset Mic" type="AUDIO_DEVICE_IN_WIRED_HEADSET" role="source">
++                    <profile name="" format="AUDIO_FORMAT_PCM_16_BIT"
++                             samplingRates="8000,11025,12000,16000,22050,24000,32000,44100,48000"
++                             channelMasks="AUDIO_CHANNEL_IN_MONO,AUDIO_CHANNEL_IN_STEREO,AUDIO_CHANNEL_IN_FRONT_BACK,AUDIO_CHANNEL_IN_VOICE_UPLINK,AUDIO_CHANNEL_IN_VOICE_DNLINK"/>
++                </devicePort>
++                <devicePort tagName="BT SCO Headset Mic" type="AUDIO_DEVICE_IN_BLUETOOTH_SCO_HEADSET" role="source">
++                    <profile name="" format="AUDIO_FORMAT_PCM_16_BIT"
++                             samplingRates="8000,11025,12000,16000,22050,24000,32000,44100,48000"
++                             channelMasks="AUDIO_CHANNEL_IN_MONO,AUDIO_CHANNEL_IN_STEREO,AUDIO_CHANNEL_IN_FRONT_BACK,AUDIO_CHANNEL_IN_VOICE_UPLINK,AUDIO_CHANNEL_IN_VOICE_DNLINK"/>
++                </devicePort>
++                <devicePort tagName="Voice Call Mic" type="AUDIO_DEVICE_IN_VOICE_CALL" role="source">
++                    <profile name="" format="AUDIO_FORMAT_PCM_16_BIT"
++                             samplingRates="8000,11025,12000,16000,22050,24000,32000,44100,48000"
++                             channelMasks="AUDIO_CHANNEL_IN_MONO,AUDIO_CHANNEL_IN_STEREO,AUDIO_CHANNEL_IN_FRONT_BACK,AUDIO_CHANNEL_IN_VOICE_UPLINK,AUDIO_CHANNEL_IN_VOICE_DNLINK"/>
++                </devicePort>
++                <devicePort tagName="FM Tuner" type="AUDIO_DEVICE_IN_FM_TUNER" role="source">
++                    <profile name="" format="AUDIO_FORMAT_PCM_16_BIT"
++                             samplingRates="8000,11025,12000,16000,22050,24000,32000,44100,48000"
++                             channelMasks="AUDIO_CHANNEL_IN_MONO,AUDIO_CHANNEL_IN_STEREO,AUDIO_CHANNEL_IN_FRONT_BACK,AUDIO_CHANNEL_IN_VOICE_UPLINK,AUDIO_CHANNEL_IN_VOICE_DNLINK"/>
++                </devicePort>
++            </devicePorts>
++
++            <routes>
++                <route sink="Earpiece" type="mix"
++                       sources="primary-out,fast"/>
++                <route sink="Speaker" type="mix"
++                       sources="primary-out,fast"/>
++                <route sink="Wired Headset" type="mix"
++                       sources="primary-out,fast"/>
++                <route sink="Wired Headphones" type="mix"
++                       sources="primary-out,fast"/>
++                <route sink="BT SCO" type="mix"
++                       sources="primary-out,fast"/>
++                <route sink="BT SCO Headset" type="mix"
++                       sources="primary-out,fast"/>
++                <route sink="BT SCO Car Kit" type="mix"
++                       sources="primary-out,fast"/>
++
++                <route sink="primary-in" type="mix"
++                       sources="Built-In Mic,Built-In Back Mic,Wired Headset Mic,BT SCO Headset Mic,Voice Call Mic,FM Tuner"/>
++            </routes>
++        </module>
++
++        <xi:include href="a2dp_audio_policy_configuration.xml"/>
++        <xi:include href="playback_record_audio_policy_configuration.xml"/>
++        <xi:include href="r_submix_audio_policy_configuration.xml"/>
++        <xi:include href="usb_audio_policy_configuration.xml"/>
++    </modules>
++</audioPolicyConfiguration>
+diff --git a/rw-system.sh b/rw-system.sh
+index a2114a5..dd28310 100644
+--- a/rw-system.sh
++++ b/rw-system.sh
+@@ -914,3 +914,7 @@ if [ "$vndk" -le 30 ];then
+ 	# Don't override vendor value, merely add a fallback
+ 	setprop ro.surface_flinger.use_color_management false
+ fi
++
++if getprop ro.vendor.build.fingerprint | grep -qi samsung/a40; then
++    mount /system/phh/audio_policy_configuration_sec_a40.xml /vendor/etc/audio_policy_configuration_sec.xml
++fi
+-- 
+2.25.1
+

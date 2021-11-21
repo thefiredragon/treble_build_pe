@@ -1,0 +1,31 @@
+From d2a4937cbdede661d81bfe75ee9d28676a1e982c Mon Sep 17 00:00:00 2001
+From: Andy CrossGate Yan <GeForce8800Ultra@gmail.com>
+Date: Thu, 5 Sep 2019 02:08:22 +0000
+Subject: [PATCH 1/5] vendor_aosp: Log privapp-permissions whitelist
+ violations instead
+
+Change-Id: I49dba61f332253e291a65e79ca70d9a07d45bb07
+---
+ config/common.mk | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/config/common.mk b/config/common.mk
+index 40f4c1da..f16f9c18 100644
+--- a/config/common.mk
++++ b/config/common.mk
+@@ -55,9 +55,9 @@ PRODUCT_COPY_FILES += \
+ PRODUCT_COPY_FILES += \
+     frameworks/base/data/keyboards/Vendor_045e_Product_028e.kl:system/usr/keylayout/Vendor_045e_Product_0719.kl
+
+-# Enforce privapp-permissions whitelist
+-#PRODUCT_SYSTEM_DEFAULT_PROPERTIES += \
+-#    ro.control_privapp_permissions=enforce
++# Log privapp-permissions whitelist
++PRODUCT_SYSTEM_DEFAULT_PROPERTIES += \
++    ro.control_privapp_permissions=log
+
+ # Power whitelist
+ PRODUCT_COPY_FILES += \
+-- 
+2.25.1
+
