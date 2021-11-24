@@ -5,10 +5,10 @@ Subject: [PATCH 9/9] A40: Fix audio policy
 
 ---
  base.mk                                      |   3 +
- files/audio_policy_configuration_sec_a40.xml | 129 +++++++++++++++++++
+ files/audio_policy_configuration_sec.xml | 129 +++++++++++++++++++
  rw-system.sh                                 |   4 +
  3 files changed, 136 insertions(+)
- create mode 100644 files/audio_policy_configuration_sec_a40.xml
+ create mode 100644 files/audio_policy_configuration_sec.xml
 
 diff --git a/base.mk b/base.mk
 index f52b722..b2cc58a 100644
@@ -20,12 +20,12 @@ index f52b722..b2cc58a 100644
  include build/make/target/product/gsi_release.mk
 +
 +PRODUCT_COPY_FILES += \
-+	device/phh/treble/files/audio_policy_configuration_sec_a40.xml:system/phh/audio_policy_configuration_sec_a40.xml
-diff --git a/files/audio_policy_configuration_sec_a40.xml b/files/audio_policy_configuration_sec_a40.xml
++	device/phh/treble/files/audio_policy_configuration_sec.xml:system/phh/audio_policy_configuration_sec.xml
+diff --git a/files/audio_policy_configuration_sec.xml b/files/audio_policy_configuration_sec.xml
 new file mode 100644
 index 0000000..a7b0198
 --- /dev/null
-+++ b/files/audio_policy_configuration_sec_a40.xml
++++ b/files/audio_policy_configuration_sec.xml
 @@ -0,0 +1,129 @@
 +<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 +<audioPolicyConfiguration version="1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
@@ -166,7 +166,7 @@ index a2114a5..dd28310 100644
  fi
 +
 +if getprop ro.vendor.build.fingerprint | grep -qi samsung/a40; then
-+    mount /system/phh/audio_policy_configuration_sec_a40.xml /vendor/etc/audio_policy_configuration_sec.xml
++    mount /system/phh/audio_policy_configuration_sec.xml /vendor/etc/audio_policy_configuration_sec.xml
 +fi
 -- 
 2.25.1
