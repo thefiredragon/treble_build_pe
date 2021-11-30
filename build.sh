@@ -66,7 +66,7 @@ mkdir -p ~/builds
 
 buildTrebleApp() {
     cd treble_app
-    bash build.sh
+    bash build.sh release
     cp TrebleApp.apk ../vendor/hardware_overlay/TrebleApp/app.apk
     cd ..
 }
