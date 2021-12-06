@@ -57,8 +57,8 @@ echo "Applying personal patches"
 bash $BL/apply-patches.sh $BL personal
 echo ""
 
-echo "CHECK PATCH STATUS NOW!"
-sleep 5
+echo "Applying device specific patches"
+bash $BL/apply-patches.sh $BL a40
 echo ""
 
 export WITHOUT_CHECK_API=true

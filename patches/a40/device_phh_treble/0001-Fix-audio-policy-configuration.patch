@@ -1,23 +1,23 @@
 From 1a43038412cf0bde7b9af6b9c1d86ef180979de4 Mon Sep 17 00:00:00 2001
 From: Alberto Ponces <ponces26@gmail.com>
 Date: Wed, 27 Oct 2021 23:58:59 +0100
-Subject: [PATCH 9/9] A40: Fix audio policy
+Subject: [PATCH] Fix audio policy configuration
 
 ---
- base.mk                                      |   3 +
+ base.mk                                  |   3 +
  files/audio_policy_configuration_sec.xml | 129 +++++++++++++++++++
- rw-system.sh                                 |   4 +
+ rw-system.sh                             |   4 +
  3 files changed, 136 insertions(+)
  create mode 100644 files/audio_policy_configuration_sec.xml
 
 diff --git a/base.mk b/base.mk
-index f52b722..b2cc58a 100644
+index a48ed01..0f87f59 100644
 --- a/base.mk
 +++ b/base.mk
-@@ -204,3 +204,6 @@ PRODUCT_PACKAGES += \
- 	oplus-alert-slider
- 
- include build/make/target/product/gsi_release.mk
+@@ -212,3 +212,6 @@ PRODUCT_COPY_FILES += \
+ 	device/phh/treble/v4afx/libv4a_fx.so:system/v4afx/libv4a_fx.so \
+ 	device/phh/treble/v4afx/v4afx.sh:system/bin/v4afx.sh \
+ 	device/phh/treble/v4afx/init.v4afx.rc:system/etc/init/init.v4afx.rc
 +
 +PRODUCT_COPY_FILES += \
 +	device/phh/treble/files/audio_policy_configuration_sec.xml:system/phh/audio_policy_configuration_sec.xml
@@ -157,12 +157,12 @@ index 0000000..a7b0198
 +    </modules>
 +</audioPolicyConfiguration>
 diff --git a/rw-system.sh b/rw-system.sh
-index a2114a5..dd28310 100644
+index a871374..d3cea8d 100644
 --- a/rw-system.sh
 +++ b/rw-system.sh
-@@ -914,3 +914,7 @@ if [ "$vndk" -le 30 ];then
- 	# Don't override vendor value, merely add a fallback
- 	setprop ro.surface_flinger.use_color_management false
+@@ -936,3 +936,7 @@ fi
+ if getprop ro.boot.prjname |grep -qi 21615;then
+     mount -o bind /system/phh/empty /odm/overlay/android_framework_res_overlay.display.product.21615.apk
  fi
 +
 +if getprop ro.vendor.build.fingerprint | grep -qi samsung/a40; then
