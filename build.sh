@@ -45,7 +45,6 @@ source build/envsetup.sh &> /dev/null
 echo ""
 
 echo "Applying PHH patches"
-rm -f device/*/sepolicy/common/private/genfs_contexts
 cd device/phh/treble
 cp $BL/pe.mk .
 bash generate.sh pe
