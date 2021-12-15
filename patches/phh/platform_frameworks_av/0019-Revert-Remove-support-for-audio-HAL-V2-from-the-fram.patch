@@ -1,4 +1,4 @@
-From e156249b75e7cd49a8da70fec252b44917689bc3 Mon Sep 17 00:00:00 2001
+From 7f3b1f7131205a2a0748912322964e1a51f8ac25 Mon Sep 17 00:00:00 2001
 From: Pierre-Hugues Husson <phh@phh.me>
 Date: Mon, 11 Oct 2021 16:10:42 -0400
 Subject: [PATCH 19/19] Revert "Remove support for audio HAL V2 from the

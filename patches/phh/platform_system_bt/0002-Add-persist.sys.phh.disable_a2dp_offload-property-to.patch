@@ -1,4 +1,4 @@
-From ca93b6b4ef81d957b6e4ce33dd4f7e16cf5d6b3b Mon Sep 17 00:00:00 2001
+From 5173921e4424dd872c5a4727e06d1e84e181885f Mon Sep 17 00:00:00 2001
 From: Pierre-Hugues Husson <phh@phh.me>
 Date: Mon, 25 May 2020 21:25:12 +0200
 Subject: [PATCH 2/5] Add persist.sys.phh.disable_a2dp_offload property to

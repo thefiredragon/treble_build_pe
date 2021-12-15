@@ -1,4 +1,4 @@
-From 76000b343c74778e78a21285f5ce01fb9715f7e0 Mon Sep 17 00:00:00 2001
+From 40b43f648327b3fc13a18f0f28da54b34db11c79 Mon Sep 17 00:00:00 2001
 From: Pierre-Hugues Husson <phh@phh.me>
 Date: Wed, 20 Oct 2021 09:39:47 -0400
 Subject: [PATCH 7/7] Try to fallback mCallingSid to getpidcon
@@ -14,7 +14,7 @@ Change-Id: I3b6c4dac9d0e20a3d66f931b283e3a535ab499cd
  1 file changed, 21 insertions(+)
 
 diff --git a/libs/binder/IPCThreadState.cpp b/libs/binder/IPCThreadState.cpp
-index 445df9eeff..a5c4a7e106 100644
+index c415ea02e2..66d790af4b 100644
 --- a/libs/binder/IPCThreadState.cpp
 +++ b/libs/binder/IPCThreadState.cpp
 @@ -36,6 +36,7 @@
