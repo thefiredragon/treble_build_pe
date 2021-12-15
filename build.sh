@@ -19,6 +19,7 @@ echo\
 START=`date +%s`
 BUILD_DATE="$(date +%Y%m%d)"
 BL=$PWD/treble_build_pe
+BD=$HOME/builds
 
 if [ ! -d .repo ]
 then
@@ -61,7 +62,7 @@ bash $BL/apply-patches.sh $BL a40
 echo ""
 
 export WITHOUT_CHECK_API=true
-mkdir -p ~/builds
+mkdir -p $BD
 
 buildTrebleApp() {
     cd treble_app
@@ -75,36 +76,47 @@ buildVariant() {
     make installclean
     make -j$(nproc --all) systemimage
     make vndk-test-sepolicy
-    mv $OUT/system.img ~/builds/system-"$1".img
+    mv $OUT/system.img $BD/system-$1.img
+    buildSlimVariant $1
     rm -rf out/target/product/phhgsi*
+}
+
+buildSlimVariant() {
+    wget https://gist.github.com/ponces/891139a70ee4fdaf1b1c3aed3a59534e/raw/slim.patch -O /tmp/slim.patch
+    (cd vendor/gapps && git am /tmp/slim.patch)
+    lunch ${1}-userdebug
+    make -j$(nproc --all) systemimage
+    mv $OUT/system.img $BD/system-$1-slim.img
+    (cd vendor/gapps && git reset --hard HEAD~1)
 }
 
 buildSasImages() {
     cd sas-creator
-    BASE_IMAGE=~/builds/system-treble_a64_bvN.img
-    if [ -f $BASE_IMAGE ]
-    then
-        sudo bash lite-adapter.sh 32 $BASE_IMAGE
-        xz -c s.img -T0 > ~/builds/PixelExperience_arm32_binder64-ab-vndklite-12.0-$BUILD_DATE-UNOFFICIAL.img.xz
-        xz -c $BASE_IMAGE -T0 > ~/builds/PixelExperience_arm32_binder64-ab-12.0-$BUILD_DATE-UNOFFICIAL.img.xz
-        rm -rf $BASE_IMAGE
-    fi
-    BASE_IMAGE=~/builds/system-treble_arm64_bvN.img
-    if [ -f $BASE_IMAGE ]
-    then
-        sudo bash lite-adapter.sh 64 $BASE_IMAGE
-        xz -c s.img -T0 > ~/builds/PixelExperience_arm64-ab-vndklite-12.0-$BUILD_DATE-UNOFFICIAL.img.xz
-        xz -c $BASE_IMAGE -T0 > ~/builds/PixelExperience_arm64-ab-12.0-$BUILD_DATE-UNOFFICIAL.img.xz
-        rm -rf $BASE_IMAGE
-    fi
+    sudo bash lite-adapter.sh 32 $BD/system-treble_a64_bvN.img
+    cp s.img $BD/system-treble_a64_bvN-vndklite.img
+    sudo bash lite-adapter.sh 64 $BD/system-treble_arm64_bvN.img
+    cp s.img $BD/system-treble_arm64_bvN-vndklite.img
+    sudo rm -rf s.img d tmp
     cd ..
+}
+
+generatePackages() {
+    BASE_IMAGE=$BD/system-treble_a64_bvN.img
+    xz -cv $BASE_IMAGE -T0 > $BD/PixelExperience_arm32_binder64-ab-12.0-$BUILD_DATE-UNOFFICIAL.img.xz
+    xz -cv ${BASE_IMAGE%.img}-vndklite.img -T0 > $BD/PixelExperience_arm32_binder64-ab-vndklite-12.0-$BUILD_DATE-UNOFFICIAL.img.xz
+    xz -cv ${BASE_IMAGE%.img}-slim.img -T0 > $BD/PixelExperience_arm32_binder64-ab-slim-12.0-$BUILD_DATE-UNOFFICIAL.img.xz
+    BASE_IMAGE=$BD/system-treble_arm64_bvN.img
+    xz -cv $BASE_IMAGE -T0 > $BD/PixelExperience_arm64-ab-12.0-$BUILD_DATE-UNOFFICIAL.img.xz
+    xz -cv ${BASE_IMAGE%.img}-vndklite.img -T0 > $BD/PixelExperience_arm64-ab-vndklite-12.0-$BUILD_DATE-UNOFFICIAL.img.xz
+    xz -cv ${BASE_IMAGE%.img}-slim.img -T0 > $BD/PixelExperience_arm64-ab-slim-12.0-$BUILD_DATE-UNOFFICIAL.img.xz
+    rm -rf $BD/system-*.img
 }
 
 buildTrebleApp
 buildVariant treble_a64_bvN
 buildVariant treble_arm64_bvN
 buildSasImages
-ls ~/builds | grep PixelExperience
+generatePackages
 
 END=`date +%s`
 ELAPSEDM=$(($(($END-$START))/60))
