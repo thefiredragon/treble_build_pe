@@ -1,0 +1,59 @@
+From 17c2de9e37bb49ecba995b707fe96ed46835b947 Mon Sep 17 00:00:00 2001
+From: Alberto Ponces <ponces26@gmail.com>
+Date: Wed, 8 Dec 2021 17:54:45 +0000
+Subject: [PATCH] surfaceflinger: Re-introduce debug.sf.disable_backpressure
+
+Change-Id: I67460f959449b9388a74a9335025965194a4e4cd
+---
+ services/surfaceflinger/SurfaceFlinger.cpp | 8 ++++++--
+ services/surfaceflinger/SurfaceFlinger.h   | 1 +
+ 2 files changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/services/surfaceflinger/SurfaceFlinger.cpp b/services/surfaceflinger/SurfaceFlinger.cpp
+index bda1a261ad..ad707469df 100644
+--- a/services/surfaceflinger/SurfaceFlinger.cpp
++++ b/services/surfaceflinger/SurfaceFlinger.cpp
+@@ -440,6 +440,10 @@ SurfaceFlinger::SurfaceFlinger(Factory& factory) : SurfaceFlinger(factory, SkipI
+     int debugDdms = atoi(value);
+     ALOGI_IF(debugDdms, "DDMS debugging not supported");
+
++    property_get("debug.sf.disable_backpressure", value, "0");
++    mPropagateBackpressure = !atoi(value);
++    ALOGI_IF(!mPropagateBackpressure, "Disabling backpressure propagation");
++
+     property_get("debug.sf.enable_gl_backpressure", value, "0");
+     mPropagateBackpressureClientComposition = atoi(value);
+     ALOGI_IF(mPropagateBackpressureClientComposition,
+@@ -1905,7 +1909,7 @@ void SurfaceFlinger::onMessageInvalidate(int64_t vsyncId, nsecs_t expectedVSyncT
+     // for the present fence to fire instead of just giving up on this frame to handle cases
+     // where present fence is just about to get signaled.
+     const int graceTimeForPresentFenceMs =
+-            (mPropagateBackpressureClientComposition || !mHadClientComposition) ? 1 : 0;
++            (mPropagateBackpressure && (mPropagateBackpressureClientComposition || !mHadClientComposition)) ? 1 : 0;
+
+     // Pending frames may trigger backpressure propagation.
+     const TracedOrdinal<bool> framePending = {"PrevFramePending",
+@@ -1959,7 +1963,7 @@ void SurfaceFlinger::onMessageInvalidate(int64_t vsyncId, nsecs_t expectedVSyncT
+         ON_MAIN_THREAD(setActiveModeInternal());
+     }
+
+-    if (framePending) {
++    if (framePending && mPropagateBackpressure) {
+         if ((hwcFrameMissed && !gpuFrameMissed) || mPropagateBackpressureClientComposition) {
+             signalLayerUpdate();
+             return;
+diff --git a/services/surfaceflinger/SurfaceFlinger.h b/services/surfaceflinger/SurfaceFlinger.h
+index e13b06984b..d0a42804ea 100644
+--- a/services/surfaceflinger/SurfaceFlinger.h
++++ b/services/surfaceflinger/SurfaceFlinger.h
+@@ -1299,6 +1299,7 @@ private:
+     bool mLayerCachingEnabled = false;
+     volatile nsecs_t mDebugInTransaction = 0;
+     bool mForceFullDamage = false;
++    bool mPropagateBackpressure = true;
+     bool mPropagateBackpressureClientComposition = false;
+     sp<SurfaceInterceptor> mInterceptor;
+ 
+-- 
+2.32.0
+
