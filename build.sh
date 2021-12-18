@@ -37,10 +37,6 @@ echo "Syncing repos"
 repo sync -c --force-sync --no-clone-bundle --no-tags -j$(nproc --all)
 echo ""
 
-echo "Cloning dependency repos"
-[ ! -d sas-creator ] && git clone https://github.com/ponces/sas-creator
-rm -rf treble_app && git clone https://github.com/phhusson/treble_app
-
 echo "Setting up build environment"
 source build/envsetup.sh &> /dev/null
 echo ""
