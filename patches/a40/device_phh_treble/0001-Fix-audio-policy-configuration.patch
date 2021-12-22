@@ -157,7 +157,7 @@ index 0000000..a7b0198
 +    </modules>
 +</audioPolicyConfiguration>
 diff --git a/rw-system.sh b/rw-system.sh
-index d77cf44..6302abf 100644
+index a871374..6302abf 100644
 --- a/rw-system.sh
 +++ b/rw-system.sh
 @@ -952,3 +952,7 @@ fi
