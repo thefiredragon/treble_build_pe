@@ -1,0 +1,324 @@
+From 6c871f980a3389dcf5460f10e910f5fe0003598e Mon Sep 17 00:00:00 2001
+From: Alberto Ponces <ponces26@gmail.com>
+Date: Sat, 25 Dec 2021 01:52:18 +0100
+Subject: [PATCH] Squashed revert of PE FOD implementation
+
+Change-Id: If31e9b4c9f1454c22303d8ca0f7d6cbec3786ebf
+---
+ .../fingerprint/IUdfpsOverlayController.aidl  |   3 -
+ .../res/drawable-nodpi/udfps_icon_pressed.png | 108 bytes -> Bin 0
+ .../SystemUI/res/values/custom_config.xml     |  17 ------
+ .../biometrics/AuthContainerView.java         |   2 +-
+ .../systemui/biometrics/UdfpsController.java  |  55 +-----------------
+ .../systemui/biometrics/UdfpsSurfaceView.java |  16 +----
+ .../systemui/biometrics/UdfpsView.java        |   3 +-
+ .../hidl/FingerprintAuthenticationClient.java |   9 ---
+ 8 files changed, 6 insertions(+), 99 deletions(-)
+ delete mode 100644 packages/SystemUI/res/drawable-nodpi/udfps_icon_pressed.png
+
+diff --git a/core/java/android/hardware/fingerprint/IUdfpsOverlayController.aidl b/core/java/android/hardware/fingerprint/IUdfpsOverlayController.aidl
+index f9d037648813..f18360ff4108 100644
+--- a/core/java/android/hardware/fingerprint/IUdfpsOverlayController.aidl
++++ b/core/java/android/hardware/fingerprint/IUdfpsOverlayController.aidl
+@@ -47,7 +47,4 @@ oneway interface IUdfpsOverlayController {
+ 
+     // Shows debug messages on the UDFPS overlay.
+     void setDebugMessage(int sensorId, String message);
+-
+-    // Useful for Legacy devices not having dedicated aod sensor
+-    void onAcquired(int sensorId, int acquiredInfo, int vendorCode);
+ }
+diff --git a/packages/SystemUI/res/drawable-nodpi/udfps_icon_pressed.png b/packages/SystemUI/res/drawable-nodpi/udfps_icon_pressed.png
+deleted file mode 100644
+index 4102e28c1300b49323b50625d8cfaa73b006561f..0000000000000000000000000000000000000000
+GIT binary patch
+literal 0
+HcmV?d00001
+
+literal 108
+zcmeAS@N?(olHy`uVBq!ia0vp^j3CUx1|;Q0k8}bl$r9IylHmNblJdl&R0hYC{G?O`
+z&)mfH)S%SFl*+=BsWw1Ge4Z|jAr-fh5*U~o7?>FtSQ!{^cTT<plwt66^>bP0l+XkK
+D@OB!I
+
+diff --git a/packages/SystemUI/res/values/custom_config.xml b/packages/SystemUI/res/values/custom_config.xml
+index 43ec98eb4d2a..8dba072bee93 100644
+--- a/packages/SystemUI/res/values/custom_config.xml
++++ b/packages/SystemUI/res/values/custom_config.xml
+@@ -2,21 +2,4 @@
+     <!-- Max visible notification icons -->
+     <integer name="config_maxVisibleNotificationIcons">4</integer>
+     <integer name="config_maxVisibleNotificationIconsOnLock">5</integer>
+-
+-    <!-- Color of the UDFPS pressed view -->
+-    <color name="config_udfpsColor">#ffffffff</color>
+-
+-    <!-- HBM type of UDFPS overlay.
+-            0 - GLOBAL HBM
+-            1 - LOCAL HBM
+-    -->
+-    <integer name="config_udfps_hbm_type">1</integer>
+-
+-    <!-- Udfps vendor code -->
+-    <integer name="config_udfps_vendor_code">0</integer>
+-
+-    <!-- Whether to pulse onFingerDown actions instead
+-        of waking the screen while the screen is off or in lpm. -->
+-    <bool name="config_pulseOnFingerDown">false</bool>
+-
+     <!-- SystemUI Google -->
+diff --git a/packages/SystemUI/src/com/android/systemui/biometrics/AuthContainerView.java b/packages/SystemUI/src/com/android/systemui/biometrics/AuthContainerView.java
+index fb5a948c6716..fd37b3509a4e 100644
+--- a/packages/SystemUI/src/com/android/systemui/biometrics/AuthContainerView.java
++++ b/packages/SystemUI/src/com/android/systemui/biometrics/AuthContainerView.java
+@@ -793,7 +793,7 @@ public class AuthContainerView extends LinearLayout
+         final WindowManager.LayoutParams lp = new WindowManager.LayoutParams(
+                 ViewGroup.LayoutParams.MATCH_PARENT,
+                 ViewGroup.LayoutParams.MATCH_PARENT,
+-                WindowManager.LayoutParams.TYPE_DISPLAY_OVERLAY,
++                WindowManager.LayoutParams.TYPE_STATUS_BAR_SUB_PANEL,
+                 windowFlags,
+                 PixelFormat.TRANSLUCENT);
+         lp.privateFlags |= WindowManager.LayoutParams.SYSTEM_FLAG_SHOW_FOR_ALL_USERS;
+diff --git a/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsController.java b/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsController.java
+index e2b3d9fd1a87..420ae531b3dd 100644
+--- a/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsController.java
++++ b/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsController.java
+@@ -45,7 +45,6 @@ import android.os.RemoteException;
+ import android.os.Trace;
+ import android.os.VibrationEffect;
+ import android.os.Vibrator;
+-import android.os.UserHandle;
+ import android.util.Log;
+ import android.view.Gravity;
+ import android.view.LayoutInflater;
+@@ -59,7 +58,6 @@ import android.view.accessibility.AccessibilityManager;
+ import com.android.internal.annotations.VisibleForTesting;
+ import com.android.keyguard.KeyguardUpdateMonitor;
+ import com.android.systemui.R;
+-import com.android.systemui.biometrics.UdfpsHbmTypes.HbmType;
+ import com.android.systemui.dagger.SysUISingleton;
+ import com.android.systemui.dagger.qualifiers.Main;
+ import com.android.systemui.doze.DozeReceiver;
+@@ -99,9 +97,8 @@ import kotlin.Unit;
+  */
+ @SuppressWarnings("deprecation")
+ @SysUISingleton
+-public class UdfpsController implements DozeReceiver, UdfpsHbmProvider {
++public class UdfpsController implements DozeReceiver {
+     private static final String TAG = "UdfpsController";
+-    private static final String PULSE_ACTION = "com.android.systemui.doze.pulse";
+     private static final long AOD_INTERRUPT_TIMEOUT_MILLIS = 1000;
+ 
+     // Minimum required delay between consecutive touch logs in milliseconds.
+@@ -120,7 +117,6 @@ public class UdfpsController implements DozeReceiver {
+     @NonNull private final DumpManager mDumpManager;
+     @NonNull private final KeyguardUpdateMonitor mKeyguardUpdateMonitor;
+     @Nullable private final Vibrator mVibrator;
+-    @NonNull private final Handler mMainHandler;
+     @NonNull private final FalsingManager mFalsingManager;
+     @NonNull private final PowerManager mPowerManager;
+     @NonNull private final AccessibilityManager mAccessibilityManager;
+@@ -163,7 +159,6 @@ public class UdfpsController implements DozeReceiver {
+     private Runnable mAodInterruptRunnable;
+     private boolean mOnFingerDown;
+     private boolean mAttemptedToDismissKeyguard;
+-    private final int mUdfpsVendorCode;
+     private Set<Callback> mCallbacks = new HashSet<>();
+ 
+     @VisibleForTesting
+@@ -312,24 +307,6 @@ public class UdfpsController implements DozeReceiver {
+                 mView.setDebugMessage(message);
+             });
+         }
+-
+-        @Override
+-        public void onAcquired(int sensorId, int acquiredInfo, int vendorCode) {
+-            mFgExecutor.execute(() -> {
+-                if (acquiredInfo == 6 && (mStatusBarStateController.isDozing() || !mScreenOn)) {
+-                    if (vendorCode == mUdfpsVendorCode) {
+-                        if (mContext.getResources().getBoolean(R.bool.config_pulseOnFingerDown)) {
+-                            mContext.sendBroadcastAsUser(new Intent(PULSE_ACTION),
+-                                    new UserHandle(UserHandle.USER_CURRENT));
+-                        } else {
+-                            mPowerManager.wakeUp(mSystemClock.uptimeMillis(),
+-                                    PowerManager.WAKE_REASON_GESTURE, TAG);
+-                        }
+-                        onAodInterrupt(0, 0, 0, 0); // To-Do pass proper values
+-                    }
+-                }
+-            });
+-        }
+     }
+ 
+     private static float computePointerSpeed(@NonNull VelocityTracker tracker, int pointerId) {
+@@ -425,12 +402,7 @@ public class UdfpsController implements DozeReceiver {
+                     // We need to persist its ID to track it during ACTION_MOVE that could include
+                     // data for many other pointers because of multi-touch support.
+                     mActivePointerId = event.getPointerId(0);
+-                    final int idx = mActivePointerId == -1
+-                            ? event.getPointerId(0)
+-                            : event.findPointerIndex(mActivePointerId);
+                     mVelocityTracker.addMovement(event);
+-                    onFingerDown((int) event.getRawX(), (int) event.getRawY(),
+-                            (int) event.getTouchMinor(idx), (int) event.getTouchMajor(idx));
+                     handled = true;
+                 }
+                 if ((withinSensorArea || fromUdfpsView) && shouldTryToDismissKeyguard()) {
+@@ -562,7 +534,6 @@ public class UdfpsController implements DozeReceiver {
+         mContext = context;
+         mExecution = execution;
+         // TODO (b/185124905): inject main handler and vibrator once done prototyping
+-        mMainHandler = mainHandler;
+         mVibrator = vibrator;
+         mInflater = inflater;
+         // The fingerprint manager is queried for UDFPS before this class is constructed, so the
+@@ -601,7 +572,7 @@ public class UdfpsController implements DozeReceiver {
+         checkArgument(mSensorProps != null);
+ 
+         mCoreLayoutParams = new WindowManager.LayoutParams(
+-                WindowManager.LayoutParams.TYPE_DISPLAY_OVERLAY,
++                WindowManager.LayoutParams.TYPE_KEYGUARD_DIALOG,
+                 getCoreLayoutParamFlags(),
+                 PixelFormat.TRANSLUCENT);
+         mCoreLayoutParams.setTitle(TAG);
+@@ -618,9 +589,6 @@ public class UdfpsController implements DozeReceiver {
+         context.registerReceiver(mBroadcastReceiver, filter);
+ 
+         udfpsHapticsSimulator.setUdfpsController(this);
+-
+-        mUdfpsVendorCode = mContext.getResources().getInteger(R.integer.config_udfps_vendor_code);
+-
+     }
+ 
+     /**
+@@ -786,7 +754,7 @@ public class UdfpsController implements DozeReceiver {
+                 mView = (UdfpsView) mInflater.inflate(R.layout.udfps_view, null, false);
+                 mOnFingerDown = false;
+                 mView.setSensorProperties(mSensorProps);
+-                mView.setHbmProvider(this);
++                mView.setHbmProvider(mHbmProvider);
+                 UdfpsAnimationViewController animation = inflateUdfpsAnimation(reason);
+                 mAttemptedToDismissKeyguard = false;
+                 animation.init();
+@@ -1052,21 +1020,4 @@ public class UdfpsController implements DozeReceiver {
+          */
+         void onFingerDown();
+     }
+-
+-    @Override
+-    public void enableHbm(@HbmType int hbmType, @Nullable Surface surface,
+-            @Nullable Runnable onHbmEnabled) {
+-        // TO-DO send call to lineage biometric hal and/or add dummy jni that device could override
+-        if (onHbmEnabled != null) {
+-            mMainHandler.post(onHbmEnabled);
+-        }
+-    }
+-
+-    @Override
+-    public void disableHbm(@Nullable Runnable onHbmDisabled) {
+-        // TO-DO send call to lineage biometric hal and/or add dummy jni that device could override
+-        if (onHbmDisabled != null) {
+-            mMainHandler.post(onHbmDisabled);
+-        }
+-    }
+ }
+diff --git a/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsSurfaceView.java b/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsSurfaceView.java
+index 71e33a699934..77fad35d32d4 100644
+--- a/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsSurfaceView.java
++++ b/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsSurfaceView.java
+@@ -19,7 +19,6 @@ package com.android.systemui.biometrics;
+ import android.annotation.NonNull;
+ import android.annotation.Nullable;
+ import android.content.Context;
+-import android.graphics.drawable.Drawable;
+ import android.graphics.Canvas;
+ import android.graphics.Paint;
+ import android.graphics.PixelFormat;
+@@ -30,8 +29,6 @@ import android.view.Surface;
+ import android.view.SurfaceHolder;
+ import android.view.SurfaceView;
+ 
+-import com.android.systemui.R;
+-
+ /**
+  * Surface View for providing the Global High-Brightness Mode (GHBM) illumination for UDFPS.
+  */
+@@ -57,8 +54,6 @@ public class UdfpsSurfaceView extends SurfaceView implements SurfaceHolder.Callb
+     boolean mAwaitingSurfaceToStartIllumination;
+     boolean mHasValidSurface;
+ 
+-    private Drawable mUdfpsIconPressed;
+-
+     public UdfpsSurfaceView(Context context, AttributeSet attrs) {
+         super(context, attrs);
+ 
+@@ -74,10 +69,8 @@ public class UdfpsSurfaceView extends SurfaceView implements SurfaceHolder.Callb
+ 
+         mSensorPaint = new Paint(0 /* flags */);
+         mSensorPaint.setAntiAlias(true);
+-        mSensorPaint.setColor(context.getColor(R.color.config_udfpsColor));
++        mSensorPaint.setARGB(255, 255, 255, 255);
+         mSensorPaint.setStyle(Paint.Style.FILL);
+-
+-        mUdfpsIconPressed = context.getDrawable(R.drawable.udfps_icon_pressed);
+     }
+ 
+     @Override public void surfaceCreated(SurfaceHolder holder) {
+@@ -141,13 +134,6 @@ public class UdfpsSurfaceView extends SurfaceView implements SurfaceHolder.Callb
+         Canvas canvas = null;
+         try {
+             canvas = mHolder.lockCanvas();
+-            mUdfpsIconPressed.setBounds(
+-                    Math.round(sensorRect.left),
+-                    Math.round(sensorRect.top),
+-                    Math.round(sensorRect.right),
+-                    Math.round(sensorRect.bottom)
+-            );
+-            mUdfpsIconPressed.draw(canvas);
+             canvas.drawOval(sensorRect, mSensorPaint);
+         } finally {
+             // Make sure the surface is never left in a bad state.
+diff --git a/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsView.java b/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsView.java
+index ac391f63f4da..15f77ffc08fd 100644
+--- a/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsView.java
++++ b/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsView.java
+@@ -50,7 +50,7 @@ public class UdfpsView extends FrameLayout implements DozeReceiver, UdfpsIllumin
+ 
+     private static final String SETTING_HBM_TYPE =
+             "com.android.systemui.biometrics.UdfpsSurfaceView.hbmType";
+-    private static @HbmType int DEFAULT_HBM_TYPE;
++    private static final @HbmType int DEFAULT_HBM_TYPE = UdfpsHbmTypes.LOCAL_HBM;
+ 
+     private static final int DEBUG_TEXT_SIZE_PX = 32;
+ 
+@@ -96,7 +96,6 @@ public class UdfpsView extends FrameLayout implements DozeReceiver, UdfpsIllumin
+         mOnIlluminatedDelayMs = mContext.getResources().getInteger(
+                 com.android.internal.R.integer.config_udfps_illumination_transition_ms);
+ 
+-        DEFAULT_HBM_TYPE = mContext.getResources().getInteger(R.integer.config_udfps_hbm_type);
+         if (Build.IS_ENG || Build.IS_USERDEBUG) {
+             mHbmType = Settings.Secure.getIntForUser(mContext.getContentResolver(),
+                     SETTING_HBM_TYPE, DEFAULT_HBM_TYPE, UserHandle.USER_CURRENT);
+diff --git a/services/core/java/com/android/server/biometrics/sensors/fingerprint/hidl/FingerprintAuthenticationClient.java b/services/core/java/com/android/server/biometrics/sensors/fingerprint/hidl/FingerprintAuthenticationClient.java
+index 87c2910c396c..7d95ec098fee 100644
+--- a/services/core/java/com/android/server/biometrics/sensors/fingerprint/hidl/FingerprintAuthenticationClient.java
++++ b/services/core/java/com/android/server/biometrics/sensors/fingerprint/hidl/FingerprintAuthenticationClient.java
+@@ -99,15 +99,6 @@ class FingerprintAuthenticationClient extends AuthenticationClient<IBiometricsFi
+         return new CompositeCallback(mALSProbeCallback, callback);
+     }
+ 
+-    @Override
+-    public void onAcquired(int acquiredInfo, int vendorCode) {
+-        super.onAcquired(acquiredInfo, vendorCode);
+-        try {
+-            mUdfpsOverlayController.onAcquired(getSensorId(), acquiredInfo, vendorCode);
+-        } catch (Exception e) {
+-        }
+-    }
+-
+     @Override
+     public void onAuthenticated(BiometricAuthenticator.Identifier identifier,
+             boolean authenticated, ArrayList<Byte> token) {
+-- 
+2.32.0
+
