@@ -1,7 +1,7 @@
-From db470b0cbae6b18fc38681a9fa047760ef6e9389 Mon Sep 17 00:00:00 2001
+From 38203453bca7c327a371ee771ff4fedad7be6d75 Mon Sep 17 00:00:00 2001
 From: Pierre-Hugues Husson <phh@phh.me>
 Date: Wed, 24 Nov 2021 15:50:30 -0500
-Subject: [PATCH 7/8] Log support for exfat/texfat FS driver names
+Subject: [PATCH 6/7] Log support for exfat/texfat FS driver names
 
 Change-Id: I5ae38741374b25b84595a9eae9bdda7afe2cac05
 ---

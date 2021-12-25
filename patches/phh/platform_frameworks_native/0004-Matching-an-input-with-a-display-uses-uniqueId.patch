@@ -1,7 +1,7 @@
 From 7bb6fec31cc5a9ed258c1ec783341b3da40c91d9 Mon Sep 17 00:00:00 2001
 From: Pierre-Hugues Husson <phh@phh.me>
 Date: Thu, 22 Oct 2020 23:22:46 +0200
-Subject: [PATCH 4/7] Matching an input with a display uses uniqueId
+Subject: [PATCH 04/11] Matching an input with a display uses uniqueId
 
 Not all devices have a `location`, notably bluetooth devices.
 However, we might still want to associate them with a screen,
