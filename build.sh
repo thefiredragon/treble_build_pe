@@ -41,6 +41,10 @@ echo "Setting up build environment"
 source build/envsetup.sh &> /dev/null
 echo ""
 
+echo "Applying prerequisite patches"
+bash $BL/apply-patches.sh $BL prerequisite
+echo ""
+
 echo "Applying PHH patches"
 cd device/phh/treble
 cp $BL/pe.mk .
