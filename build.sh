@@ -18,6 +18,7 @@ echo\
 
 START=`date +%s`
 BUILD_DATE="$(date +%Y%m%d)"
+WITHOUT_CHECK_API=true
 BL=$PWD/treble_build_pe
 BD=$HOME/builds
 
@@ -39,6 +40,7 @@ echo ""
 
 echo "Setting up build environment"
 source build/envsetup.sh &> /dev/null
+mkdir -p $BD
 echo ""
 
 echo "Applying prerequisite patches"
@@ -60,9 +62,6 @@ echo ""
 echo "Applying device specific patches"
 bash $BL/apply-patches.sh $BL a40
 echo ""
-
-export WITHOUT_CHECK_API=true
-mkdir -p $BD
 
 buildTrebleApp() {
     cd treble_app
