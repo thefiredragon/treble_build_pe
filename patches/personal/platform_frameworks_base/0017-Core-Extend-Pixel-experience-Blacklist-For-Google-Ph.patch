@@ -1,0 +1,36 @@
+From 38e19917a45d0728add314e5ff12e58985381c7e Mon Sep 17 00:00:00 2001
+From: kondors1995 <normandija1945@gmail.com>
+Date: Mon, 20 Dec 2021 16:53:46 +0000
+Subject: [PATCH 17/17] Core: Extend Pixel experience Blacklist For Google Photos
+
+Turns out having these brakes Original quality backups.
+Since these indicate that the device is pixel 4 with in the turn brakes device spoofing as OG pixel
+
+Change-Id: I336facff7b55552f094997ade337656461a0ea1d
+Signed-off-by: Joey Huab <joey@evolution-x.org>
+---
+ core/java/android/app/ApplicationPackageManager.java | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/core/java/android/app/ApplicationPackageManager.java b/core/java/android/app/ApplicationPackageManager.java
+index 2504e5034b3a..84185cdb4e44 100644
+--- a/core/java/android/app/ApplicationPackageManager.java
++++ b/core/java/android/app/ApplicationPackageManager.java
+@@ -713,7 +713,13 @@ public class ApplicationPackageManager extends PackageManager {
+         String packageName = ActivityThread.currentPackageName();
+         if (packageName != null &&
+                 packageName.contains("com.google.android.apps.photos") &&
+-                name.contains("PIXEL_2021_EXPERIENCE")) {
++                name.contains("PIXEL_2021_EXPERIENCE") ||
++                name.contains("PIXEL_2021_MIDYEAR_EXPERIENCE") ||
++                name.contains("PIXEL_2020_EXPERIENCE") ||
++                name.contains("PIXEL_2020_MIDYEAR_EXPERIENCE") ||
++                name.contains("PIXEL_2019_EXPERIENCE") ||
++                name.contains("PIXEL_2019_PRELOAD") ||
++                name.contains("PIXEL_2019_MIDYEAR_EXPERIENCE")) {
+             return false;
+         }
+         return mHasSystemFeatureCache.query(new HasSystemFeatureQuery(name, version));
+-- 
+2.32.0
+
