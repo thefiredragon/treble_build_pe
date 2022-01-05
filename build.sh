@@ -1,4 +1,10 @@
 #!/bin/bash
+export USE_CCACHE=1
+export CCACHE_COMPRESS=1
+export CCACHE_SIZE=100G
+export CCACHE_EXEC=/usr/bin/ccache
+export CCACHE_DIR=/mnt/cache
+
 echo ""
 echo "Pixel Experience 12 Treble Buildbot"
 echo "ATTENTION: this script syncs repo on each run"
@@ -112,7 +118,7 @@ generatePackages() {
 }
 
 buildTrebleApp
-buildVariant treble_a64_bvN
+#buildVariant treble_a64_bvN
 buildVariant treble_arm64_bvN
 buildSasImages
 generatePackages
