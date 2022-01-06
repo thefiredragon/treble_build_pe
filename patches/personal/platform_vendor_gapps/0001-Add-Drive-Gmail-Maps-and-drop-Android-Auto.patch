@@ -1,7 +1,7 @@
 From 590788fc4b110d103a86c67f21b4fafb5fe56ef7 Mon Sep 17 00:00:00 2001
 From: Alberto Ponces <ponces26@gmail.com>
 Date: Sun, 31 Oct 2021 21:09:42 +0000
-Subject: [PATCH 1/2] Add Drive, Gmail, Maps and drop Android Auto
+Subject: [PATCH] Add Drive, Gmail, Maps and drop Android Auto
 
 ---
  config.mk | 4 +++-

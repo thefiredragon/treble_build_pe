@@ -1,7 +1,7 @@
 From 89c8b675ffbfbbade7900d33ab2e308b25d316ed Mon Sep 17 00:00:00 2001
 From: Danny Lin <danny@kdrag0n.dev>
 Date: Fri, 25 Sep 2020 12:08:23 -0700
-Subject: [PATCH 2/17] SystemUI: Fix uneven volume icon padding in status bar
+Subject: [PATCH 2/15] SystemUI: Fix uneven volume icon padding in status bar
 
 The current silent and vibrate volume icons in the status bar have
 slightly too much padding compared to all of the other status bar icons,
