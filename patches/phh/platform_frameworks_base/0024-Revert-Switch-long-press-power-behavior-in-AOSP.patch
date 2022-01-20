@@ -28,8 +28,8 @@ index fbc14c7e2e17..0681ec24cf8a 100644
 -    <integer name="config_keyChordPowerVolumeUp">2</integer>
 +    <integer name="config_keyChordPowerVolumeUp">1</integer>
  
-     <!-- Control the behavior when the user long presses the back button.  Non-zero values are only
-          valid for watches as part of CDD/CTS.
+     <!-- Allows activities to be launched on a long press on power during device setup. -->
+     <bool name="config_allowStartActivityForLongPressOnPowerInSetup">false</bool>
 -- 
 2.25.1
 

@@ -108,19 +108,10 @@ index 15f77ffc08fd..bc72e6ed7d78 100644
      public UdfpsView(Context context, AttributeSet attrs) {
          super(context, attrs);
  
-@@ -239,7 +288,7 @@ public class UdfpsView extends FrameLayout implements DozeReceiver, UdfpsIllumin
-         if (mGhbmView != null && surface == null) {
-             Log.e(TAG, "doIlluminate | surface must be non-null for GHBM");
+@@ -253,6 +301,11 @@ public class UdfpsView extends FrameLayout implements DozeReceiver, UdfpsIllumin
+                 }
+             });
          }
--        mHbmProvider.enableHbm(mHbmType, surface, () -> {
-+        if(mHbmProvider != null) mHbmProvider.enableHbm(mHbmType, surface, () -> {
-             if (mGhbmView != null) {
-                 mGhbmView.drawIlluminationDot(mSensorRect);
-             }
-@@ -251,6 +300,11 @@ public class UdfpsView extends FrameLayout implements DozeReceiver, UdfpsIllumin
-                 Log.w(TAG, "doIlluminate | onIlluminatedRunnable is null");
-             }
-         });
 +	else {
 +		if (mGhbmView != null) {
 +			mGhbmView.drawIlluminationDot(mSensorRect);
@@ -129,14 +120,6 @@ index 15f77ffc08fd..bc72e6ed7d78 100644
      }
  
      @Override
-@@ -263,6 +317,6 @@ public class UdfpsView extends FrameLayout implements DozeReceiver, UdfpsIllumin
-             mGhbmView.setGhbmIlluminationListener(null);
-             mGhbmView.setVisibility(View.INVISIBLE);
-         }
--        mHbmProvider.disableHbm(null /* onHbmDisabled */);
-+        if(mHbmProvider != null) mHbmProvider.disableHbm(null /* onHbmDisabled */);
-     }
- }
 diff --git a/services/core/Android.bp b/services/core/Android.bp
 index 55b982b40611..5af7770fd6fe 100644
 --- a/services/core/Android.bp
