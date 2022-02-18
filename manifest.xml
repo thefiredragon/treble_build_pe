@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<remote name="stevesoltys-github"
+    fetch="https://github.com/stevesoltys/"
+    revision="refs/heads/master" />
 <manifest>
   <project path="device/generic/common" name="device/generic/common" groups="pdk" />
   <project name="phhusson/vendor_hardware_overlay" path="vendor/hardware_overlay" remote="github" revision="pie" />
@@ -8,4 +11,5 @@
   <project name="phhusson/vendor_magisk" path="vendor/magisk" remote="github" revision="android-10.0" />
   <project name="phhusson/treble_app" path="treble_app" remote="github" revision="master" />
   <project name="ponces/sas-creator" path="sas-creator" remote="github" revision="master" />
+  <project path="packages/apps/Seedvault" name="seedvault-prebuilt" remote="stevesoltys-github" revision="android12" />
 </manifest>
