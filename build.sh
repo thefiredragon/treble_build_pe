@@ -88,28 +88,28 @@ buildVariant() {
     rm -rf out/target/product/phhgsi*
 }
 
-buildSlimVariant() {
-    wget https://gist.github.com/ponces/891139a70ee4fdaf1b1c3aed3a59534e/raw/slim.patch -O /tmp/slim.patch
-    (cd vendor/gapps && git am /tmp/slim.patch)
-    lunch ${1}-userdebug
-    make -j$(nproc --all) systemimage
-    mv $OUT/system.img $BD/system-$1-slim.img
-    (cd vendor/gapps && git reset --hard HEAD~1)
-}
+#buildSlimVariant() {
+#    wget https://gist.github.com/ponces/891139a70ee4fdaf1b1c3aed3a59534e/raw/slim.patch -O /tmp/slim.patch
+#    (cd vendor/gapps && git am /tmp/slim.patch)
+#    lunch ${1}-userdebug
+#    make -j$(nproc --all) systemimage
+#    mv $OUT/system.img $BD/system-$1-slim.img
+#    (cd vendor/gapps && git reset --hard HEAD~1)
+#}
 
-buildSasImages() {
-    cd sas-creator
-    sudo bash lite-adapter.sh 64 $BD/system-treble_arm64_bvS.img
-    cp s.img $BD/system-treble_arm64_bvS-vndklite.img
-    sudo rm -rf s.img d tmp
-    cd ..
-}
+#buildSasImages() {
+#    cd sas-creator
+#    sudo bash lite-adapter.sh 64 $BD/system-treble_arm64_bvS.img
+#    cp s.img $BD/system-treble_arm64_bvS-vndklite.img
+#    sudo rm -rf s.img d tmp
+#    cd ..
+#}
 
 generatePackages() {
     BASE_IMAGE=$BD/system-treble_arm64_bvS.img
     xz -cv $BASE_IMAGE -T0 > $BD/PixelExperience_arm64-ab-12.0-$BUILD_DATE-UNOFFICIAL.img.xz
-    xz -cv ${BASE_IMAGE%.img}-vndklite.img -T0 > $BD/PixelExperience_arm64-ab-vndklite-12.0-$BUILD_DATE-UNOFFICIAL.img.xz
-    xz -cv ${BASE_IMAGE%.img}-slim.img -T0 > $BD/PixelExperience_arm64-ab-slim-12.0-$BUILD_DATE-UNOFFICIAL.img.xz
+#    xz -cv ${BASE_IMAGE%.img}-vndklite.img -T0 > $BD/PixelExperience_arm64-ab-vndklite-12.0-$BUILD_DATE-UNOFFICIAL.img.xz
+#    xz -cv ${BASE_IMAGE%.img}-slim.img -T0 > $BD/PixelExperience_arm64-ab-slim-12.0-$BUILD_DATE-UNOFFICIAL.img.xz
     rm -rf $BD/system-*.img
 }
 
@@ -136,7 +136,7 @@ generateOtaJson() {
 
 buildTrebleApp
 buildVariant treble_arm64_bvS
-buildSasImages
+#buildSasImages
 generatePackages
 generateOtaJson
 

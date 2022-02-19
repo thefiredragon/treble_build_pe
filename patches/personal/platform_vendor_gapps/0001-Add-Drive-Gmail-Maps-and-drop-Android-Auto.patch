@@ -5,7 +5,7 @@ Subject: [PATCH] Add Drive, Gmail, Maps and drop Android Auto
 
 ---
  config.mk | 4 +++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/config.mk b/config.mk
 index 29df6bc..a1768b7 100644
@@ -31,7 +31,6 @@ index 29df6bc..a1768b7 100644
      PrebuiltDeskClockGoogle \
 +    PrebuiltGmail \
      PrebuiltGoogleTelemetryTvp \
-+    Seedvault \
      SoundAmplifierPrebuilt \
      SoundPickerPrebuilt \
 @@ -74,7 +77,6 @@ PRODUCT_PACKAGES += \
@@ -44,4 +43,3 @@ index 29df6bc..a1768b7 100644
      CarrierLocation \
 -- 
 2.32.0
-
