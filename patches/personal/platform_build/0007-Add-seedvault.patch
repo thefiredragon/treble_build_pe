@@ -1,0 +1,36 @@
+
+From 324234234234234234234 Mon Sep 17 00:00:00 2001
+From: David Faller <danny.faller@gmail.com>
+Date: Wed, 8 Dec 2021 07:04:53 +0000
+Subject: [PATCH 7/7] Remove init.vndk-nodef.rc
+
+This partially reverts "Deprecate VNDK-lite support from Legacy GSI".
+
+Paired with https://github.com/LineageOS/android_system_core/commit/0b265e35ddf42638fa807f5349a10c40e3d46446, it kicks permissive devices into bootloader.
+Given that GSI+permissive won't ever be a Lineage official scenario, revert this only on our side.
+Thanks @Kethen for the insight!
+
+Change-Id: I7c14fe5227779e953f620bb225fa5c981752d0ac5f9
+---
+ target/product/handheld_system.mk         |  1 +
+ 1 files changed, 1 insertion(+)
+
+
+diff --git a/target/product/handheld_system.mk b/target/product/handheld_system.mk
+index b0df5a32c..251cef6c4 100644
+--- a/target/product/handheld_system.mk
++++ b/target/product/handheld_system.mk
+@@ -61,6 +61,7 @@ PRODUCT_PACKAGES += \
+     PrintSpooler \
+     ProxyHandler \
+     screenrecord \
++    Seedvault \
+     SecureElement \
+     SharedStorageBackup \
+     SimAppDialog \
+@@ -89,4 +90,4 @@ ifeq ($(CUSTOM_BUILD),)
+ PRODUCT_VENDOR_PROPERTIES := \
+     ro.config.notification_sound?=OnTheHunt.ogg \
+     ro.config.alarm_alert?=Alarm_Classic.ogg
+-- 
+2.25.1
