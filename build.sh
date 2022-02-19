@@ -82,9 +82,9 @@ buildVariant() {
     lunch ${1}-userdebug
     make installclean
     make -j$(nproc --all) systemimage
-    make vndk-test-sepolicy
+#    make vndk-test-sepolicy
     mv $OUT/system.img $BD/system-$1.img
-    buildSlimVariant $1
+#    buildSlimVariant $1
     rm -rf out/target/product/phhgsi*
 }
 
