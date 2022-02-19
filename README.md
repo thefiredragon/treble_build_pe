@@ -23,3 +23,9 @@ These people have helped this project in some way or another, so they should be 
 - [eremitein](https://github.com/eremitein)
 - [kdrag0n](https://github.com/kdrag0n)
 - [ponces](https://github.com/ponces)
+
+
+# Notes
+git add <filename>
+git commit <patchname>
+git format-patch -1 HEAD

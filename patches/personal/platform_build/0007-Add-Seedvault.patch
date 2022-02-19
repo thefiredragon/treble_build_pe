@@ -1,0 +1,31 @@
+From e75dcf19e898eec91ede993fe5529b423ba78fde Mon Sep 17 00:00:00 2001
+From: thefiredragon <d.faller@live.de>
+Date: Sat, 19 Feb 2022 17:24:14 +0000
+Subject: [PATCH 7/7] Add-Seedvault
+
+Change-Id: I414e4244298ba9e407b740fad9cfe63a89a0bfca
+---
+ target/product/handheld_system.mk | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/target/product/handheld_system.mk b/target/product/handheld_system.mk
+index b0df5a32c..251cef6c4 100644
+--- a/target/product/handheld_system.mk
++++ b/target/product/handheld_system.mk
+@@ -61,6 +61,7 @@ PRODUCT_PACKAGES += \
+     PrintSpooler \
+     ProxyHandler \
+     screenrecord \
++    Seedvault \
+     SecureElement \
+     SharedStorageBackup \
+     SimAppDialog \
+@@ -89,4 +90,4 @@ ifeq ($(CUSTOM_BUILD),)
+ PRODUCT_VENDOR_PROPERTIES := \
+     ro.config.notification_sound?=OnTheHunt.ogg \
+     ro.config.alarm_alert?=Alarm_Classic.ogg
+-endif
+\ No newline at end of file
++endif
+--
+2.32.0
