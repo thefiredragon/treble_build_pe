@@ -1,7 +1,7 @@
 From efb2f041175836a16b1082812c23f093842a9552 Mon Sep 17 00:00:00 2001
 From: SamarV-121 <samarvispute121@gmail.com>
 Date: Thu, 15 Jul 2021 23:16:29 +0530
-Subject: [PATCH 2/2] Allow hwc HAL to read hwc.exynos.vsync_mode prop
+Subject: [PATCH] Allow hwc HAL to read hwc.exynos.vsync_mode prop
 
 `W composer@2.1-se: type=1400 audit(0.0:23509): avc: denied { read } for name="u:object_r:default_prop:s0" dev="tmpfs" ino=2518 scontext=u:r:hal_graphics_composer_default:s0 tcontext=u:object_r:default_prop:s0 tclass=file permissive=0`
 `E libc    : Access denied finding property "hwc.exynos.vsync_mode"`

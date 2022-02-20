@@ -25,7 +25,16 @@ These people have helped this project in some way or another, so they should be 
 - [ponces](https://github.com/ponces)
 
 
-# Notes
+# Personal notes
+```
 git add <filename>
 git commit <patchname>
 git format-patch -1 HEAD
+```
+
+# Enable Backup over ADB
+
+```
+# adb shell bmgr enable true
+# adb shell bmgr transport com.stevesoltys.seedvault.transport.ConfigurableBackupTransport
+```
