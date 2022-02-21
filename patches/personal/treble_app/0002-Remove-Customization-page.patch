@@ -18,9 +18,9 @@ index 1682a3f..9a4fa2a 100644
 -    <header
 -        android:fragment="me.phh.treble.app.CustomSettingsFragment"
 -        android:title="Customization features" />
-     <header android:title="Updater">
-         <intent android:action="android.settings.SYSTEM_UPDATE_SETTINGS"
-                 android:targetClass=".UpdaterActivity"/>
+     <header
+         android:id="@+id/updater"
+         android:title="Updater">
 -- 
 2.25.1
 

@@ -1,7 +1,7 @@
 From 7850ab773ef48f6fddb166e1af10fce56ba06648 Mon Sep 17 00:00:00 2001
 From: Danny Lin <danny@kdrag0n.dev>
 Date: Sat, 16 Oct 2021 03:27:23 -0700
-Subject: [PATCH 13/15] SystemUI: Expose legacy Wi-Fi and cellular data QS
+Subject: [PATCH 10/11] SystemUI: Expose legacy Wi-Fi and cellular data QS
  tiles
 
 We'll still use Android 12's unified internet settings and the Internet
@@ -21,8 +21,8 @@ index 14276754e450..c99ab8bf5e9a 100644
  
      <!-- Tiles native to System UI. Order should match "quick_settings_tiles_default" -->
      <string name="quick_settings_tiles_stock" translatable="false">
--        internet,bt,flashlight,dnd,alarm,airplane,controls,wallet,rotation,battery,cast,screenrecord,mictoggle,cameratoggle,location,hotspot,inversion,saver,dark,work,night,reverse,reduce_brightness,powershare
-+        internet,wifi,cell,bt,flashlight,dnd,alarm,airplane,controls,wallet,rotation,battery,cast,screenrecord,mictoggle,cameratoggle,location,hotspot,inversion,saver,dark,work,night,reverse,reduce_brightness,powershare
+-        internet,bt,flashlight,dnd,alarm,airplane,controls,wallet,rotation,battery,cast,screenrecord,mictoggle,cameratoggle,location,hotspot,inversion,saver,dark,work,night,reverse,reduce_brightness,powershare,nfc
++        internet,wifi,cell,bt,flashlight,dnd,alarm,airplane,controls,wallet,rotation,battery,cast,screenrecord,mictoggle,cameratoggle,location,hotspot,inversion,saver,dark,work,night,reverse,reduce_brightness,powershare,nfc
      </string>
  
      <!-- The tiles to display in QuickSettings -->

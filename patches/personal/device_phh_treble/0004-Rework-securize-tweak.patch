@@ -21,18 +21,15 @@ index d9c3ca6..b809100 100644
  
  PRODUCT_COPY_FILES += \
 diff --git a/rw-system.sh b/rw-system.sh
-index 09469e7..c663936 100644
+index 5bfa270..5406110 100644
 --- a/rw-system.sh
 +++ b/rw-system.sh
-@@ -697,7 +697,6 @@ fi
- 
- setprop ctl.stop console
- dmesg -n 1
+@@ -701,35 +701,59 @@ copyprop() {
+         resetprop_phh "$1" "$(getprop "$2")"
+     fi
+ }
 -if [ -f /system/phh/secure ] || [ -f /metadata/phh/secure ];then
-     copyprop() {
-         p="$(getprop "$2")"
-         if [ "$p" ]; then
-@@ -709,30 +708,55 @@ if [ -f /system/phh/secure ] || [ -f /metadata/phh/secure ];then
+     copyprop ro.build.device ro.vendor.build.device
      copyprop ro.system.build.fingerprint ro.vendor.build.fingerprint
      copyprop ro.bootimage.build.fingerprint ro.vendor.build.fingerprint
      copyprop ro.build.fingerprint ro.vendor.build.fingerprint
@@ -93,7 +90,7 @@ index 09469e7..c663936 100644
  
      resetprop_phh ro.build.tags release-keys
      resetprop_phh ro.boot.vbmeta.device_state locked
-@@ -746,25 +746,6 @@ if [ -f /system/phh/secure ] || [ -f /metadata/phh/secure ];then
+@@ -743,25 +767,6 @@ if [ -f /system/phh/secure ] || [ -f /metadata/phh/secure ];then
      resetprop_phh ro.build.type user
      resetprop_phh ro.build.selinux 0
  
