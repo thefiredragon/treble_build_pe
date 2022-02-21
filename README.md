@@ -1,6 +1,6 @@
 # Pixel Experience GSI
-# Repo Maintainer is ponces
-# only adjusted things for samsung specific devices.
+> Repo Maintainer is ponces
+> only adjusted things for samsung specific devices.
 
 ## Build
 To get started with building Pixel Experience GSI, you'll need to get familiar with [Git and Repo](https://source.android.com/source/using-repo.html) as well as [How to build a GSI](https://github.com/phhusson/treble_experimentations/wiki/How-to-build-a-GSI%3F).
