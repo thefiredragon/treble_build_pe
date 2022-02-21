@@ -67,9 +67,6 @@ echo "Applying personal patches"
 bash $BL/apply-patches.sh $BL personal
 echo ""
 
-echo "Applying device specific patches"
-bash $BL/apply-patches.sh $BL a40
-echo ""
 
 buildTrebleApp() {
     cd treble_app
