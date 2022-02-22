@@ -28,12 +28,12 @@ BUILD_DATE="$(date +%Y%m%d)"
 WITHOUT_CHECK_API=true
 BL=$PWD/treble_build_pe
 BD=$HOME/builds
-VERSION="v401"
+VERSION="v402"
 
 if [ ! -d .repo ]
 then
     echo "Initializing PE workspace"
-    repo init -u https://github.com/thefiredragon/manifest -b twelve
+    repo init -u https://github.com/PixelExperience/manifest -b twelve
     echo ""
 
     echo "Preparing local manifest"
@@ -67,7 +67,6 @@ echo "Applying personal patches"
 bash $BL/apply-patches.sh $BL personal
 echo ""
 
-
 buildTrebleApp() {
     cd treble_app
     bash build.sh release
@@ -75,26 +74,23 @@ buildTrebleApp() {
     cd ..
 }
 
-buildVariant() {
-    lunch ${1}-userdebug
+buildRegularVariant() {
+    lunch treble_arm64_bvS-userdebug
     make installclean
     make -j$(nproc --all) systemimage
-#    make vndk-test-sepolicy
-    mv $OUT/system.img $BD/system-$1.img
-#    buildSlimVariant $1
-    rm -rf out/target/product/phhgsi*
+    make vndk-test-sepolicy
+    mv $OUT/system.img $BD/system-treble_arm64_bvS.img
 }
 
-#buildSlimVariant() {
-#    wget https://gist.github.com/ponces/891139a70ee4fdaf1b1c3aed3a59534e/raw/slim.patch -O /tmp/slim.patch
-#    (cd vendor/gapps && git am /tmp/slim.patch)
-#    lunch ${1}-userdebug
-#    make -j$(nproc --all) systemimage
-#    mv $OUT/system.img $BD/system-$1-slim.img
-#    (cd vendor/gapps && git reset --hard HEAD~1)
-#}
+buildSlimVariant() {
+    wget https://gist.github.com/ponces/891139a70ee4fdaf1b1c3aed3a59534e/raw/slim.patch -O /tmp/slim.patch
+    (cd vendor/gapps && git am /tmp/slim.patch)
+    make -j$(nproc --all) systemimage
+    mv $OUT/system.img $BD/system-treble_arm64_bvS-slim.img
+    (cd vendor/gapps && git reset --hard HEAD~1)
+}
 
-#buildSasImages() {
+#buildVndkliteVariant() {
 #    cd sas-creator
 #    sudo bash lite-adapter.sh 64 $BD/system-treble_arm64_bvS.img
 #    cp s.img $BD/system-treble_arm64_bvS-vndklite.img
@@ -103,10 +99,9 @@ buildVariant() {
 #}
 
 generatePackages() {
-    BASE_IMAGE=$BD/system-treble_arm64_bvS.img
-    xz -cv $BASE_IMAGE -T0 > $BD/PixelExperience_arm64-ab-12.0-$BUILD_DATE-UNOFFICIAL.img.xz
-#    xz -cv ${BASE_IMAGE%.img}-vndklite.img -T0 > $BD/PixelExperience_arm64-ab-vndklite-12.0-$BUILD_DATE-UNOFFICIAL.img.xz
-#    xz -cv ${BASE_IMAGE%.img}-slim.img -T0 > $BD/PixelExperience_arm64-ab-slim-12.0-$BUILD_DATE-UNOFFICIAL.img.xz
+    xz -cv $BD/system-treble_arm64_bvS.img -T0 > $BD/PixelExperience_arm64-ab-12.0-$BUILD_DATE-UNOFFICIAL.img.xz
+   # xz -cv $BD/system-treble_arm64_bvS-vndklite.img -T0 > $BD/PixelExperience_arm64-ab-vndklite-12.0-$BUILD_DATE-UNOFFICIAL.img.xz
+    xz -cv $BD/system-treble_arm64_bvS-slim.img -T0 > $BD/PixelExperience_arm64-ab-slim-12.0-$BUILD_DATE-UNOFFICIAL.img.xz
     rm -rf $BD/system-*.img
 }
 
@@ -123,7 +118,7 @@ generateOtaJson() {
                 "arm64-ab-slim") name="treble_arm64_bvS-slim";;
             esac
             size=$(wc -c $file | awk '{print $1}')
-            url="https://github.com/thefiredragon/treble_build_pe/releases/download/$VERSION/$(basename $file)"
+            url="https://github.com/ponces/treble_build_pe/releases/download/$VERSION/$(basename $file)"
             json="${json} {\"name\": \"$name\",\"size\": \"$size\",\"url\": \"$url\"},"
         done
         json="${json%?}]}"
@@ -132,8 +127,9 @@ generateOtaJson() {
 }
 
 buildTrebleApp
-buildVariant treble_arm64_bvS
-#buildSasImages
+buildRegularVariant
+buildSlimVariant
+#buildVndkliteVariant
 generatePackages
 generateOtaJson
 
