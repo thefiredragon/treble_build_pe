@@ -1,11 +1,11 @@
 {
-  "version": "v402",
-  "date": "1645443935",
+  "version": "v402.1",
+  "date": "1645944072",
   "variants": [
     {
       "name": "treble_arm64_bvS",
-      "size": "1439199556",
-      "url": "https://github.com/thefiredragon/treble_build_pe/releases/download/v402-20220221/PixelExperience_arm64-ab-12.0-20220221-UNOFFICIAL.img.xz"
+      "size": "1439180168",
+      "url": "http://ota.company-group.net/PixelExperience_arm64-ab-12.0-20220221-UNOFFICIAL.img.xz"
     }
   ]
 }
