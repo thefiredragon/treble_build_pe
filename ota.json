@@ -1,11 +1,16 @@
 {
-  "version": "v402.1",
-  "date": "1645944072",
+  "version": "v402.2",
+  "date": "1647180808",
   "variants": [
     {
+      "name": "treble_arm64_bvS-slim",
+      "size": "1114123888",
+      "url": "https://github.com/thefiredragon/treble_build_pe/releases/download/v402.2/PixelExperience_arm64-ab-slim-12.0-20220313-UNOFFICIAL.img.xz"
+    },
+    {
       "name": "treble_arm64_bvS",
-      "size": "1439180168",
-      "url": "https://github.com/thefiredragon/treble_build_pe/releases/download/v402.1/PixelExperience_arm64-ab-12.0-20220227-UNOFFICIAL.img.xz"
+      "size": "1439243288",
+      "url": "https://github.com/thefiredragon/treble_build_pe/releases/download/v402.2/PixelExperience_arm64-ab-12.0-20220313-UNOFFICIAL.img.xz"
     }
   ]
 }
