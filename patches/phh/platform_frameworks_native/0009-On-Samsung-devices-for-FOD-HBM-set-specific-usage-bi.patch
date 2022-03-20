@@ -1,7 +1,7 @@
-From 79c052c371add4e2432b9981549d9407751459aa Mon Sep 17 00:00:00 2001
+From 95f3bd5a505d5af185dd51051b66fb006362db75 Mon Sep 17 00:00:00 2001
 From: Pierre-Hugues Husson <phh@phh.me>
 Date: Fri, 17 Dec 2021 17:18:20 -0500
-Subject: [PATCH 09/13] On Samsung devices for FOD HBM, set specific usage bits
+Subject: [PATCH 09/14] On Samsung devices for FOD HBM, set specific usage bits
 
 Change-Id: Ibe71e291c6fba9ce48e83a5fd93f1beae3a63bc7
 ---
@@ -12,7 +12,7 @@ Change-Id: Ibe71e291c6fba9ce48e83a5fd93f1beae3a63bc7
  4 files changed, 20 insertions(+), 5 deletions(-)
 
 diff --git a/libs/gui/BLASTBufferQueue.cpp b/libs/gui/BLASTBufferQueue.cpp
-index 94e1ae1c74..d23fb53703 100644
+index f034642681..f9a52e48ee 100644
 --- a/libs/gui/BLASTBufferQueue.cpp
 +++ b/libs/gui/BLASTBufferQueue.cpp
 @@ -32,9 +32,19 @@
@@ -35,7 +35,7 @@ index 94e1ae1c74..d23fb53703 100644
  using namespace std::chrono_literals;
  
  namespace {
-@@ -144,9 +154,14 @@ BLASTBufferQueue::BLASTBufferQueue(const std::string& name, const sp<SurfaceCont
+@@ -140,9 +150,14 @@ BLASTBufferQueue::BLASTBufferQueue(const std::string& name)
  
      // safe default, most producers are expected to override this
      mProducer->setMaxDequeuedBufferCount(2);
@@ -48,8 +48,8 @@ index 94e1ae1c74..d23fb53703 100644
      mBufferItemConsumer = new BLASTBufferItemConsumer(mConsumer,
 -                                                      GraphicBuffer::USAGE_HW_COMPOSER |
 -                                                              GraphicBuffer::USAGE_HW_TEXTURE,
-+							    usage,
-                                                       1, false);
++                                                      usage,
+                                                       1, false, this);
      static int32_t id = 0;
      mName = name + "#" + std::to_string(id);
 diff --git a/libs/ui/Gralloc2.cpp b/libs/ui/Gralloc2.cpp
@@ -79,7 +79,7 @@ index 882674f479..330caf4302 100644
      return NO_ERROR;
  }
 diff --git a/libs/ui/Gralloc4.cpp b/libs/ui/Gralloc4.cpp
-index 9dc9beb8e7..f43083a0f0 100644
+index 80f6c82bb0..1bda8332f9 100644
 --- a/libs/ui/Gralloc4.cpp
 +++ b/libs/ui/Gralloc4.cpp
 @@ -109,7 +109,7 @@ status_t Gralloc4Mapper::validateBufferDescriptorInfo(

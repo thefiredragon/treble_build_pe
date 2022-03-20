@@ -1,4 +1,4 @@
-From 441be3227ca74c98ad951d6343f3623e98e87cb6 Mon Sep 17 00:00:00 2001
+From d5489ae07aa82d44093b9082916f1a790b01c2e0 Mon Sep 17 00:00:00 2001
 From: Pierre-Hugues Husson <phh@phh.me>
 Date: Thu, 14 Oct 2021 15:32:19 -0400
 Subject: [PATCH] Boot wifi supplicant both with lazy-hal style and init style

@@ -1,7 +1,7 @@
-From 4519fb92c0c356171068ac7c3ddf2dd4364457b0 Mon Sep 17 00:00:00 2001
+From 0c7fc04f6cde6c2b3215b96b0d18a9ada5cd33b9 Mon Sep 17 00:00:00 2001
 From: Pierre-Hugues Husson <phh@phh.me>
 Date: Tue, 23 Mar 2021 19:43:26 +0100
-Subject: [PATCH 21/28] Catch broken mainBuiltInDisplayCutoutRectApproximation
+Subject: [PATCH 21/31] Catch broken mainBuiltInDisplayCutoutRectApproximation
 
 Some devices (Redmi Note 9T) have:
 mainBuiltInDisplayCutoutRectApproximation = @android:mainBuiltInDisplayCutout
@@ -18,27 +18,27 @@ Change-Id: I03b6e78bac2cc38f3a623c8add801405ad6ba7ba
  1 file changed, 11 insertions(+), 4 deletions(-)
 
 diff --git a/core/java/android/view/DisplayCutout.java b/core/java/android/view/DisplayCutout.java
-index e1a4402d8964..25282b50cc45 100644
+index c1a5636b7b34..2f3d71c963c8 100644
 --- a/core/java/android/view/DisplayCutout.java
 +++ b/core/java/android/view/DisplayCutout.java
-@@ -881,10 +881,17 @@ public final class DisplayCutout {
+@@ -987,10 +987,17 @@ public final class DisplayCutout {
       */
-     public static DisplayCutout fromResourcesRectApproximation(Resources res, int displayWidth,
-             int displayHeight) {
--        return pathAndDisplayCutoutFromSpec(res.getString(R.string.config_mainBuiltInDisplayCutout),
--                res.getString(R.string.config_mainBuiltInDisplayCutoutRectApproximation),
+     public static DisplayCutout fromResourcesRectApproximation(Resources res,
+             String displayUniqueId, int displayWidth, int displayHeight) {
+-        return pathAndDisplayCutoutFromSpec(getDisplayCutoutPath(res, displayUniqueId),
+-                getDisplayCutoutApproximationRect(res, displayUniqueId),
 -                displayWidth, displayHeight, DENSITY_DEVICE_STABLE / (float) DENSITY_DEFAULT,
--                loadWaterfallInset(res)).second;
-+        try  {
-+            return pathAndDisplayCutoutFromSpec(res.getString(R.string.config_mainBuiltInDisplayCutout),
-+                    res.getString(R.string.config_mainBuiltInDisplayCutoutRectApproximation),
+-                getWaterfallInsets(res, displayUniqueId)).second;
++        try {
++            return pathAndDisplayCutoutFromSpec(getDisplayCutoutPath(res, displayUniqueId),
++                    getDisplayCutoutApproximationRect(res, displayUniqueId),
 +                    displayWidth, displayHeight, DENSITY_DEVICE_STABLE / (float) DENSITY_DEFAULT,
-+                    loadWaterfallInset(res)).second;
++                    getWaterfallInsets(res, displayUniqueId)).second;
 +        } catch(Throwable t) {
-+            return pathAndDisplayCutoutFromSpec(res.getString(R.string.config_mainBuiltInDisplayCutout),
++            return pathAndDisplayCutoutFromSpec(getDisplayCutoutPath(res, displayUniqueId),
 +                    null,
 +                    displayWidth, displayHeight, DENSITY_DEVICE_STABLE / (float) DENSITY_DEFAULT,
-+                    loadWaterfallInset(res)).second;
++                    getWaterfallInsets(res, displayUniqueId)).second;
 +        }
      }
  

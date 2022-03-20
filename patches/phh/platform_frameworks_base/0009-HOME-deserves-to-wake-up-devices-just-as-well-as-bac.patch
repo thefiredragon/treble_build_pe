@@ -1,7 +1,7 @@
-From 57817c53c9498ed238e709a0046705cfcde31c02 Mon Sep 17 00:00:00 2001
+From 3925b12d33200021da041df9eae372093cfaa785 Mon Sep 17 00:00:00 2001
 From: Pierre-Hugues Husson <phh@phh.me>
 Date: Sat, 6 Jun 2020 18:21:56 +0200
-Subject: [PATCH 09/28] HOME deserves to wake-up devices just as well as back
+Subject: [PATCH 09/31] HOME deserves to wake-up devices just as well as back
  and menu
 
 Change-Id: Ia562bafd8c620d00c17e8eb338e4701c6c4a3c3a
@@ -13,9 +13,9 @@ diff --git a/core/java/android/view/KeyEvent.java b/core/java/android/view/KeyEv
 index cda9b233576c..bb35e3172165 100644
 --- a/core/java/android/view/KeyEvent.java
 +++ b/core/java/android/view/KeyEvent.java
-@@ -1989,6 +1989,7 @@ public class KeyEvent extends InputEvent implements Parcelable {
+@@ -1988,6 +1988,7 @@ public class KeyEvent extends InputEvent implements Parcelable {
+         switch (keyCode) {
              case KeyEvent.KEYCODE_CAMERA:
-             case KeyEvent.KEYCODE_FOCUS:
              case KeyEvent.KEYCODE_MENU:
 +            case KeyEvent.KEYCODE_HOME:
              case KeyEvent.KEYCODE_PAIRING:

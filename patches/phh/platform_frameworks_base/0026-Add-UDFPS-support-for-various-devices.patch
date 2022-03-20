@@ -1,7 +1,7 @@
-From f154927148ff2c97cfb7d12e84c7ddc61b22efdf Mon Sep 17 00:00:00 2001
+From 459c4f9b8effb865525ea4c8ef70f654d3847e70 Mon Sep 17 00:00:00 2001
 From: Pierre-Hugues Husson <phh@phh.me>
 Date: Sun, 19 Dec 2021 17:08:22 -0500
-Subject: [PATCH 26/28] Add UDFPS support for various devices
+Subject: [PATCH 26/31] Add UDFPS support for various devices
 
 Successfully tested on Galaxy A51, Xiaomi Mi 9, and OnePlus Nord 2
 
@@ -33,10 +33,10 @@ index 77fad35d32d4..51409b9c533a 100644
      }
  
 diff --git a/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsView.java b/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsView.java
-index 15f77ffc08fd..bc72e6ed7d78 100644
+index 6d31ef0e7701..dd5da24a87bf 100644
 --- a/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsView.java
 +++ b/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsView.java
-@@ -41,6 +41,12 @@ import com.android.systemui.R;
+@@ -42,6 +42,12 @@ import com.android.systemui.R;
  import com.android.systemui.biometrics.UdfpsHbmTypes.HbmType;
  import com.android.systemui.doze.DozeReceiver;
  
@@ -49,7 +49,7 @@ index 15f77ffc08fd..bc72e6ed7d78 100644
  /**
   * A view containing 1) A SurfaceView for HBM, and 2) A normal drawable view for all other
   * animations.
-@@ -50,7 +56,7 @@ public class UdfpsView extends FrameLayout implements DozeReceiver, UdfpsIllumin
+@@ -51,7 +57,7 @@ public class UdfpsView extends FrameLayout implements DozeReceiver, UdfpsIllumin
  
      private static final String SETTING_HBM_TYPE =
              "com.android.systemui.biometrics.UdfpsSurfaceView.hbmType";
@@ -58,7 +58,7 @@ index 15f77ffc08fd..bc72e6ed7d78 100644
  
      private static final int DEBUG_TEXT_SIZE_PX = 32;
  
-@@ -70,6 +76,49 @@ public class UdfpsView extends FrameLayout implements DozeReceiver, UdfpsIllumin
+@@ -71,6 +77,49 @@ public class UdfpsView extends FrameLayout implements DozeReceiver, UdfpsIllumin
      @Nullable private String mDebugMessage;
      private boolean mIlluminationRequested;
  
@@ -108,10 +108,19 @@ index 15f77ffc08fd..bc72e6ed7d78 100644
      public UdfpsView(Context context, AttributeSet attrs) {
          super(context, attrs);
  
-@@ -253,6 +301,11 @@ public class UdfpsView extends FrameLayout implements DozeReceiver, UdfpsIllumin
-                 }
-             });
+@@ -241,7 +290,7 @@ public class UdfpsView extends FrameLayout implements DozeReceiver, UdfpsIllumin
+         if (mGhbmView != null && surface == null) {
+             Log.e(TAG, "doIlluminate | surface must be non-null for GHBM");
          }
+-        mHbmProvider.enableHbm(mHbmType, surface, () -> {
++        if(mHbmProvider != null) mHbmProvider.enableHbm(mHbmType, surface, () -> {
+             if (mGhbmView != null) {
+                 mGhbmView.drawIlluminationDot(mSensorRect);
+             }
+@@ -253,6 +302,11 @@ public class UdfpsView extends FrameLayout implements DozeReceiver, UdfpsIllumin
+                 Log.w(TAG, "doIlluminate | onIlluminatedRunnable is null");
+             }
+         });
 +	else {
 +		if (mGhbmView != null) {
 +			mGhbmView.drawIlluminationDot(mSensorRect);
@@ -120,8 +129,16 @@ index 15f77ffc08fd..bc72e6ed7d78 100644
      }
  
      @Override
+@@ -265,6 +319,6 @@ public class UdfpsView extends FrameLayout implements DozeReceiver, UdfpsIllumin
+             mGhbmView.setGhbmIlluminationListener(null);
+             mGhbmView.setVisibility(View.INVISIBLE);
+         }
+-        mHbmProvider.disableHbm(null /* onHbmDisabled */);
++        if(mHbmProvider != null) mHbmProvider.disableHbm(null /* onHbmDisabled */);
+     }
+ }
 diff --git a/services/core/Android.bp b/services/core/Android.bp
-index 55b982b40611..5af7770fd6fe 100644
+index e5716eee467e..9c359cea6244 100644
 --- a/services/core/Android.bp
 +++ b/services/core/Android.bp
 @@ -155,6 +155,10 @@ java_library_static {
@@ -136,10 +153,10 @@ index 55b982b40611..5af7770fd6fe 100644
          "icu4j_calendar_astronomer",
          "netd-client",
 diff --git a/services/core/java/com/android/server/biometrics/AuthService.java b/services/core/java/com/android/server/biometrics/AuthService.java
-index b42f8980d1c0..41a04b8b5056 100644
+index 9c8ccd946b7f..62ea6dd8633b 100644
 --- a/services/core/java/com/android/server/biometrics/AuthService.java
 +++ b/services/core/java/com/android/server/biometrics/AuthService.java
-@@ -72,6 +72,21 @@ import com.android.server.SystemService;
+@@ -73,6 +73,21 @@ import com.android.server.SystemService;
  import java.util.ArrayList;
  import java.util.List;
  
@@ -161,7 +178,7 @@ index b42f8980d1c0..41a04b8b5056 100644
  /**
   * System service that provides an interface for authenticating with biometrics and
   * PIN/pattern/password to BiometricPrompt and lock screen.
-@@ -88,6 +103,9 @@ public class AuthService extends SystemService {
+@@ -89,6 +104,9 @@ public class AuthService extends SystemService {
      @VisibleForTesting
      final IAuthService.Stub mImpl;
  
@@ -171,7 +188,7 @@ index b42f8980d1c0..41a04b8b5056 100644
      /**
       * Class for injecting dependencies into AuthService.
       * TODO(b/141025588): Replace with a dependency injection framework (e.g. Guice, Dagger).
-@@ -636,6 +654,68 @@ public class AuthService extends SystemService {
+@@ -637,6 +655,68 @@ public class AuthService extends SystemService {
          registerAuthenticators(hidlConfigs);
  
          mInjector.publishBinderService(this, mImpl);
@@ -240,7 +257,7 @@ index b42f8980d1c0..41a04b8b5056 100644
      }
  
      /**
-@@ -734,19 +814,197 @@ public class AuthService extends SystemService {
+@@ -735,19 +815,197 @@ public class AuthService extends SystemService {
                  ? modality : (modality & ~BiometricAuthenticator.TYPE_CREDENTIAL);
      }
  
@@ -441,12 +458,12 @@ index b42f8980d1c0..41a04b8b5056 100644
          if (isUdfps) {
              sensorType = FingerprintSensorProperties.TYPE_UDFPS_OPTICAL;
 diff --git a/services/core/java/com/android/server/biometrics/sensors/fingerprint/UdfpsHelper.java b/services/core/java/com/android/server/biometrics/sensors/fingerprint/UdfpsHelper.java
-index 879c8a0317d7..d288acdc2ef5 100644
+index 29661d46f328..e97f70d7bffd 100644
 --- a/services/core/java/com/android/server/biometrics/sensors/fingerprint/UdfpsHelper.java
 +++ b/services/core/java/com/android/server/biometrics/sensors/fingerprint/UdfpsHelper.java
-@@ -28,6 +28,10 @@ import android.util.Slog;
- 
- import com.android.server.biometrics.sensors.AcquisitionClient;
+@@ -23,6 +23,10 @@ import android.hardware.fingerprint.FingerprintManager;
+ import android.os.RemoteException;
+ import android.util.Slog;
  
 +import vendor.goodix.hardware.biometrics.fingerprint.V2_1.IGoodixFingerprintDaemon;
 +
@@ -455,7 +472,7 @@ index 879c8a0317d7..d288acdc2ef5 100644
  /**
   * Contains helper methods for under-display fingerprint HIDL.
   */
-@@ -35,37 +39,120 @@ public class UdfpsHelper {
+@@ -30,37 +34,120 @@ public class UdfpsHelper {
  
      private static final String TAG = "UdfpsHelper";
  
@@ -564,21 +581,21 @@ index 879c8a0317d7..d288acdc2ef5 100644
              return;
 +        } catch(Throwable t) {
 +            Slog.e(TAG, "Tried sending goodix daemon cmd failed", t);
-         }
- 
-         try {
--            extension.onFingerUp();
--        } catch (RemoteException e) {
--            Slog.e(TAG, "onFingerUp | RemoteException: ", e);
++        }
++
++        try {
 +            vendor.oplus.hardware.biometrics.fingerprint.V2_1.IBiometricsFingerprint fp = vendor.oplus.hardware.biometrics.fingerprint.V2_1.IBiometricsFingerprint.getService();
 +            writeFile("/sys/kernel/oppo_display/notify_fppress", "0");
 +            writeFile("/sys/kernel/oplus_display/oplus_notify_fppress", "0");
 +            fp.touchUp();
 +        } catch(Throwable t) {
 +            Slog.e(TAG, "Tried sending oplus daemon cmd failed", t);
-+        }
-+
-+        try {
+         }
+ 
+         try {
+-            extension.onFingerUp();
+-        } catch (RemoteException e) {
+-            Slog.e(TAG, "onFingerUp | RemoteException: ", e);
 +            vendor.oppo.hardware.biometrics.fingerprint.V2_1.IBiometricsFingerprint fp = vendor.oppo.hardware.biometrics.fingerprint.V2_1.IBiometricsFingerprint.getService();
 +            writeFile("/sys/kernel/oppo_display/notify_fppress", "0");
 +            writeFile("/sys/kernel/oplus_display/oplus_notify_fppress", "0");
@@ -589,7 +606,7 @@ index 879c8a0317d7..d288acdc2ef5 100644
 +        Slog.v(TAG, "onFingerUp | failed to cast the HIDL to V2_3");
      }
  
-     public static int getReasonFromEnrollReason(@FingerprintManager.EnrollReason int reason) {
+     public static boolean isValidAcquisitionMessage(@NonNull Context context,
 -- 
 2.25.1
 
