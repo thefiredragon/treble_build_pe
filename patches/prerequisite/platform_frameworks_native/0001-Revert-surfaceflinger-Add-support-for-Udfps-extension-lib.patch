@@ -1,7 +1,7 @@
 From a0bd6eb9960ec3489164790c78f0ee7c68ce858c Mon Sep 17 00:00:00 2001
 From: Alberto Ponces <ponces26@gmail.com>
 Date: Sun, 20 Mar 2022 23:52:48 +0000
-Subject: [PATCH] Revert "surfaceflinger: Add support for Udfps extension lib"
+Subject: [PATCH 1/2] Revert "surfaceflinger: Add support for Udfps extension lib"
 
 This reverts commit 68b794c2bfdcf20f3c408605799c40a65a4c2875.
 ---
