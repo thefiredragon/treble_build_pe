@@ -1,9 +1,9 @@
-From c5b041d6483b12aced501bcef114d9325449268c Mon Sep 17 00:00:00 2001
-From: Andy CrossGate Yan <GeForce8800Ultra@gmail.com>
-Date: Sun, 8 Aug 2021 01:43:34 +0000
-Subject: [PATCH] Revert "surfaceflinger: Add support for extension lib"
+From a0bd6eb9960ec3489164790c78f0ee7c68ce858c Mon Sep 17 00:00:00 2001
+From: Alberto Ponces <ponces26@gmail.com>
+Date: Sun, 20 Mar 2022 23:52:48 +0000
+Subject: [PATCH] Revert "surfaceflinger: Add support for Udfps extension lib"
 
-This reverts commit 381416d540ea92dca5f64cd48fd8c9dc887cac7b.
+This reverts commit 68b794c2bfdcf20f3c408605799c40a65a4c2875.
 ---
  services/surfaceflinger/BufferQueueLayer.cpp  | 10 +------
  .../CompositionEngine/Android.bp              | 14 +--------
@@ -15,7 +15,7 @@ This reverts commit 381416d540ea92dca5f64cd48fd8c9dc887cac7b.
  delete mode 100644 services/surfaceflinger/CompositionEngine/src/UdfpsExtension.cpp
 
 diff --git a/services/surfaceflinger/BufferQueueLayer.cpp b/services/surfaceflinger/BufferQueueLayer.cpp
-index 58e391d64b..6b6d43425d 100644
+index 8c404aca3a..99e470dfe6 100644
 --- a/services/surfaceflinger/BufferQueueLayer.cpp
 +++ b/services/surfaceflinger/BufferQueueLayer.cpp
 @@ -25,7 +25,6 @@
@@ -26,8 +26,8 @@ index 58e391d64b..6b6d43425d 100644
  #include <gui/BufferQueueConsumer.h>
  #include <system/window.h>
  
-@@ -525,17 +524,10 @@ status_t BufferQueueLayer::setDefaultBufferProperties(uint32_t w, uint32_t h, Pi
-         ALOGE("dimensions too large %u x %u", uint32_t(w), uint32_t(h));
+@@ -522,17 +521,10 @@ status_t BufferQueueLayer::setDefaultBufferProperties(uint32_t w, uint32_t h, Pi
+         ALOGE("dimensions too large %" PRIu32 " x %" PRIu32, w, h);
          return BAD_VALUE;
      }
 -    uint64_t usageBits = getEffectiveUsage(0);

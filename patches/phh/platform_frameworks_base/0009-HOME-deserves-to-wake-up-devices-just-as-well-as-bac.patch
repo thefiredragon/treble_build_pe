@@ -10,12 +10,12 @@ Change-Id: Ia562bafd8c620d00c17e8eb338e4701c6c4a3c3a
  1 file changed, 1 insertion(+)
 
 diff --git a/core/java/android/view/KeyEvent.java b/core/java/android/view/KeyEvent.java
-index cda9b233576c..bb35e3172165 100644
+index 8eff8039df39..46c2c75264a5 100644
 --- a/core/java/android/view/KeyEvent.java
 +++ b/core/java/android/view/KeyEvent.java
-@@ -1988,6 +1988,7 @@ public class KeyEvent extends InputEvent implements Parcelable {
-         switch (keyCode) {
+@@ -1989,6 +1989,7 @@ public class KeyEvent extends InputEvent implements Parcelable {
              case KeyEvent.KEYCODE_CAMERA:
+             case KeyEvent.KEYCODE_FOCUS:
              case KeyEvent.KEYCODE_MENU:
 +            case KeyEvent.KEYCODE_HOME:
              case KeyEvent.KEYCODE_PAIRING:

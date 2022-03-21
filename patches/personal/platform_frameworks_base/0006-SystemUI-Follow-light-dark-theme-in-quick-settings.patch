@@ -1,7 +1,7 @@
 From c0aadaca1ab833a13ecacc48cf5c458427f8f6b4 Mon Sep 17 00:00:00 2001
 From: Danny Lin <danny@kdrag0n.dev>
 Date: Mon, 11 Oct 2021 19:24:58 -0700
-Subject: [PATCH 6/11] SystemUI: Follow light/dark theme in quick settings
+Subject: [PATCH 6/12] SystemUI: Follow light/dark theme in quick settings
 
 Android 12's dual-tone style where the quick settings panel is always
 dark makes the light theme look like a second-class citizen. Pure black
@@ -82,7 +82,7 @@ index 860d23b11439..8f12b95ed4f6 100644
              </shape>
          </item>
 diff --git a/packages/SystemUI/res/values-night/styles.xml b/packages/SystemUI/res/values-night/styles.xml
-index dd999837a1ba..3fd6f9cc5454 100644
+index ffcc3a821d36..a9fa9f3f9fde 100644
 --- a/packages/SystemUI/res/values-night/styles.xml
 +++ b/packages/SystemUI/res/values-night/styles.xml
 @@ -24,6 +24,18 @@
@@ -166,7 +166,7 @@ diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/phone/ScrimCon
 index 27c129ad34c5..6bdf82a60e40 100644
 --- a/packages/SystemUI/src/com/android/systemui/statusbar/phone/ScrimController.java
 +++ b/packages/SystemUI/src/com/android/systemui/statusbar/phone/ScrimController.java
-@@ -692,7 +692,7 @@ private void applyStateToAlpha() {
+@@ -692,7 +692,7 @@ public class ScrimController implements ViewTreeObserver.OnPreDrawListener, Dump
                  mNotificationsAlpha = behindAlpha;
                  mNotificationsTint = behindTint;
                  mBehindAlpha = 1;
@@ -179,7 +179,7 @@ diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/phone/ScrimSta
 index 15b8c67fd4ba..577e33c3c8d6 100644
 --- a/packages/SystemUI/src/com/android/systemui/statusbar/phone/ScrimState.java
 +++ b/packages/SystemUI/src/com/android/systemui/statusbar/phone/ScrimState.java
-@@ -88,7 +88,7 @@ public void prepare(ScrimState previousState) {
+@@ -88,7 +88,7 @@ public enum ScrimState {
              mNotifAlpha = mClipQsScrim ? mScrimBehindAlphaKeyguard : 0;
              mBubbleAlpha = 0;
              if (mClipQsScrim) {
@@ -188,7 +188,7 @@ index 15b8c67fd4ba..577e33c3c8d6 100644
              }
          }
      },
-@@ -114,7 +114,7 @@ public void prepare(ScrimState previousState) {
+@@ -114,7 +114,7 @@ public enum ScrimState {
          @Override
          public void prepare(ScrimState previousState) {
              mBehindAlpha = mClipQsScrim ? 1 : mDefaultScrimAlpha;
@@ -197,7 +197,7 @@ index 15b8c67fd4ba..577e33c3c8d6 100644
              mNotifAlpha = mClipQsScrim ? mDefaultScrimAlpha : 0;
              mNotifTint = Color.TRANSPARENT;
              mFrontAlpha = 0f;
-@@ -141,17 +141,17 @@ public void prepare(ScrimState previousState) {
+@@ -141,17 +141,17 @@ public enum ScrimState {
              mNotifAlpha = 1f;
              mBubbleAlpha = 0f;
              mFrontAlpha = 0f;
@@ -218,7 +218,7 @@ index 15b8c67fd4ba..577e33c3c8d6 100644
          }
      },
  
-@@ -248,27 +248,27 @@ public void prepare(ScrimState previousState) {
+@@ -248,27 +248,27 @@ public enum ScrimState {
              mAnimateChange = !mLaunchingAffordanceWithPreview && !fromAod;
  
              mFrontTint = Color.TRANSPARENT;
@@ -250,7 +250,7 @@ index 15b8c67fd4ba..577e33c3c8d6 100644
              }
          }
      },
-@@ -468,4 +468,4 @@ public void setKeyguardFadingAway(boolean fadingAway, long duration) {
+@@ -468,4 +468,4 @@ public enum ScrimState {
      public void setClipQsScrim(boolean clipsQsScrim) {
          mClipQsScrim = clipsQsScrim;
      }
