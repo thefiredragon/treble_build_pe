@@ -11,12 +11,12 @@ Change-Id: I55c8897d7d4d5c2a9e62b1a931b3856b2e38956e
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/config/branding.mk b/config/branding.mk
-index 85ef87f9..934e5df1 100644
+index ceaabaa4..e8479f73 100644
 --- a/config/branding.mk
 +++ b/config/branding.mk
 @@ -10,5 +10,5 @@ CUSTOM_BUILD_DATE := $(CUSTOM_DATE_YEAR)$(CUSTOM_DATE_MONTH)$(CUSTOM_DATE_DAY)-$
 
- CUSTOM_PLATFORM_VERSION := 12.0
+ CUSTOM_PLATFORM_VERSION := 12.1
 
 -CUSTOM_VERSION := PixelExperience_$(CUSTOM_BUILD)-$(CUSTOM_PLATFORM_VERSION)-$(CUSTOM_BUILD_DATE)-$(CUSTOM_BUILD_TYPE)
 +CUSTOM_VERSION := PixelExperience_$(TARGET_PRODUCT)-$(CUSTOM_PLATFORM_VERSION)-$(CUSTOM_BUILD_DATE)-$(CUSTOM_BUILD_TYPE)

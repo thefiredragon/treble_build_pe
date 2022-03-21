@@ -1,4 +1,4 @@
-From 1ed0fb3e67d9d1f41435e7e60b801837a83c2c64 Mon Sep 17 00:00:00 2001
+From f245cb8f21951c04b094708eb0c9c67bcb2fa795 Mon Sep 17 00:00:00 2001
 From: Danny Lin <danny@kdrag0n.dev>
 Date: Wed, 6 Oct 2021 18:41:11 -0700
 Subject: [PATCH 5/12] Revert "Do not re-inflate QS and SB when
@@ -15,10 +15,10 @@ Change-Id: Ibad399ece587505559cc73febdda2f2d8558e94d
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/packages/SystemUI/src/com/android/systemui/fragments/FragmentHostManager.java b/packages/SystemUI/src/com/android/systemui/fragments/FragmentHostManager.java
-index b45dc52585ad..87d90adceba5 100644
+index 10878dcc2474..483865186945 100644
 --- a/packages/SystemUI/src/com/android/systemui/fragments/FragmentHostManager.java
 +++ b/packages/SystemUI/src/com/android/systemui/fragments/FragmentHostManager.java
-@@ -54,7 +54,8 @@ public class FragmentHostManager {
+@@ -53,7 +53,8 @@ public class FragmentHostManager {
      private final View mRootView;
      private final InterestingConfigChanges mConfigChanges = new InterestingConfigChanges(
              ActivityInfo.CONFIG_FONT_SCALE | ActivityInfo.CONFIG_LOCALE

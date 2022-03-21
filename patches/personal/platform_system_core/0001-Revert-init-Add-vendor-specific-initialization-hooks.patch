@@ -16,13 +16,13 @@ Change-Id: I0c3241ef3626bc989b34723e30b2339e4a62399d
  delete mode 100644 init/vendor_init.h
 
 diff --git a/init/Android.bp b/init/Android.bp
-index 69f8815ed..7eeafa24b 100644
+index 1282a2538..a57f3a407 100644
 --- a/init/Android.bp
 +++ b/init/Android.bp
-@@ -89,14 +89,6 @@ init_host_sources = [
-     "host_init_verifier.cpp",
- ]
-
+@@ -101,14 +101,6 @@ soong_config_module_type {
+     ],
+ }
+ 
 -cc_library_static {
 -    name: "vendor_init",
 -    recovery_available: true,
@@ -31,10 +31,10 @@ index 69f8815ed..7eeafa24b 100644
 -    ],
 -}
 -
- cc_defaults {
+ libinit_cc_defaults {
      name: "init_defaults",
      sanitize: {
-@@ -190,7 +182,6 @@ cc_library_static {
+@@ -211,7 +203,6 @@ cc_library_static {
      defaults: [
          "init_defaults",
          "selinux_policy_version",

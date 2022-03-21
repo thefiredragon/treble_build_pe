@@ -4089,10 +4089,10 @@ index 4f2b878..78fd046 100644
          const metadata_vendor_id_t tagId, const std::string &id,
          uint16_t minorVersion,
 diff --git a/services/camera/libcameraservice/common/CameraProviderManager.h b/services/camera/libcameraservice/common/CameraProviderManager.h
-index 1bdbb44..c7a62fb 100644
+index e3763a14c7..f858bf0d6d 100644
 --- a/services/camera/libcameraservice/common/CameraProviderManager.h
 +++ b/services/camera/libcameraservice/common/CameraProviderManager.h
-@@ -283,6 +283,11 @@
+@@ -282,6 +282,11 @@ public:
              /*out*/
              sp<hardware::camera::device::V3_2::ICameraDeviceSession> *session);
  
@@ -4102,9 +4102,9 @@ index 1bdbb44..c7a62fb 100644
 +            sp<hardware::camera::device::V1_0::ICameraDevice> *session);
 +
      /**
-      * Save the ICameraProvider while it is being used by a camera or torch client
+      * Notify that the camera or torch is no longer being used by a camera client
       */
-@@ -535,6 +540,28 @@
+@@ -544,6 +549,28 @@ private:
          // physical camera IDs.
          std::vector<std::string> mProviderPublicCameraIds;
  

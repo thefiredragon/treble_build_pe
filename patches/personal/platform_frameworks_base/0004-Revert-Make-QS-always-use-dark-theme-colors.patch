@@ -1,4 +1,4 @@
-From d6a215d67f767fe6a793dd66f5bf8dcd02f48d57 Mon Sep 17 00:00:00 2001
+From bf258bd06284df94c2872e677679299d2498b4df Mon Sep 17 00:00:00 2001
 From: Danny Lin <danny@kdrag0n.dev>
 Date: Wed, 6 Oct 2021 18:40:30 -0700
 Subject: [PATCH 4/12] Revert "Make QS always use dark theme colors"
@@ -15,11 +15,11 @@ Change-Id: Iac4c96ccb3845812ca3df820bf27dc533816f72e
  2 files changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/packages/SystemUI/res/layout/quick_qs_status_icons.xml b/packages/SystemUI/res/layout/quick_qs_status_icons.xml
-index 42a7c895ff84..27514617fb23 100644
+index 542a1c9d22bd..7a370d8cbc48 100644
 --- a/packages/SystemUI/res/layout/quick_qs_status_icons.xml
 +++ b/packages/SystemUI/res/layout/quick_qs_status_icons.xml
 @@ -24,7 +24,7 @@
-     android:minHeight="48dp"
+     android:minHeight="@dimen/qs_header_row_min_height"
      android:clickable="false"
      android:focusable="true"
 -    android:theme="@style/Theme.SystemUI.QuickSettings.Header">
@@ -28,10 +28,10 @@ index 42a7c895ff84..27514617fb23 100644
      <LinearLayout
          android:id="@+id/clock_container"
 diff --git a/packages/SystemUI/res/values/styles.xml b/packages/SystemUI/res/values/styles.xml
-index 93d60cce2915..e592fe2dd630 100644
+index f26159f5176a..e2665f879e5e 100644
 --- a/packages/SystemUI/res/values/styles.xml
 +++ b/packages/SystemUI/res/values/styles.xml
-@@ -395,7 +395,7 @@
+@@ -326,7 +326,7 @@
          <item name="*android:dotColor">?android:attr/textColorSecondary</item>
      </style>
  
@@ -40,7 +40,7 @@ index 93d60cce2915..e592fe2dd630 100644
          <item name="lightIconTheme">@style/QSIconTheme</item>
          <item name="darkIconTheme">@style/QSIconTheme</item>
          <item name="android:colorError">@*android:color/error_color_material_dark</item>
-@@ -486,7 +486,7 @@
+@@ -421,7 +421,7 @@
          <item name="singleToneColor">@color/dark_mode_qs_icon_color_single_tone</item>
      </style>
  
