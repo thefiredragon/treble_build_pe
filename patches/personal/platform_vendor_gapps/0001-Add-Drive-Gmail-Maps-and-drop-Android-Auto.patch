@@ -1,0 +1,46 @@
+From 590788fc4b110d103a86c67f21b4fafb5fe56ef7 Mon Sep 17 00:00:00 2001
+From: Alberto Ponces <ponces26@gmail.com>
+Date: Sun, 31 Oct 2021 21:09:42 +0000
+Subject: [PATCH] Add Drive, Gmail, Maps and drop Android Auto
+
+---
+ config.mk | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/config.mk b/config.mk
+index 29df6bc..a1768b7 100644
+--- a/config.mk
++++ b/config.mk
+@@ -50,18 +50,21 @@ PRODUCT_PACKAGES += \
+     Chrome-Stub \
+     DevicePolicyPrebuilt \
+     DiagnosticsToolPrebuilt \
++    Drive \
+     GoogleCamera \
+     GoogleContacts \
+     GoogleContactsSyncAdapter \
+     GoogleTTS \
+     LatinIMEGooglePrebuilt \
+     LocationHistoryPrebuilt \
++    Maps \
+     MarkupGoogle \
+     Photos \
+     PixelThemesStub \
+     PixelWallpapers2021 \
+     PrebuiltBugle \
+     PrebuiltDeskClockGoogle \
++    PrebuiltGmail \
+     PrebuiltGoogleTelemetryTvp \
+     SoundAmplifierPrebuilt \
+     SoundPickerPrebuilt \
+@@ -74,7 +77,6 @@ PRODUCT_PACKAGES += \
+ # product/priv-app
+ PRODUCT_PACKAGES += \
+     AmbientSensePrebuilt \
+-    AndroidAutoStubPrebuilt \
+     AppDirectedSMSService \
+     BetterBug \
+     CarrierLocation \
+-- 
+2.32.0
+
