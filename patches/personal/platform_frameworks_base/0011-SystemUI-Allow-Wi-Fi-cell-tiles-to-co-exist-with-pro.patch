@@ -1,0 +1,200 @@
+From 9ce191a9e40ee0cafd6bf5fe12cd439c33f4c8c3 Mon Sep 17 00:00:00 2001
+From: Danny Lin <danny@kdrag0n.dev>
+Date: Mon, 25 Oct 2021 19:32:33 -0700
+Subject: [PATCH 11/15] SystemUI: Allow Wi-Fi/cell tiles to co-exist with provider
+ model
+
+The dedicated Wi-Fi/cellular data QS tiles are partially working now
+that we've exposed them in the list of tile options, but they're very
+buggy and somewhat broken when the provider model (unified internet) is
+enabled.
+
+Allow the tiles to co-exist with InternetTile and the provider model
+(including both settings_provider_model and combined signal icons) by
+always including QS icons in Wi-Fi/data indicator callbacks, and add
+a new flag to indicate whether they should be shown in the internet
+tile.
+
+[kdrag0n: ported to 12L. Some conditions could be simplified as both
+          cases are now the same, but I've left them as-is to ease
+          future porting]
+
+Change-Id: I11f8c3dd4796d792d0f0e48dc21eb5d8158d0476
+---
+ .../systemui/qs/tiles/InternetTile.java       |  4 +-
+ .../connectivity/MobileSignalController.java  |  9 ++---
+ .../statusbar/connectivity/SignalCallback.kt  |  8 ++--
+ .../connectivity/WifiSignalController.java    | 39 ++++++++-----------
+ 4 files changed, 27 insertions(+), 33 deletions(-)
+
+diff --git a/packages/SystemUI/src/com/android/systemui/qs/tiles/InternetTile.java b/packages/SystemUI/src/com/android/systemui/qs/tiles/InternetTile.java
+index 2c070dfad3eb..ab8df9ffa105 100644
+--- a/packages/SystemUI/src/com/android/systemui/qs/tiles/InternetTile.java
++++ b/packages/SystemUI/src/com/android/systemui/qs/tiles/InternetTile.java
+@@ -262,7 +262,7 @@ public void setWifiIndicators(@NonNull WifiIndicators indicators) {
+                 Log.d(TAG, "setWifiIndicators: " + indicators);
+             }
+             mWifiInfo.mEnabled = indicators.enabled;
+-            if (indicators.qsIcon == null) {
++            if (indicators.qsIcon == null || !indicators.isDefault) {
+                 return;
+             }
+             mWifiInfo.mConnected = indicators.qsIcon.visible;
+@@ -282,7 +282,7 @@ public void setMobileDataIndicators(@NonNull MobileDataIndicators indicators) {
+             if (DEBUG) {
+                 Log.d(TAG, "setMobileDataIndicators: " + indicators);
+             }
+-            if (indicators.qsIcon == null) {
++            if (indicators.qsIcon == null || !indicators.isDefault) {
+                 // Not data sim, don't display.
+                 return;
+             }
+diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/connectivity/MobileSignalController.java b/packages/SystemUI/src/com/android/systemui/statusbar/connectivity/MobileSignalController.java
+index 9ae7ea2bdded..c83238c9b9de 100644
+--- a/packages/SystemUI/src/com/android/systemui/statusbar/connectivity/MobileSignalController.java
++++ b/packages/SystemUI/src/com/android/systemui/statusbar/connectivity/MobileSignalController.java
+@@ -385,7 +385,8 @@ public void notifyListeners(SignalCallback callback) {
+                 qsInfo.description,
+                 mSubscriptionInfo.getSubscriptionId(),
+                 mCurrentState.roaming,
+-                sbInfo.showTriangle);
++                sbInfo.showTriangle,
++                mCurrentState.isDefault);
+         callback.setMobileDataIndicators(mobileDataIndicators);
+     }
+ 
+@@ -397,10 +398,6 @@ private QsInfo getQsInfo(String contentDescription, int dataTypeIcon) {
+         boolean pm = mProviderModelSetting || mProviderModelBehavior;
+         if (mCurrentState.dataSim) {
+             // If using provider model behavior, only show QS icons if the state is also default
+-            if (pm && !mCurrentState.isDefault) {
+-                return new QsInfo(qsTypeIcon, qsIcon, qsDescription);
+-            }
+-
+             if (mCurrentState.showQuickSettingsRatIcon() || mConfig.alwaysShowDataRatIcon) {
+                 qsTypeIcon = dataTypeIcon;
+             }
+@@ -424,7 +421,7 @@ private SbInfo getSbInfo(String contentDescription, int dataTypeIcon) {
+ 
+         if (mProviderModelBehavior) {
+             boolean showDataIconStatusBar = (mCurrentState.dataConnected || dataDisabled)
+-                    && (mCurrentState.dataSim && mCurrentState.isDefault);
++                    && mCurrentState.dataSim;
+             typeIcon =
+                     (showDataIconStatusBar || mConfig.alwaysShowDataRatIcon) ? dataTypeIcon : 0;
+             showDataIconStatusBar |= mCurrentState.roaming;
+diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/connectivity/SignalCallback.kt b/packages/SystemUI/src/com/android/systemui/statusbar/connectivity/SignalCallback.kt
+index 599beecb0e00..ebba1b26dfb2 100644
+--- a/packages/SystemUI/src/com/android/systemui/statusbar/connectivity/SignalCallback.kt
++++ b/packages/SystemUI/src/com/android/systemui/statusbar/connectivity/SignalCallback.kt
+@@ -122,7 +122,8 @@ data class WifiIndicators(
+     @JvmField val activityOut: Boolean,
+     @JvmField val description: String?,
+     @JvmField val isTransient: Boolean,
+-    @JvmField val statusLabel: String?
++    @JvmField val statusLabel: String?,
++    @JvmField val isDefault: Boolean,
+ ) {
+     override fun toString(): String {
+         return StringBuilder("WifiIndicators[")
+@@ -151,7 +152,8 @@ data class MobileDataIndicators(
+     @JvmField val qsDescription: CharSequence?,
+     @JvmField val subId: Int,
+     @JvmField val roaming: Boolean,
+-    @JvmField val showTriangle: Boolean
++    @JvmField val showTriangle: Boolean,
++    @JvmField val isDefault: Boolean,
+ ) {
+     override fun toString(): String {
+         return java.lang.StringBuilder("MobileDataIndicators[")
+@@ -184,4 +186,4 @@ data class IconState(
+                 .append("contentDescription=").append(contentDescription).append(']')
+                 .toString()
+     }
+-}
+\ No newline at end of file
++}
+diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/connectivity/WifiSignalController.java b/packages/SystemUI/src/com/android/systemui/statusbar/connectivity/WifiSignalController.java
+index ff9d919dda13..278e3bf32039 100644
+--- a/packages/SystemUI/src/com/android/systemui/statusbar/connectivity/WifiSignalController.java
++++ b/packages/SystemUI/src/com/android/systemui/statusbar/connectivity/WifiSignalController.java
+@@ -83,9 +83,7 @@ void refreshLocale() {
+     @Override
+     public void notifyListeners(SignalCallback callback) {
+         if (mCurrentState.isCarrierMerged) {
+-            if (mCurrentState.isDefault || !mNetworkController.isRadioOn()) {
+-                notifyListenersForCarrierWifi(callback);
+-            }
++            notifyListenersForCarrierWifi(callback);
+         } else {
+             notifyListenersForNonCarrierWifi(callback);
+         }
+@@ -108,18 +106,17 @@ private void notifyListenersForNonCarrierWifi(SignalCallback callback) {
+         if (mProviderModelSetting) {
+             IconState statusIcon = new IconState(
+                     wifiVisible, getCurrentIconId(), contentDescription);
+-            IconState qsIcon = null;
+-            if (mCurrentState.isDefault || (!mNetworkController.isRadioOn()
+-                    && !mNetworkController.isEthernetDefault())) {
+-                qsIcon = new IconState(mCurrentState.connected,
+-                        mWifiTracker.isCaptivePortal ? R.drawable.ic_qs_wifi_disconnected
+-                                : getQsCurrentIconId(), contentDescription);
+-            }
++            IconState qsIcon = new IconState(mCurrentState.connected,
++                    mWifiTracker.isCaptivePortal ? R.drawable.ic_qs_wifi_disconnected
++                            : getQsCurrentIconId(), contentDescription);
++            boolean isDefault = mCurrentState.isDefault || (!mNetworkController.isRadioOn()
++                    && !mNetworkController.isEthernetDefault());
+             WifiIndicators wifiIndicators = new WifiIndicators(
+                     mCurrentState.enabled, statusIcon, qsIcon,
+                     ssidPresent && mCurrentState.activityIn,
+                     ssidPresent && mCurrentState.activityOut,
+-                    wifiDesc, mCurrentState.isTransient, mCurrentState.statusLabel
++                    wifiDesc, mCurrentState.isTransient, mCurrentState.statusLabel,
++                    isDefault
+             );
+             callback.setWifiIndicators(wifiIndicators);
+         } else {
+@@ -132,7 +129,8 @@ private void notifyListenersForNonCarrierWifi(SignalCallback callback) {
+                     mCurrentState.enabled, statusIcon, qsIcon,
+                     ssidPresent && mCurrentState.activityIn,
+                     ssidPresent && mCurrentState.activityOut,
+-                    wifiDesc, mCurrentState.isTransient, mCurrentState.statusLabel
++                    wifiDesc, mCurrentState.isTransient, mCurrentState.statusLabel,
++                    false
+             );
+             callback.setWifiIndicators(wifiIndicators);
+         }
+@@ -148,25 +146,22 @@ private void notifyListenersForCarrierWifi(SignalCallback callback) {
+         if (mCurrentState.inetCondition == 0) {
+             dataContentDescription = mContext.getString(R.string.data_connection_no_internet);
+         }
+-        boolean sbVisible = mCurrentState.enabled && mCurrentState.connected
+-                && mCurrentState.isDefault;
++        boolean sbVisible = mCurrentState.enabled && mCurrentState.connected;
+         IconState statusIcon =
+                 new IconState(sbVisible, getCurrentIconIdForCarrierWifi(), contentDescription);
+         int typeIcon = sbVisible ? icons.dataType : 0;
+-        int qsTypeIcon = 0;
+-        IconState qsIcon = null;
+-        if (sbVisible) {
+-            qsTypeIcon = icons.dataType;
+-            qsIcon = new IconState(mCurrentState.connected, getQsCurrentIconIdForCarrierWifi(),
+-                    contentDescription);
+-        }
++        int qsTypeIcon = icons.dataType;
++        IconState qsIcon = new IconState(mCurrentState.connected, getQsCurrentIconIdForCarrierWifi(),
++                contentDescription);
+         CharSequence description =
+                 mNetworkController.getNetworkNameForCarrierWiFi(mCurrentState.subId);
++        boolean isDefault = mCurrentState.isDefault || !mNetworkController.isRadioOn();
+         MobileDataIndicators mobileDataIndicators = new MobileDataIndicators(
+                 statusIcon, qsIcon, typeIcon, qsTypeIcon,
+                 mCurrentState.activityIn, mCurrentState.activityOut, dataContentDescription,
+                 dataContentDescriptionHtml, description,
+-                mCurrentState.subId, /* roaming= */ false, /* showTriangle= */ true
++                mCurrentState.subId, /* roaming= */ false, /* showTriangle= */ true,
++                isDefault
+         );
+         callback.setMobileDataIndicators(mobileDataIndicators);
+     }

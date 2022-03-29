@@ -1,0 +1,356 @@
+From 5077f0af48a861d61e3c9d8aab82dc2c8a7711bd Mon Sep 17 00:00:00 2001
+From: Danny Lin <danny@kdrag0n.dev>
+Date: Tue, 14 Dec 2021 19:01:33 -0800
+Subject: [PATCH 12/15] Revert "[DO NOT MERGE] Make sure WiFi and Cell tiles are not
+ created in Provider Model"
+
+This reverts commit 8bb5148906138b09505b85aa04755f1ec8befdb8.
+
+We've intentionally enabled and fixed the Wi-Fi and cellular data tiles
+to work with the provider model, so revert this to fix the dedicated
+network tiles.
+
+Signed-off-by: Danny Lin <danny@kdrag0n.dev>
+Change-Id: If3a8683ee1ce9a651800b5ae88183680bd9f3f38
+---
+ .../com/android/systemui/qs/QSTileHost.java   | 29 ++------
+ .../qs/customize/TileQueryHelper.java         |  9 +--
+ .../android/systemui/qs/QSFragmentTest.java   |  2 +-
+ .../android/systemui/qs/QSTileHostTest.java   | 69 +++----------------
+ .../qs/customize/TileQueryHelperTest.java     |  6 +-
+ .../qs/external/TileServicesTest.java         |  5 +-
+ 6 files changed, 18 insertions(+), 102 deletions(-)
+
+diff --git a/packages/SystemUI/src/com/android/systemui/qs/QSTileHost.java b/packages/SystemUI/src/com/android/systemui/qs/QSTileHost.java
+index ef1f0dcff796..df0f6b03c572 100644
+--- a/packages/SystemUI/src/com/android/systemui/qs/QSTileHost.java
++++ b/packages/SystemUI/src/com/android/systemui/qs/QSTileHost.java
+@@ -96,7 +96,6 @@ public class QSTileHost implements QSHost, Tunable, PluginListener<QSFactory>, D
+     private final UiEventLogger mUiEventLogger;
+     private final InstanceIdSequence mInstanceIdSequence;
+     private final CustomTileStatePersister mCustomTileStatePersister;
+-    private final FeatureFlags mFeatureFlags;
+ 
+     private final List<Callback> mCallbacks = new ArrayList<>();
+     private AutoTileManager mAutoTiles;
+@@ -124,8 +123,7 @@ public class QSTileHost implements QSHost, Tunable, PluginListener<QSFactory>, D
+             UiEventLogger uiEventLogger,
+             UserTracker userTracker,
+             SecureSettings secureSettings,
+-            CustomTileStatePersister customTileStatePersister,
+-            FeatureFlags featureFlags
++            CustomTileStatePersister customTileStatePersister
+     ) {
+         mIconController = iconController;
+         mContext = context;
+@@ -147,7 +145,6 @@ public class QSTileHost implements QSHost, Tunable, PluginListener<QSFactory>, D
+         mUserTracker = userTracker;
+         mSecureSettings = secureSettings;
+         mCustomTileStatePersister = customTileStatePersister;
+-        mFeatureFlags = featureFlags;
+ 
+         mainHandler.post(() -> {
+             // This is technically a hack to avoid circular dependency of
+@@ -269,7 +266,7 @@ public class QSTileHost implements QSHost, Tunable, PluginListener<QSFactory>, D
+         if (newValue == null && UserManager.isDeviceInDemoMode(mContext)) {
+             newValue = mContext.getResources().getString(R.string.quick_settings_tiles_retail_mode);
+         }
+-        final List<String> tileSpecs = loadTileSpecs(mContext, newValue, mFeatureFlags);
++        final List<String> tileSpecs = loadTileSpecs(mContext, newValue);
+         int currentUser = mUserTracker.getUserId();
+         if (currentUser != mCurrentUser) {
+             mUserContext = mUserTracker.getUserContext();
+@@ -338,7 +335,7 @@ public class QSTileHost implements QSHost, Tunable, PluginListener<QSFactory>, D
+         if (newTiles.isEmpty() && !tileSpecs.isEmpty()) {
+             // If we didn't manage to create any tiles, set it to empty (default)
+             Log.d(TAG, "No valid tiles on tuning changed. Setting to default.");
+-            changeTiles(currentSpecs, loadTileSpecs(mContext, "", mFeatureFlags));
++            changeTiles(currentSpecs, loadTileSpecs(mContext, ""));
+         } else {
+             for (int i = 0; i < mCallbacks.size(); i++) {
+                 mCallbacks.get(i).onTilesChanged();
+@@ -406,7 +403,7 @@ public class QSTileHost implements QSHost, Tunable, PluginListener<QSFactory>, D
+ 
+     private void changeTileSpecs(Predicate<List<String>> changeFunction) {
+         final String setting = mSecureSettings.getStringForUser(TILES_SETTING, mCurrentUser);
+-        final List<String> tileSpecs = loadTileSpecs(mContext, setting, mFeatureFlags);
++        final List<String> tileSpecs = loadTileSpecs(mContext, setting);
+         if (changeFunction.test(tileSpecs)) {
+             saveTilesToSettings(tileSpecs);
+         }
+@@ -495,8 +492,7 @@ public class QSTileHost implements QSHost, Tunable, PluginListener<QSFactory>, D
+         throw new RuntimeException("Default factory didn't create view for " + tile.getTileSpec());
+     }
+ 
+-    protected static List<String> loadTileSpecs(
+-            Context context, String tileList, FeatureFlags featureFlags) {
++    protected static List<String> loadTileSpecs(Context context, String tileList) {
+         final Resources res = context.getResources();
+ 
+         if (TextUtils.isEmpty(tileList)) {
+@@ -529,21 +525,6 @@ public class QSTileHost implements QSHost, Tunable, PluginListener<QSFactory>, D
+                 }
+             }
+         }
+-        if (featureFlags.isProviderModelSettingEnabled()) {
+-            if (!tiles.contains("internet")) {
+-                if (tiles.contains("wifi")) {
+-                    // Replace the WiFi with Internet, and remove the Cell
+-                    tiles.set(tiles.indexOf("wifi"), "internet");
+-                    tiles.remove("cell");
+-                } else if (tiles.contains("cell")) {
+-                    // Replace the Cell with Internet
+-                    tiles.set(tiles.indexOf("cell"), "internet");
+-                }
+-            } else {
+-                tiles.remove("wifi");
+-                tiles.remove("cell");
+-            }
+-        }
+         return tiles;
+     }
+ 
+diff --git a/packages/SystemUI/src/com/android/systemui/qs/customize/TileQueryHelper.java b/packages/SystemUI/src/com/android/systemui/qs/customize/TileQueryHelper.java
+index 5eabcb958c1a..1be0f972b3c5 100644
+--- a/packages/SystemUI/src/com/android/systemui/qs/customize/TileQueryHelper.java
++++ b/packages/SystemUI/src/com/android/systemui/qs/customize/TileQueryHelper.java
+@@ -63,7 +63,6 @@ public class TileQueryHelper {
+     private final Executor mBgExecutor;
+     private final Context mContext;
+     private final UserTracker mUserTracker;
+-    private final FeatureFlags mFeatureFlags;
+     private TileStateListener mListener;
+ 
+     private boolean mFinished;
+@@ -73,14 +72,12 @@ public class TileQueryHelper {
+             Context context,
+             UserTracker userTracker,
+             @Main Executor mainExecutor,
+-            @Background Executor bgExecutor,
+-            FeatureFlags featureFlags
++            @Background Executor bgExecutor
+     ) {
+         mContext = context;
+         mMainExecutor = mainExecutor;
+         mBgExecutor = bgExecutor;
+         mUserTracker = userTracker;
+-        mFeatureFlags = featureFlags;
+     }
+ 
+     public void setListener(TileStateListener listener) {
+@@ -121,10 +118,6 @@ public class TileQueryHelper {
+         }*/
+ 
+         final ArrayList<QSTile> tilesToAdd = new ArrayList<>();
+-        if (mFeatureFlags.isProviderModelSettingEnabled()) {
+-            possibleTiles.remove("cell");
+-            possibleTiles.remove("wifi");
+-        }
+ 
+         for (String spec : possibleTiles) {
+             // Only add current and stock tiles that can be created from QSFactoryImpl.
+diff --git a/packages/SystemUI/tests/src/com/android/systemui/qs/QSFragmentTest.java b/packages/SystemUI/tests/src/com/android/systemui/qs/QSFragmentTest.java
+index 5b9a7f3bd158..b8d1959960af 100644
+--- a/packages/SystemUI/tests/src/com/android/systemui/qs/QSFragmentTest.java
++++ b/packages/SystemUI/tests/src/com/android/systemui/qs/QSFragmentTest.java
+@@ -137,7 +137,7 @@ public class QSFragmentTest extends SysuiBaseFragmentTest {
+                 () -> mock(AutoTileManager.class), mock(DumpManager.class),
+                 mock(BroadcastDispatcher.class), Optional.of(mock(StatusBar.class)),
+                 mock(QSLogger.class), mock(UiEventLogger.class), mock(UserTracker.class),
+-                mock(SecureSettings.class), mock(CustomTileStatePersister.class), mFeatureFlags);
++                mock(SecureSettings.class), mock(CustomTileStatePersister.class));
+         qs.setHost(host);
+ 
+         qs.setListening(true);
+diff --git a/packages/SystemUI/tests/src/com/android/systemui/qs/QSTileHostTest.java b/packages/SystemUI/tests/src/com/android/systemui/qs/QSTileHostTest.java
+index 6bb2b9dda593..6c7f770f9482 100644
+--- a/packages/SystemUI/tests/src/com/android/systemui/qs/QSTileHostTest.java
++++ b/packages/SystemUI/tests/src/com/android/systemui/qs/QSTileHostTest.java
+@@ -121,8 +121,6 @@ public class QSTileHostTest extends SysuiTestCase {
+     private SecureSettings mSecureSettings;
+     @Mock
+     private CustomTileStatePersister mCustomTileStatePersister;
+-    @Mock
+-    private FeatureFlags mFeatureFlags;
+ 
+     private Handler mHandler;
+     private TestableLooper mLooper;
+@@ -140,9 +138,8 @@ public class QSTileHostTest extends SysuiTestCase {
+         mQSTileHost = new TestQSTileHost(mContext, mIconController, mDefaultFactory, mHandler,
+                 mLooper.getLooper(), mPluginManager, mTunerService, mAutoTiles, mDumpManager,
+                 mBroadcastDispatcher, mStatusBar, mQSLogger, mUiEventLogger, mUserTracker,
+-                mSecureSettings, mCustomTileStatePersister, mFeatureFlags);
++                mSecureSettings, mCustomTileStatePersister);
+         setUpTileFactory();
+-        when(mFeatureFlags.isProviderModelSettingEnabled()).thenReturn(false);
+     }
+ 
+     private void setUpTileFactory() {
+@@ -170,13 +167,13 @@ public class QSTileHostTest extends SysuiTestCase {
+ 
+     @Test
+     public void testLoadTileSpecs_emptySetting() {
+-        List<String> tiles = QSTileHost.loadTileSpecs(mContext, "", mFeatureFlags);
++        List<String> tiles = QSTileHost.loadTileSpecs(mContext, "");
+         assertFalse(tiles.isEmpty());
+     }
+ 
+     @Test
+     public void testLoadTileSpecs_nullSetting() {
+-        List<String> tiles = QSTileHost.loadTileSpecs(mContext, null, mFeatureFlags);
++        List<String> tiles = QSTileHost.loadTileSpecs(mContext, null);
+         assertFalse(tiles.isEmpty());
+     }
+ 
+@@ -189,55 +186,6 @@ public class QSTileHostTest extends SysuiTestCase {
+         assertEquals(2, mQSTileHost.getTiles().size());
+     }
+ 
+-    @Test
+-    public void testRemoveWifiAndCellularWithoutInternet() {
+-        when(mFeatureFlags.isProviderModelSettingEnabled()).thenReturn(true);
+-        mQSTileHost.onTuningChanged(QSTileHost.TILES_SETTING, "wifi, spec1, cell, spec2");
+-
+-        assertEquals("internet", mQSTileHost.mTileSpecs.get(0));
+-        assertEquals("spec1", mQSTileHost.mTileSpecs.get(1));
+-        assertEquals("spec2", mQSTileHost.mTileSpecs.get(2));
+-    }
+-
+-    @Test
+-    public void testRemoveWifiAndCellularWithInternet() {
+-        when(mFeatureFlags.isProviderModelSettingEnabled()).thenReturn(true);
+-        mQSTileHost.onTuningChanged(QSTileHost.TILES_SETTING, "wifi, spec1, cell, spec2, internet");
+-
+-        assertEquals("spec1", mQSTileHost.mTileSpecs.get(0));
+-        assertEquals("spec2", mQSTileHost.mTileSpecs.get(1));
+-        assertEquals("internet", mQSTileHost.mTileSpecs.get(2));
+-    }
+-
+-    @Test
+-    public void testRemoveWifiWithoutInternet() {
+-        when(mFeatureFlags.isProviderModelSettingEnabled()).thenReturn(true);
+-        mQSTileHost.onTuningChanged(QSTileHost.TILES_SETTING, "spec1, wifi, spec2");
+-
+-        assertEquals("spec1", mQSTileHost.mTileSpecs.get(0));
+-        assertEquals("internet", mQSTileHost.mTileSpecs.get(1));
+-        assertEquals("spec2", mQSTileHost.mTileSpecs.get(2));
+-    }
+-
+-    @Test
+-    public void testRemoveCellWithInternet() {
+-        when(mFeatureFlags.isProviderModelSettingEnabled()).thenReturn(true);
+-        mQSTileHost.onTuningChanged(QSTileHost.TILES_SETTING, "spec1, spec2, cell, internet");
+-
+-        assertEquals("spec1", mQSTileHost.mTileSpecs.get(0));
+-        assertEquals("spec2", mQSTileHost.mTileSpecs.get(1));
+-        assertEquals("internet", mQSTileHost.mTileSpecs.get(2));
+-    }
+-
+-    @Test
+-    public void testNoWifiNoCellularNoInternet() {
+-        when(mFeatureFlags.isProviderModelSettingEnabled()).thenReturn(true);
+-        mQSTileHost.onTuningChanged(QSTileHost.TILES_SETTING, "spec1,spec2");
+-
+-        assertEquals("spec1", mQSTileHost.mTileSpecs.get(0));
+-        assertEquals("spec2", mQSTileHost.mTileSpecs.get(1));
+-    }
+-
+     @Test
+     public void testSpecWithInvalidDoesNotUseDefault() {
+         mContext.getOrCreateTestableResources()
+@@ -371,7 +319,7 @@ public class QSTileHostTest extends SysuiTestCase {
+ 
+     @Test
+     public void testLoadTileSpec_repeated() {
+-        List<String> specs = QSTileHost.loadTileSpecs(mContext, "spec1,spec1,spec2", mFeatureFlags);
++        List<String> specs = QSTileHost.loadTileSpecs(mContext, "spec1,spec1,spec2");
+ 
+         assertEquals(2, specs.size());
+         assertEquals("spec1", specs.get(0));
+@@ -382,7 +330,7 @@ public class QSTileHostTest extends SysuiTestCase {
+     public void testLoadTileSpec_repeatedInDefault() {
+         mContext.getOrCreateTestableResources()
+                 .addOverride(R.string.quick_settings_tiles_default, "spec1,spec1");
+-        List<String> specs = QSTileHost.loadTileSpecs(mContext, "default", mFeatureFlags);
++        List<String> specs = QSTileHost.loadTileSpecs(mContext, "default");
+ 
+         // Remove spurious tiles, like dbg:mem
+         specs.removeIf(spec -> !"spec1".equals(spec));
+@@ -393,7 +341,7 @@ public class QSTileHostTest extends SysuiTestCase {
+     public void testLoadTileSpec_repeatedDefaultAndSetting() {
+         mContext.getOrCreateTestableResources()
+                 .addOverride(R.string.quick_settings_tiles_default, "spec1");
+-        List<String> specs = QSTileHost.loadTileSpecs(mContext, "default,spec1", mFeatureFlags);
++        List<String> specs = QSTileHost.loadTileSpecs(mContext, "default,spec1");
+ 
+         // Remove spurious tiles, like dbg:mem
+         specs.removeIf(spec -> !"spec1".equals(spec));
+@@ -431,12 +379,11 @@ public class QSTileHostTest extends SysuiTestCase {
+                 Provider<AutoTileManager> autoTiles, DumpManager dumpManager,
+                 BroadcastDispatcher broadcastDispatcher, StatusBar statusBar, QSLogger qsLogger,
+                 UiEventLogger uiEventLogger, UserTracker userTracker,
+-                SecureSettings secureSettings, CustomTileStatePersister customTileStatePersister,
+-                FeatureFlags featureFlags) {
++                SecureSettings secureSettings, CustomTileStatePersister customTileStatePersister) {
+             super(context, iconController, defaultFactory, mainHandler, bgLooper, pluginManager,
+                     tunerService, autoTiles, dumpManager, broadcastDispatcher,
+                     Optional.of(statusBar), qsLogger, uiEventLogger, userTracker, secureSettings,
+-                    customTileStatePersister, featureFlags);
++                    customTileStatePersister);
+         }
+ 
+         @Override
+diff --git a/packages/SystemUI/tests/src/com/android/systemui/qs/customize/TileQueryHelperTest.java b/packages/SystemUI/tests/src/com/android/systemui/qs/customize/TileQueryHelperTest.java
+index 018806e816d9..8546a359b459 100644
+--- a/packages/SystemUI/tests/src/com/android/systemui/qs/customize/TileQueryHelperTest.java
++++ b/packages/SystemUI/tests/src/com/android/systemui/qs/customize/TileQueryHelperTest.java
+@@ -109,8 +109,6 @@ public class TileQueryHelperTest extends SysuiTestCase {
+     private PackageManager mPackageManager;
+     @Mock
+     private UserTracker mUserTracker;
+-    @Mock
+-    private FeatureFlags mFeatureFlags;
+     @Captor
+     private ArgumentCaptor<List<TileQueryHelper.TileInfo>> mCaptor;
+ 
+@@ -136,12 +134,12 @@ public class TileQueryHelperTest extends SysuiTestCase {
+                     }
+                 }
+         ).when(mQSTileHost).createTile(anyString());
+-        when(mFeatureFlags.isProviderModelSettingEnabled()).thenReturn(false);
++
+         FakeSystemClock clock = new FakeSystemClock();
+         mMainExecutor = new FakeExecutor(clock);
+         mBgExecutor = new FakeExecutor(clock);
+         mTileQueryHelper = new TileQueryHelper(
+-                mContext, mUserTracker, mMainExecutor, mBgExecutor, mFeatureFlags);
++                mContext, mUserTracker, mMainExecutor, mBgExecutor);
+         mTileQueryHelper.setListener(mListener);
+     }
+ 
+diff --git a/packages/SystemUI/tests/src/com/android/systemui/qs/external/TileServicesTest.java b/packages/SystemUI/tests/src/com/android/systemui/qs/external/TileServicesTest.java
+index e3bbfef354bd..749935f2f98d 100644
+--- a/packages/SystemUI/tests/src/com/android/systemui/qs/external/TileServicesTest.java
++++ b/packages/SystemUI/tests/src/com/android/systemui/qs/external/TileServicesTest.java
+@@ -101,8 +101,6 @@ public class TileServicesTest extends SysuiTestCase {
+     private UserTracker mUserTracker;
+     @Mock
+     private SecureSettings  mSecureSettings;
+-    @Mock
+-    private FeatureFlags mFeatureFlags;
+ 
+     @Before
+     public void setUp() throws Exception {
+@@ -124,8 +122,7 @@ public class TileServicesTest extends SysuiTestCase {
+                 mUiEventLogger,
+                 mUserTracker,
+                 mSecureSettings,
+-                mock(CustomTileStatePersister.class),
+-                mFeatureFlags);
++                mock(CustomTileStatePersister.class));
+         mTileService = new TestTileServices(host, Looper.getMainLooper(), mBroadcastDispatcher,
+                 mUserTracker);
+     }
+-- 
+2.32.0
+
