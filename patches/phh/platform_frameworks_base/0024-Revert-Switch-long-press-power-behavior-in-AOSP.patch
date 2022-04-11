@@ -12,7 +12,7 @@ diff --git a/core/res/res/values/config.xml b/core/res/res/values/config.xml
 index d9007e50c7c6..f1b9d0bcaa8a 100644
 --- a/core/res/res/values/config.xml
 +++ b/core/res/res/values/config.xml
-@@ -977,7 +977,7 @@
+@@ -955,7 +955,7 @@
              4 - Go to voice assist
              5 - Go to assistant (Settings.Secure.ASSISTANT)
      -->
@@ -21,15 +21,15 @@ index d9007e50c7c6..f1b9d0bcaa8a 100644
  
      <!-- The time in milliseconds after which a press on power button is considered "long". -->
      <integer name="config_longPressOnPowerDurationMs">500</integer>
-@@ -1009,7 +1009,7 @@
+@@ -987,7 +987,7 @@
              1 - Mute toggle
              2 - Global actions menu
      -->
 -    <integer name="config_keyChordPowerVolumeUp">2</integer>
 +    <integer name="config_keyChordPowerVolumeUp">1</integer>
  
-     <!-- Control the behavior when the user long presses the back button.  Non-zero values are only
-          valid for watches as part of CDD/CTS.
+     <!-- Allows activities to be launched on a long press on power during device setup. -->
+     <bool name="config_allowStartActivityForLongPressOnPowerInSetup">false</bool>
 -- 
 2.25.1
 

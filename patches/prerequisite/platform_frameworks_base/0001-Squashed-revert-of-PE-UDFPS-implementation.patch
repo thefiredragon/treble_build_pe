@@ -70,7 +70,7 @@ z&)mfH)S%SFl*+=BsWw1Ge4Z|jAr-fh5*U~o7?>FtSQ!{^cTT<plwt66^>bP0l+XkK
 D@OB!I
 
 diff --git a/packages/SystemUI/res/values/custom_config.xml b/packages/SystemUI/res/values/custom_config.xml
-index eff169a5c235..6045fe0d9d3f 100644
+index e53a6b6bdd9c..cc8f14385ce0 100644
 --- a/packages/SystemUI/res/values/custom_config.xml
 +++ b/packages/SystemUI/res/values/custom_config.xml
 @@ -3,22 +3,6 @@
@@ -96,14 +96,16 @@ index eff169a5c235..6045fe0d9d3f 100644
      <!-- If not zero, limits the internal screen recorder's framerate to the set value. -->
      <integer name="config_screenRecorderMaxFramerate">0</integer>
  
-@@ -29,7 +13,4 @@
-     <!-- Allow devices override audio panel location to the left side -->
-     <bool name="config_audioPanelOnLeftSide">false</bool>
+@@ -26,9 +10,6 @@
+     <bool name="config_statusBarBurnInProtection">false</bool>
+     <integer name="config_shift_interval">60</integer>
  
 -    <!-- Udfps HBM provider class name -->
 -    <string name="config_udfpsHbmProviderComponent">com.android.systemui.biometrics.DummyUdfpsHbmProvider</string>
 -
- </resources>
+     <!-- SystemUI Google -->
+     <bool name="flag_smartspace">true</bool>
+     <string name="config_systemUIFactoryComponent">org.pixelexperience.systemui.SystemUIGoogleFactory</string>
 diff --git a/packages/SystemUI/src/com/android/systemui/biometrics/AuthContainerView.java b/packages/SystemUI/src/com/android/systemui/biometrics/AuthContainerView.java
 index fb5a948c6716..fd37b3509a4e 100644
 --- a/packages/SystemUI/src/com/android/systemui/biometrics/AuthContainerView.java
