@@ -12,9 +12,9 @@ BL=$PWD/treble_build_pe
 BD=$HOME/builds
 BRANCH=$1
 
-[ "$BRANCH" == "" ] && BRANCH="twelve"
-[ "$BRANCH" == "twelve" ] && BUILD="PixelExperience" || BUILD="PixelExperience_Plus"
-[ "$BRANCH" == "twelve" ] && PEMK="$BL/pe.mk" || PEMK="$BL/peplus.mk"
+#[ "$BRANCH" == "" ] && BRANCH="twelve"
+#[ "$BRANCH" == "twelve" ] && BUILD="PixelExperience" || BUILD="PixelExperience_Plus"
+#[ "$BRANCH" == "twelve" ] && PEMK="$BL/pe.mk" || PEMK="$BL/peplus.mk"
 
 set -eE
 trap '(\
@@ -59,7 +59,7 @@ echo ""
 
 echo "Applying PHH patches"
 cd device/phh/treble
-cp $PEMK .
+cp $PEMK pe.mk
 bash generate.sh pe
 cd ../../..
 bash $BL/apply-patches.sh $BL phh $BRANCH
