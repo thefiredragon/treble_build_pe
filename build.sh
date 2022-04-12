@@ -33,7 +33,7 @@ VERSION="v412"
 if [ ! -d .repo ]
 then
     echo "Initializing PE workspace"
-    repo init -u https://github.com/thefiredragon/manifest -b twelve
+    repo init -u https://github.com/thefiredragon/manifest -b twelve-plus
     echo ""
 
     echo "Preparing local manifest"
