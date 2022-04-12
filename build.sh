@@ -12,9 +12,9 @@ BL=$PWD/treble_build_pe
 BD=$HOME/builds
 BRANCH=$1
 
-#[ "$BRANCH" == "" ] && BRANCH="twelve"
-#[ "$BRANCH" == "twelve" ] && BUILD="PixelExperience" || BUILD="PixelExperience_Plus"
-#[ "$BRANCH" == "twelve" ] && PEMK="$BL/pe.mk" || PEMK="$BL/peplus.mk"
+[ "$BRANCH" == "" ] && BRANCH="twelve"
+[ "$BRANCH" == "twelve" ] && BUILD="PixelExperience" || BUILD="PixelExperience_Plus"
+[ "$BRANCH" == "twelve" ] && PEMK="$BL/pe.mk" || PEMK="$BL/peplus.mk"
 
 set -eE
 trap '(\
