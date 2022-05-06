@@ -35,7 +35,7 @@ sleep 5
 if [ ! -d .repo ]
 then
     echo "Initializing PE workspace"
-    repo init -u https://github.com/PixelExperience/manifest -b $BRANCH
+    repo init -u https://github.com/thefiredragon/manifest -b $BRANCH
     echo ""
 
     echo "Preparing local manifest"
