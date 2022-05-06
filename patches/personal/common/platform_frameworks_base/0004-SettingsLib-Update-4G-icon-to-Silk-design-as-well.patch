@@ -1,7 +1,7 @@
 From 239f2836396c43b15e94c4e61e7a2bb3e68845db Mon Sep 17 00:00:00 2001
 From: TH779 <i@779.moe>
 Date: Thu, 18 Nov 2021 00:10:54 +0800
-Subject: [PATCH 4/4] SettingsLib: Update 4G+ icon to Silk design as well
+Subject: [PATCH 4/5] SettingsLib: Update 4G+ icon to Silk design as well
 
  * The plus icon ref from I6b2947441217ddc2215d1dcb7b2e659f9bd82743.
 
