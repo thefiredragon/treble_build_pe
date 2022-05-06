@@ -108,10 +108,19 @@ index 6d31ef0e7701..dd5da24a87bf 100644
      public UdfpsView(Context context, AttributeSet attrs) {
          super(context, attrs);
  
-@@ -255,6 +255,11 @@ public class UdfpsView extends FrameLayout implements DozeReceiver, UdfpsIllumin
-                 }
-             });
+@@ -241,7 +290,7 @@ public class UdfpsView extends FrameLayout implements DozeReceiver, UdfpsIllumin
+         if (mGhbmView != null && surface == null) {
+             Log.e(TAG, "doIlluminate | surface must be non-null for GHBM");
          }
+-        mHbmProvider.enableHbm(mHbmType, surface, () -> {
++        if(mHbmProvider != null) mHbmProvider.enableHbm(mHbmType, surface, () -> {
+             if (mGhbmView != null) {
+                 mGhbmView.drawIlluminationDot(mSensorRect);
+             }
+@@ -253,6 +302,11 @@ public class UdfpsView extends FrameLayout implements DozeReceiver, UdfpsIllumin
+                 Log.w(TAG, "doIlluminate | onIlluminatedRunnable is null");
+             }
+         });
 +	else {
 +		if (mGhbmView != null) {
 +			mGhbmView.drawIlluminationDot(mSensorRect);
@@ -120,6 +129,14 @@ index 6d31ef0e7701..dd5da24a87bf 100644
      }
  
      @Override
+@@ -265,6 +319,6 @@ public class UdfpsView extends FrameLayout implements DozeReceiver, UdfpsIllumin
+             mGhbmView.setGhbmIlluminationListener(null);
+             mGhbmView.setVisibility(View.INVISIBLE);
+         }
+-        mHbmProvider.disableHbm(null /* onHbmDisabled */);
++        if(mHbmProvider != null) mHbmProvider.disableHbm(null /* onHbmDisabled */);
+     }
+ }
 diff --git a/services/core/Android.bp b/services/core/Android.bp
 index e5716eee467e..9c359cea6244 100644
 --- a/services/core/Android.bp
@@ -240,7 +257,7 @@ index 9c8ccd946b7f..62ea6dd8633b 100644
      }
  
      /**
-@@ -737,23 +737,201 @@ public class AuthService extends SystemService {
+@@ -735,19 +815,197 @@ public class AuthService extends SystemService {
                  ? modality : (modality & ~BiometricAuthenticator.TYPE_CREDENTIAL);
      }
  
@@ -313,10 +330,6 @@ index 9c8ccd946b7f..62ea6dd8633b 100644
 -        final int[] udfpsProps = getContext().getResources().getIntArray(
 +        int[] udfpsProps = getContext().getResources().getIntArray(
                  com.android.internal.R.array.config_udfps_sensor_props);
- 
-         // Non-empty workaroundLocations indicates that the sensor is SFPS.
-         final List<SensorLocationInternal> workaroundLocations =
-                 getWorkaroundSensorProps(getContext());
  
 -        final boolean isUdfps = !ArrayUtils.isEmpty(udfpsProps);
 +        boolean isUdfps = !ArrayUtils.isEmpty(udfpsProps);
