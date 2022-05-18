@@ -16,12 +16,43 @@ Adapt to changes in camera2 api since the removal of HALv1 support.
 
 Change-Id: I4f1f505be8aaf97f5c68856806823c529a5d5ec9
 ---
+ camera/Android.bp                             |    1 +
+ camera/Camera.cpp                             |  127 +-
+ camera/ICameraRecordingProxy.cpp              |   94 +-
+ camera/ICameraRecordingProxyListener.cpp      |  180 +++
+ .../aidl/android/hardware/ICameraService.aidl |   16 +-
+ camera/include/camera/Camera.h                |   14 +-
+ camera/include/camera/ICameraRecordingProxy.h |   40 +-
+ .../camera/ICameraRecordingProxyListener.h    |   61 +
+ cmds/stagefright/record.cpp                   |   25 +
+ media/libstagefright/CameraSource.cpp         |  478 ++++++-
+ .../libstagefright/CameraSourceTimeLapse.cpp  |   67 +-
+ .../include/media/stagefright/CameraSource.h  |   61 +-
+ .../media/stagefright/CameraSourceTimeLapse.h |   36 +-
+ services/camera/libcameraservice/Android.bp   |    3 +
+ .../libcameraservice/CameraFlashlight.cpp     |  272 +++-
+ .../libcameraservice/CameraFlashlight.h       |   55 +
+ .../camera/libcameraservice/CameraService.cpp |  130 +-
+ .../camera/libcameraservice/CameraService.h   |   11 +-
+ .../libcameraservice/api1/CameraClient.cpp    | 1227 +++++++++++++++++
+ .../libcameraservice/api1/CameraClient.h      |  194 +++
+ .../common/CameraProviderManager.cpp          |  208 ++-
+ .../common/CameraProviderManager.h            |   60 +-
+ .../device1/CameraHardwareInterface.cpp       |  818 +++++++++++
+ .../device1/CameraHardwareInterface.h         |  488 +++++++
+ 24 files changed, 4537 insertions(+), 129 deletions(-)
+ create mode 100644 camera/ICameraRecordingProxyListener.cpp
+ create mode 100644 camera/include/camera/ICameraRecordingProxyListener.h
+ create mode 100644 services/camera/libcameraservice/api1/CameraClient.cpp
+ create mode 100644 services/camera/libcameraservice/api1/CameraClient.h
+ create mode 100644 services/camera/libcameraservice/device1/CameraHardwareInterface.cpp
+ create mode 100644 services/camera/libcameraservice/device1/CameraHardwareInterface.h
 
 diff --git a/camera/Android.bp b/camera/Android.bp
-index 6878c20..2b05a84 100644
+index 6878c20369..2b05a844bf 100644
 --- a/camera/Android.bp
 +++ b/camera/Android.bp
-@@ -70,6 +70,7 @@
+@@ -70,6 +70,7 @@ cc_library_shared {
          "ICamera.cpp",
          "ICameraClient.cpp",
          "ICameraRecordingProxy.cpp",
@@ -30,7 +61,7 @@ index 6878c20..2b05a84 100644
          "camera2/ConcurrentCamera.cpp",
          "camera2/OutputConfiguration.cpp",
 diff --git a/camera/Camera.cpp b/camera/Camera.cpp
-index 604dbb8..f65725f 100644
+index 604dbb8b17..f65725f129 100644
 --- a/camera/Camera.cpp
 +++ b/camera/Camera.cpp
 @@ -25,6 +25,7 @@
@@ -41,7 +72,7 @@ index 604dbb8..f65725f 100644
  #include <android/hardware/ICameraService.h>
  #include <android/hardware/ICamera.h>
  
-@@ -77,6 +78,63 @@
+@@ -77,6 +78,63 @@ sp<Camera> Camera::connect(int cameraId, const String16& clientPackageName,
              clientPid, targetSdkVersion);
  }
  
@@ -105,7 +136,7 @@ index 604dbb8..f65725f 100644
  status_t Camera::reconnect()
  {
      ALOGV("reconnect");
-@@ -157,6 +215,10 @@
+@@ -157,6 +215,10 @@ void Camera::stopPreview()
  void Camera::stopRecording()
  {
      ALOGV("stopRecording");
@@ -116,7 +147,7 @@ index 604dbb8..f65725f 100644
      sp <::android::hardware::ICamera> c = mCamera;
      if (c == 0) return;
      c->stopRecording();
-@@ -264,6 +326,12 @@
+@@ -264,6 +326,12 @@ void Camera::setListener(const sp<CameraListener>& listener)
      mListener = listener;
  }
  
@@ -129,7 +160,7 @@ index 604dbb8..f65725f 100644
  void Camera::setPreviewCallbackFlags(int flag)
  {
      ALOGV("setPreviewCallbackFlags");
-@@ -317,6 +385,19 @@
+@@ -317,6 +385,19 @@ void Camera::dataCallback(int32_t msgType, const sp<IMemory>& dataPtr,
  // callback from camera service when timestamped frame is ready
  void Camera::dataCallbackTimestamp(nsecs_t timestamp, int32_t msgType, const sp<IMemory>& dataPtr)
  {
@@ -149,7 +180,7 @@ index 604dbb8..f65725f 100644
      sp<CameraListener> listener;
      {
          Mutex::Autolock _l(mLock);
-@@ -333,6 +414,19 @@
+@@ -333,6 +414,19 @@ void Camera::dataCallbackTimestamp(nsecs_t timestamp, int32_t msgType, const sp<
  
  void Camera::recordingFrameHandleCallbackTimestamp(nsecs_t timestamp, native_handle_t* handle)
  {
@@ -169,7 +200,7 @@ index 604dbb8..f65725f 100644
      sp<CameraListener> listener;
      {
          Mutex::Autolock _l(mLock);
-@@ -351,6 +445,19 @@
+@@ -351,6 +445,19 @@ void Camera::recordingFrameHandleCallbackTimestampBatch(
          const std::vector<nsecs_t>& timestamps,
          const std::vector<native_handle_t*>& handles)
  {
@@ -189,7 +220,7 @@ index 604dbb8..f65725f 100644
      sp<CameraListener> listener;
      {
          Mutex::Autolock _l(mLock);
-@@ -370,9 +477,10 @@
+@@ -370,9 +477,10 @@ sp<ICameraRecordingProxy> Camera::getRecordingProxy() {
      return new RecordingProxy(this);
  }
  
@@ -201,7 +232,7 @@ index 604dbb8..f65725f 100644
      mCamera->reconnect();
      return mCamera->startRecording();
  }
-@@ -383,6 +491,23 @@
+@@ -383,6 +491,23 @@ void Camera::RecordingProxy::stopRecording()
      mCamera->stopRecording();
  }
  
@@ -226,7 +257,7 @@ index 604dbb8..f65725f 100644
  {
      mCamera = camera;
 diff --git a/camera/ICameraRecordingProxy.cpp b/camera/ICameraRecordingProxy.cpp
-index 97523a5..bd6af75 100644
+index 97523a5231..bd6af75c0a 100644
 --- a/camera/ICameraRecordingProxy.cpp
 +++ b/camera/ICameraRecordingProxy.cpp
 @@ -18,6 +18,7 @@
@@ -237,7 +268,7 @@ index 97523a5..bd6af75 100644
  #include <binder/IMemory.h>
  #include <binder/Parcel.h>
  #include <media/hardware/HardwareAPI.h>
-@@ -28,7 +29,10 @@
+@@ -28,7 +29,10 @@ namespace android {
  
  enum {
      START_RECORDING = IBinder::FIRST_CALL_TRANSACTION,
@@ -249,7 +280,7 @@ index 97523a5..bd6af75 100644
  };
  
  
-@@ -40,11 +44,12 @@
+@@ -40,11 +44,12 @@ public:
      {
      }
  
@@ -263,7 +294,7 @@ index 97523a5..bd6af75 100644
          remote()->transact(START_RECORDING, data, &reply);
          return reply.readInt32();
      }
-@@ -56,6 +61,46 @@
+@@ -56,6 +61,46 @@ public:
          data.writeInterfaceToken(ICameraRecordingProxy::getInterfaceDescriptor());
          remote()->transact(STOP_RECORDING, data, &reply);
      }
@@ -310,7 +341,7 @@ index 97523a5..bd6af75 100644
  };
  
  IMPLEMENT_META_INTERFACE(CameraRecordingProxy, "android.hardware.ICameraRecordingProxy");
-@@ -69,7 +114,9 @@
+@@ -69,7 +114,9 @@ status_t BnCameraRecordingProxy::onTransact(
          case START_RECORDING: {
              ALOGV("START_RECORDING");
              CHECK_INTERFACE(ICameraRecordingProxy, data, reply);
@@ -321,7 +352,7 @@ index 97523a5..bd6af75 100644
              return NO_ERROR;
          } break;
          case STOP_RECORDING: {
-@@ -78,6 +125,46 @@
+@@ -78,6 +125,46 @@ status_t BnCameraRecordingProxy::onTransact(
              stopRecording();
              return NO_ERROR;
          } break;
@@ -368,14 +399,14 @@ index 97523a5..bd6af75 100644
          default:
              return BBinder::onTransact(code, data, reply, flags);
      }
-@@ -86,3 +173,4 @@
+@@ -86,3 +173,4 @@ status_t BnCameraRecordingProxy::onTransact(
  // ----------------------------------------------------------------------------
  
  }; // namespace android
 +
 diff --git a/camera/ICameraRecordingProxyListener.cpp b/camera/ICameraRecordingProxyListener.cpp
 new file mode 100644
-index 0000000..66faf8f
+index 0000000000..66faf8fdd6
 --- /dev/null
 +++ b/camera/ICameraRecordingProxyListener.cpp
 @@ -0,0 +1,180 @@
@@ -560,10 +591,10 @@ index 0000000..66faf8f
 +}; // namespace android
 +
 diff --git a/camera/aidl/android/hardware/ICameraService.aidl b/camera/aidl/android/hardware/ICameraService.aidl
-index 78a77d4..0bfdb97 100644
+index 78a77d4ea1..0bfdb971e3 100644
 --- a/camera/aidl/android/hardware/ICameraService.aidl
 +++ b/camera/aidl/android/hardware/ICameraService.aidl
-@@ -71,7 +71,7 @@
+@@ -71,7 +71,7 @@ interface ICameraService
  
      /**
       * Default UID/PID values for non-privileged callers of
@@ -572,10 +603,11 @@ index 78a77d4..0bfdb97 100644
       */
      const int USE_CALLING_UID = -1;
      const int USE_CALLING_PID = -1;
-@@ -97,6 +97,20 @@
+@@ -96,6 +96,20 @@ interface ICameraService
+             int clientUid, int oomScoreOffset,
              int targetSdkVersion);
  
-     /**
++    /**
 +     * halVersion constant for connectLegacy
 +     */
 +    const int CAMERA_HAL_API_VERSION_UNSPECIFIED = -1;
@@ -589,12 +621,11 @@ index 78a77d4..0bfdb97 100644
 +            String opPackageName,
 +            int clientUid, int clientPid);
 +
-+    /**
+     /**
       * Add listener for changes to camera device and flashlight state.
       *
-      * Also returns the set of currently-known camera IDs and state of each device.
 diff --git a/camera/include/camera/Camera.h b/camera/include/camera/Camera.h
-index 58ccd69..c811c60 100644
+index 58ccd699d2..c811c605a9 100644
 --- a/camera/include/camera/Camera.h
 +++ b/camera/include/camera/Camera.h
 @@ -24,6 +24,7 @@
@@ -605,7 +636,7 @@ index 58ccd69..c811c60 100644
  #include <camera/android/hardware/ICamera.h>
  #include <camera/android/hardware/ICameraClient.h>
  #include <camera/CameraBase.h>
-@@ -83,6 +84,10 @@
+@@ -83,6 +84,10 @@ public:
                                  const String16& clientPackageName,
                                  int clientUid, int clientPid, int targetSdkVersion);
  
@@ -616,7 +647,7 @@ index 58ccd69..c811c60 100644
              virtual     ~Camera();
  
              status_t    reconnect();
-@@ -149,6 +154,7 @@
+@@ -149,6 +154,7 @@ public:
              status_t    setVideoTarget(const sp<IGraphicBufferProducer>& bufferProducer);
  
              void        setListener(const sp<CameraListener>& listener);
@@ -624,7 +655,7 @@ index 58ccd69..c811c60 100644
  
              // Configure preview callbacks to app. Only one of the older
              // callbacks or the callback surface can be active at the same time;
-@@ -181,8 +187,12 @@
+@@ -181,8 +187,12 @@ public:
          explicit RecordingProxy(const sp<Camera>& camera);
  
          // ICameraRecordingProxy interface
@@ -638,7 +669,7 @@ index 58ccd69..c811c60 100644
  
      private:
          sp<Camera>         mCamera;
-@@ -193,6 +203,8 @@
+@@ -193,6 +203,8 @@ protected:
                          Camera(const Camera&);
                          Camera& operator=(const Camera);
  
@@ -648,7 +679,7 @@ index 58ccd69..c811c60 100644
  };
  
 diff --git a/camera/include/camera/ICameraRecordingProxy.h b/camera/include/camera/ICameraRecordingProxy.h
-index 4306dc1..02af2f3 100644
+index 4306dc182c..02af2f3604 100644
 --- a/camera/include/camera/ICameraRecordingProxy.h
 +++ b/camera/include/camera/ICameraRecordingProxy.h
 @@ -24,11 +24,13 @@
@@ -667,7 +698,7 @@ index 4306dc1..02af2f3 100644
   *
   * Camera service allows only one client at a time. Since camcorder application
   * needs to own the camera to do things like zoom, the media recorder cannot
-@@ -40,29 +42,35 @@
+@@ -40,29 +42,35 @@ class Parcel;
   * ICameraRecordingProxy
   *   startRecording()
   *   stopRecording()
@@ -714,7 +745,7 @@ index 4306dc1..02af2f3 100644
   * 5. Stop recording
   *    (1) The app: MediaRecorder.stop()
   *    (2) The recorder: ICameraRecordingProxy.stopRecording().
-@@ -74,8 +82,12 @@
+@@ -74,8 +82,12 @@ class ICameraRecordingProxy: public IInterface
  public:
      DECLARE_META_INTERFACE(CameraRecordingProxy);
  
@@ -730,7 +761,7 @@ index 4306dc1..02af2f3 100644
  // ----------------------------------------------------------------------------
 diff --git a/camera/include/camera/ICameraRecordingProxyListener.h b/camera/include/camera/ICameraRecordingProxyListener.h
 new file mode 100644
-index 0000000..da03c56
+index 0000000000..da03c56b6f
 --- /dev/null
 +++ b/camera/include/camera/ICameraRecordingProxyListener.h
 @@ -0,0 +1,61 @@
@@ -796,10 +827,10 @@ index 0000000..da03c56
 +
 +#endif
 diff --git a/cmds/stagefright/record.cpp b/cmds/stagefright/record.cpp
-index 098c278..37091c4 100644
+index 098c27865a..37091c43e1 100644
 --- a/cmds/stagefright/record.cpp
 +++ b/cmds/stagefright/record.cpp
-@@ -259,6 +259,31 @@
+@@ -259,6 +259,31 @@ int main(int argc, char **argv) {
      printf("$\n");
  #endif
  
@@ -832,10 +863,10 @@ index 098c278..37091c4 100644
          fprintf(stderr, "record failed: %d\n", err);
          return 1;
 diff --git a/media/libstagefright/CameraSource.cpp b/media/libstagefright/CameraSource.cpp
-index 95afa62..64d59e4 100644
+index 95afa62620..64d59e4a74 100644
 --- a/media/libstagefright/CameraSource.cpp
 +++ b/media/libstagefright/CameraSource.cpp
-@@ -46,6 +46,88 @@
+@@ -46,6 +46,88 @@ namespace android {
  
  static const int64_t CAMERA_SOURCE_TIMEOUT_NS = 3000000000LL;
  
@@ -924,7 +955,7 @@ index 95afa62..64d59e4 100644
  static int32_t getColorFormat(const char* colorFormat) {
      if (!colorFormat) {
          ALOGE("Invalid color format");
-@@ -87,6 +169,16 @@
+@@ -87,6 +169,16 @@ static int32_t getColorFormat(const char* colorFormat) {
      return -1;
  }
  
@@ -941,7 +972,7 @@ index 95afa62..64d59e4 100644
  // static
  CameraSource *CameraSource::CreateFromCamera(
      const sp<hardware::ICamera>& camera,
-@@ -97,10 +189,12 @@
+@@ -97,10 +189,12 @@ CameraSource *CameraSource::CreateFromCamera(
      pid_t clientPid,
      Size videoSize,
      int32_t frameRate,
@@ -956,7 +987,7 @@ index 95afa62..64d59e4 100644
      return source;
  }
  
-@@ -113,7 +207,8 @@
+@@ -113,7 +207,8 @@ CameraSource::CameraSource(
      pid_t clientPid,
      Size videoSize,
      int32_t frameRate,
@@ -966,7 +997,7 @@ index 95afa62..64d59e4 100644
      : mCameraFlags(0),
        mNumInputBuffers(0),
        mVideoFrameRate(-1),
-@@ -136,7 +231,8 @@
+@@ -136,7 +231,8 @@ CameraSource::CameraSource(
  
      mInitCheck = init(camera, proxy, cameraId,
                      clientName, clientUid, clientPid,
@@ -976,7 +1007,7 @@ index 95afa62..64d59e4 100644
      if (mInitCheck != OK) releaseCamera();
  }
  
-@@ -436,13 +532,15 @@
+@@ -436,13 +532,15 @@ status_t CameraSource::init(
          uid_t clientUid,
          pid_t clientPid,
          Size videoSize,
@@ -994,7 +1025,7 @@ index 95afa62..64d59e4 100644
      IPCThreadState::self()->restoreCallingIdentity(token);
      return err;
  }
-@@ -529,7 +627,8 @@
+@@ -529,7 +627,8 @@ status_t CameraSource::initWithCameraAccess(
          uid_t clientUid,
          pid_t clientPid,
          Size videoSize,
@@ -1004,7 +1035,7 @@ index 95afa62..64d59e4 100644
      ALOGV("initWithCameraAccess");
      status_t err = OK;
  
-@@ -569,12 +668,24 @@
+@@ -569,12 +668,24 @@ status_t CameraSource::initWithCameraAccess(
          CHECK_EQ((status_t)OK, mCamera->setPreviewTarget(mSurface));
      }
  
@@ -1035,7 +1066,7 @@ index 95afa62..64d59e4 100644
      }
  
      int64_t glitchDurationUs = (1000000LL / mVideoFrameRate);
-@@ -614,26 +725,54 @@
+@@ -614,26 +725,54 @@ status_t CameraSource::startCameraRecording() {
      int64_t token = IPCThreadState::self()->clearCallingIdentity();
      status_t err;
  
@@ -1100,7 +1131,7 @@ index 95afa62..64d59e4 100644
          mCamera->startRecording();
          if (!mCamera->recordingEnabled()) {
              err = -EINVAL;
-@@ -699,6 +838,7 @@
+@@ -699,6 +838,7 @@ void CameraSource::stopCameraRecording() {
          }
      } else {
          if (mCamera != 0) {
@@ -1108,7 +1139,7 @@ index 95afa62..64d59e4 100644
              mCamera->stopRecording();
          }
      }
-@@ -797,31 +937,97 @@
+@@ -797,31 +937,97 @@ status_t CameraSource::reset() {
  void CameraSource::releaseRecordingFrame(const sp<IMemory>& frame) {
      ALOGV("releaseRecordingFrame");
  
@@ -1120,6 +1151,7 @@ index 95afa62..64d59e4 100644
 -        ALOGE("%s: Mismatched heap ID, ignoring release (got %x, expected %x)", __FUNCTION__,
 -                heap->getHeapID(), mMemoryHeapBase->getHeapID());
 -        return;
+-    }
 +    if (mVideoBufferMode == hardware::ICamera::VIDEO_BUFFER_MODE_BUFFER_QUEUE) {
 +        // Return the buffer to buffer queue in VIDEO_BUFFER_MODE_BUFFER_QUEUE mode.
 +        ssize_t offset;
@@ -1130,17 +1162,30 @@ index 95afa62..64d59e4 100644
 +                    heap->getHeapID(), mMemoryHeapBase->getHeapID());
 +            return;
 +        }
-+
+ 
+-    VideoNativeMetadata *payload = reinterpret_cast<VideoNativeMetadata*>(
+-        (uint8_t*)heap->getBase() + offset);
 +        VideoNativeMetadata *payload = reinterpret_cast<VideoNativeMetadata*>(
 +                (uint8_t*)heap->getBase() + offset);
-+
+ 
+-    // Find the corresponding buffer item for the native window buffer.
+-    ssize_t index = mReceivedBufferItemMap.indexOfKey(payload->pBuffer);
+-    if (index == NAME_NOT_FOUND) {
+-        ALOGE("%s: Couldn't find buffer item for %p", __FUNCTION__, payload->pBuffer);
+-        return;
+-    }
 +        // Find the corresponding buffer item for the native window buffer.
 +        ssize_t index = mReceivedBufferItemMap.indexOfKey(payload->pBuffer);
 +        if (index == NAME_NOT_FOUND) {
 +            ALOGE("%s: Couldn't find buffer item for %p", __FUNCTION__, payload->pBuffer);
 +            return;
 +        }
-+
+ 
+-    BufferItem buffer = mReceivedBufferItemMap.valueAt(index);
+-    mReceivedBufferItemMap.removeItemsAt(index);
+-    mVideoBufferConsumer->releaseBuffer(buffer);
+-    mMemoryBases.push_back(frame);
+-    mMemoryBaseAvailableCond.signal();
 +        BufferItem buffer = mReceivedBufferItemMap.valueAt(index);
 +        mReceivedBufferItemMap.removeItemsAt(index);
 +        mVideoBufferConsumer->releaseBuffer(buffer);
@@ -1210,27 +1255,11 @@ index 95afa62..64d59e4 100644
 +            mCamera->releaseRecordingFrame(frame);
 +            IPCThreadState::self()->restoreCallingIdentity(token);
 +        }
-     }
--
--    VideoNativeMetadata *payload = reinterpret_cast<VideoNativeMetadata*>(
--        (uint8_t*)heap->getBase() + offset);
--
--    // Find the corresponding buffer item for the native window buffer.
--    ssize_t index = mReceivedBufferItemMap.indexOfKey(payload->pBuffer);
--    if (index == NAME_NOT_FOUND) {
--        ALOGE("%s: Couldn't find buffer item for %p", __FUNCTION__, payload->pBuffer);
--        return;
--    }
--
--    BufferItem buffer = mReceivedBufferItemMap.valueAt(index);
--    mReceivedBufferItemMap.removeItemsAt(index);
--    mVideoBufferConsumer->releaseBuffer(buffer);
--    mMemoryBases.push_back(frame);
--    mMemoryBaseAvailableCond.signal();
++    }
  }
  
  void CameraSource::releaseQueuedFrames() {
-@@ -982,6 +1188,152 @@
+@@ -982,6 +1188,152 @@ bool CameraSource::shouldSkipFrameLocked(int64_t timestampUs) {
      return false;
  }
  
@@ -1383,7 +1412,7 @@ index 95afa62..64d59e4 100644
  CameraSource::BufferQueueListener::BufferQueueListener(const sp<BufferItemConsumer>& consumer,
          const sp<CameraSource>& cameraSource) {
      mConsumer = consumer;
-@@ -1073,7 +1425,41 @@
+@@ -1073,7 +1425,41 @@ void CameraSource::processBufferQueueFrame(BufferItem& buffer) {
  MetadataBufferType CameraSource::metaDataStoredInVideoBuffers() const {
      ALOGV("metaDataStoredInVideoBuffers");
  
@@ -1427,10 +1456,10 @@ index 95afa62..64d59e4 100644
  
  void CameraSource::DeathNotifier::binderDied(const wp<IBinder>& who __unused) {
 diff --git a/media/libstagefright/CameraSourceTimeLapse.cpp b/media/libstagefright/CameraSourceTimeLapse.cpp
-index 50a512f..e0a6eb3 100644
+index 50a512f726..e0a6eb3a57 100644
 --- a/media/libstagefright/CameraSourceTimeLapse.cpp
 +++ b/media/libstagefright/CameraSourceTimeLapse.cpp
-@@ -45,13 +45,15 @@
+@@ -45,13 +45,15 @@ CameraSourceTimeLapse *CameraSourceTimeLapse::CreateFromCamera(
          Size videoSize,
          int32_t videoFrameRate,
          const sp<IGraphicBufferProducer>& surface,
@@ -1448,7 +1477,7 @@ index 50a512f..e0a6eb3 100644
  
      if (source != NULL) {
          if (source->initCheck() != OK) {
-@@ -72,9 +74,11 @@
+@@ -72,9 +74,11 @@ CameraSourceTimeLapse::CameraSourceTimeLapse(
          Size videoSize,
          int32_t videoFrameRate,
          const sp<IGraphicBufferProducer>& surface,
@@ -1462,7 +1491,7 @@ index 50a512f..e0a6eb3 100644
        mTimeBetweenTimeLapseVideoFramesUs(1E6/videoFrameRate),
        mLastTimeLapseFrameRealTimestampUs(0),
        mSkipCurrentFrame(false) {
-@@ -169,6 +173,12 @@
+@@ -169,6 +173,12 @@ void CameraSourceTimeLapse::signalBufferReturned(MediaBufferBase* buffer) {
      ALOGV("signalBufferReturned");
      Mutex::Autolock autoLock(mQuickStopLock);
      if (mQuickStop && (buffer == mLastReadBufferCopy)) {
@@ -1475,7 +1504,7 @@ index 50a512f..e0a6eb3 100644
          buffer->setObserver(NULL);
          buffer->release();
          mLastReadBufferCopy = NULL;
-@@ -181,7 +191,8 @@
+@@ -181,7 +191,8 @@ void CameraSourceTimeLapse::signalBufferReturned(MediaBufferBase* buffer) {
  void createMediaBufferCopy(
          const MediaBufferBase& sourceBuffer,
          int64_t frameTime,
@@ -1485,7 +1514,7 @@ index 50a512f..e0a6eb3 100644
  
      ALOGV("createMediaBufferCopy");
      size_t sourceSize = sourceBuffer.size();
-@@ -192,13 +203,19 @@
+@@ -192,13 +203,19 @@ void createMediaBufferCopy(
  
      (*newBuffer)->meta_data().setInt64(kKeyTime, frameTime);
  
@@ -1506,7 +1535,7 @@ index 50a512f..e0a6eb3 100644
      mLastReadBufferCopy->add_ref();
      mLastReadBufferCopy->setObserver(this);
  }
-@@ -223,6 +240,19 @@
+@@ -223,6 +240,19 @@ status_t CameraSourceTimeLapse::read(
      }
  }
  
@@ -1526,7 +1555,7 @@ index 50a512f..e0a6eb3 100644
  bool CameraSourceTimeLapse::skipCurrentFrame(int64_t /* timestampUs */) {
      ALOGV("skipCurrentFrame");
      if (mSkipCurrentFrame) {
-@@ -288,6 +318,31 @@
+@@ -288,6 +318,31 @@ bool CameraSourceTimeLapse::skipFrameAndModifyTimeStamp(int64_t *timestampUs) {
      return false;
  }
  
@@ -1559,7 +1588,7 @@ index 50a512f..e0a6eb3 100644
      ALOGV("processBufferQueueFrame");
      int64_t timestampUs = buffer.mTimestamp / 1000;
 diff --git a/media/libstagefright/include/media/stagefright/CameraSource.h b/media/libstagefright/include/media/stagefright/CameraSource.h
-index e8770ed..efdfa02 100644
+index e8770ed6c0..efdfa02be5 100644
 --- a/media/libstagefright/include/media/stagefright/CameraSource.h
 +++ b/media/libstagefright/include/media/stagefright/CameraSource.h
 @@ -23,6 +23,7 @@
@@ -1570,10 +1599,11 @@ index e8770ed..efdfa02 100644
  #include <camera/CameraParameters.h>
  #include <gui/BufferItemConsumer.h>
  #include <utils/List.h>
-@@ -39,6 +40,17 @@
+@@ -38,6 +39,17 @@ class Surface;
+ 
  class CameraSource : public MediaSource, public MediaBufferObserver {
  public:
-     /**
++    /**
 +     * Factory method to create a new CameraSource using the current
 +     * settings (such as video size, frame rate, color format, etc)
 +     * from the default camera.
@@ -1584,11 +1614,10 @@ index e8770ed..efdfa02 100644
 +     */
 +    static CameraSource *Create(const String16 &clientName);
 +
-+    /**
+     /**
       * Factory method to create a new CameraSource.
       *
-      * @param camera the video input frame data source. If it is NULL,
-@@ -77,7 +89,8 @@
+@@ -77,7 +89,8 @@ public:
                                            pid_t clientPid,
                                            Size videoSize,
                                            int32_t frameRate,
@@ -1598,10 +1627,11 @@ index e8770ed..efdfa02 100644
  
      virtual ~CameraSource();
  
-@@ -119,6 +132,26 @@
+@@ -118,6 +131,26 @@ public:
+ 
  protected:
  
-     /**
++    /**
 +     * The class for listening to BnCameraRecordingProxyListener. This is used to receive video
 +     * buffers in VIDEO_BUFFER_MODE_DATA_CALLBACK_YUV and VIDEO_BUFFER_MODE_DATA_CALLBACK_METADATA
 +     * mode. When a frame is available, CameraSource::dataCallbackTimestamp() will be called.
@@ -1621,11 +1651,10 @@ index e8770ed..efdfa02 100644
 +        sp<CameraSource> mSource;
 +    };
 +
-+    /**
+     /**
       * The class for listening to BufferQueue's onFrameAvailable. This is used to receive video
       * buffers in VIDEO_BUFFER_MODE_BUFFER_QUEUE mode. When a frame is available,
-      * CameraSource::processBufferQueueFrame() will be called.
-@@ -181,15 +214,32 @@
+@@ -181,15 +214,32 @@ protected:
      CameraSource(const sp<hardware::ICamera>& camera, const sp<ICameraRecordingProxy>& proxy,
                   int32_t cameraId, const String16& clientName, uid_t clientUid, pid_t clientPid,
                   Size videoSize, int32_t frameRate,
@@ -1659,7 +1688,7 @@ index e8770ed..efdfa02 100644
      // Process a buffer item received in BufferQueueListener.
      virtual void processBufferQueueFrame(BufferItem& buffer);
  
-@@ -212,6 +262,9 @@
+@@ -212,6 +262,9 @@ private:
      int64_t mGlitchDurationThresholdUs;
      bool mCollectStats;
  
@@ -1669,7 +1698,7 @@ index e8770ed..efdfa02 100644
      static const uint32_t kDefaultVideoBufferCount = 32;
  
      /**
-@@ -245,12 +298,12 @@
+@@ -245,12 +298,12 @@ private:
  
      status_t init(const sp<hardware::ICamera>& camera, const sp<ICameraRecordingProxy>& proxy,
                    int32_t cameraId, const String16& clientName, uid_t clientUid, pid_t clientPid,
@@ -1685,10 +1714,10 @@ index e8770ed..efdfa02 100644
      // Initialize the buffer queue used in VIDEO_BUFFER_MODE_BUFFER_QUEUE mode.
      status_t initBufferQueue(uint32_t width, uint32_t height, uint32_t format,
 diff --git a/media/libstagefright/include/media/stagefright/CameraSourceTimeLapse.h b/media/libstagefright/include/media/stagefright/CameraSourceTimeLapse.h
-index 3c311cf..533e33b 100644
+index 3c311cff00..533e33b4ce 100644
 --- a/media/libstagefright/include/media/stagefright/CameraSourceTimeLapse.h
 +++ b/media/libstagefright/include/media/stagefright/CameraSourceTimeLapse.h
-@@ -45,7 +45,8 @@
+@@ -45,7 +45,8 @@ public:
          Size videoSize,
          int32_t videoFrameRate,
          const sp<IGraphicBufferProducer>& surface,
@@ -1698,7 +1727,7 @@ index 3c311cf..533e33b 100644
  
      virtual ~CameraSourceTimeLapse();
  
-@@ -121,7 +122,8 @@
+@@ -121,7 +122,8 @@ private:
          Size videoSize,
          int32_t videoFrameRate,
          const sp<IGraphicBufferProducer>& surface,
@@ -1708,7 +1737,7 @@ index 3c311cf..533e33b 100644
  
      // Wrapper over CameraSource::signalBufferReturned() to implement quick stop.
      // It only handles the case when mLastReadBufferCopy is signalled. Otherwise
-@@ -135,6 +137,33 @@
+@@ -135,6 +137,33 @@ private:
      // frame needs to be skipped and this function just returns the value of mSkipCurrentFrame.
      virtual bool skipCurrentFrame(int64_t timestampUs);
  
@@ -1742,7 +1771,7 @@ index 3c311cf..533e33b 100644
      // Process a buffer item received in CameraSource::BufferQueueListener.
      // This will be called in VIDEO_BUFFER_MODE_BUFFER_QUEUE mode.
      virtual void processBufferQueueFrame(BufferItem& buffer);
-@@ -158,6 +187,9 @@
+@@ -158,6 +187,9 @@ private:
      // Wrapper to enter threadTimeLapseEntry()
      static void *ThreadTimeLapseWrapper(void *me);
  
@@ -1753,10 +1782,10 @@ index 3c311cf..533e33b 100644
      CameraSourceTimeLapse &operator=(const CameraSourceTimeLapse &);
  };
 diff --git a/services/camera/libcameraservice/Android.bp b/services/camera/libcameraservice/Android.bp
-index 26562e0..dcbeb23 100644
+index a9ef730993..9dd077d0e6 100644
 --- a/services/camera/libcameraservice/Android.bp
 +++ b/services/camera/libcameraservice/Android.bp
-@@ -49,6 +49,7 @@
+@@ -52,6 +52,7 @@ cc_library_shared {
          "common/CameraProviderManager.cpp",
          "common/DepthPhotoProcessor.cpp",
          "common/FrameProcessorBase.cpp",
@@ -1764,7 +1793,7 @@ index 26562e0..dcbeb23 100644
          "api1/Camera2Client.cpp",
          "api1/client2/Parameters.cpp",
          "api1/client2/FrameProcessor.cpp",
-@@ -64,6 +65,7 @@
+@@ -67,6 +68,7 @@ cc_library_shared {
          "api2/DepthCompositeStream.cpp",
          "api2/HeicEncoderInfoManager.cpp",
          "api2/HeicCompositeStream.cpp",
@@ -1772,7 +1801,7 @@ index 26562e0..dcbeb23 100644
          "device3/BufferUtils.cpp",
          "device3/Camera3Device.cpp",
          "device3/Camera3OfflineSession.cpp",
-@@ -148,6 +150,7 @@
+@@ -151,6 +153,7 @@ cc_library_shared {
          "android.hardware.camera.provider@2.5",
          "android.hardware.camera.provider@2.6",
          "android.hardware.camera.provider@2.7",
@@ -1781,10 +1810,10 @@ index 26562e0..dcbeb23 100644
          "android.hardware.camera.device@3.3",
          "android.hardware.camera.device@3.4",
 diff --git a/services/camera/libcameraservice/CameraFlashlight.cpp b/services/camera/libcameraservice/CameraFlashlight.cpp
-index ccdd9e5..e629cdd 100644
+index ccdd9e5c62..e629cdd798 100644
 --- a/services/camera/libcameraservice/CameraFlashlight.cpp
 +++ b/services/camera/libcameraservice/CameraFlashlight.cpp
-@@ -59,8 +59,9 @@
+@@ -59,8 +59,9 @@ status_t CameraFlashlight::createFlashlightControl(const String8& cameraId) {
      if (mProviderManager->supportSetTorchMode(cameraId.string())) {
          mFlashControl = new ProviderFlashControl(mProviderManager);
      } else {
@@ -1796,7 +1825,7 @@ index ccdd9e5..e629cdd 100644
      }
  
      return OK;
-@@ -308,4 +309,271 @@
+@@ -308,4 +309,271 @@ status_t ProviderFlashControl::setTorchMode(const String8& cameraId, bool enable
  }
  // ProviderFlashControl implementation ends
  
@@ -2069,7 +2098,7 @@ index ccdd9e5..e629cdd 100644
 +
  }
 diff --git a/services/camera/libcameraservice/CameraFlashlight.h b/services/camera/libcameraservice/CameraFlashlight.h
-index b97fa5f..1baaba2 100644
+index b97fa5f340..1baaba27fd 100644
 --- a/services/camera/libcameraservice/CameraFlashlight.h
 +++ b/services/camera/libcameraservice/CameraFlashlight.h
 @@ -23,6 +23,8 @@
@@ -2081,7 +2110,7 @@ index b97fa5f..1baaba2 100644
  
  namespace android {
  
-@@ -122,6 +124,59 @@
+@@ -122,6 +124,59 @@ class ProviderFlashControl : public FlashControlBase {
          Mutex mLock;
  };
  
@@ -2142,10 +2171,10 @@ index b97fa5f..1baaba2 100644
  
  #endif
 diff --git a/services/camera/libcameraservice/CameraService.cpp b/services/camera/libcameraservice/CameraService.cpp
-index 04b5604..c3dfc5a 100644
+index c24ff726ea..33508a9afd 100644
 --- a/services/camera/libcameraservice/CameraService.cpp
 +++ b/services/camera/libcameraservice/CameraService.cpp
-@@ -70,6 +70,7 @@
+@@ -71,6 +71,7 @@
  #include <system/camera.h>
  
  #include "CameraService.h"
@@ -2153,7 +2182,7 @@ index 04b5604..c3dfc5a 100644
  #include "api1/Camera2Client.h"
  #include "api2/CameraDeviceClient.h"
  #include "utils/CameraTraces.h"
-@@ -741,17 +742,11 @@
+@@ -750,17 +751,11 @@ Status CameraService::getCameraCharacteristics(const String16& cameraId,
      status_t res = mCameraProviderManager->getCameraCharacteristics(
              cameraIdStr, overrideForPerfClass, cameraInfo);
      if (res != OK) {
@@ -2176,7 +2205,7 @@ index 04b5604..c3dfc5a 100644
      }
      SystemCameraKind deviceKind = SystemCameraKind::PUBLIC;
      if (getSystemCameraKind(String8(cameraId), &deviceKind) != OK) {
-@@ -881,16 +876,25 @@
+@@ -890,16 +885,25 @@ Status CameraService::makeClient(const sp<CameraService>& cameraService,
          const sp<IInterface>& cameraCb, const String16& packageName,
          const std::optional<String16>& featureId,  const String8& cameraId,
          int api1CameraId, int facing, int sensorOrientation, int clientPid, uid_t clientUid,
@@ -2210,7 +2239,7 @@ index 04b5604..c3dfc5a 100644
              break;
          case CAMERA_DEVICE_API_VERSION_3_0:
          case CAMERA_DEVICE_API_VERSION_3_1:
-@@ -914,12 +918,32 @@
+@@ -923,12 +927,32 @@ Status CameraService::makeClient(const sp<CameraService>& cameraService,
                          overrideForPerfClass);
              }
              break;
@@ -2244,7 +2273,7 @@ index 04b5604..c3dfc5a 100644
      }
      return Status::ok();
  }
-@@ -1007,6 +1031,7 @@
+@@ -1016,6 +1040,7 @@ Status CameraService::initializeShimMetadata(int cameraId) {
      sp<Client> tmp = nullptr;
      if (!(ret = connectHelper<ICameraClient,Client>(
              sp<ICameraClient>{nullptr}, id, cameraId,
@@ -2252,7 +2281,7 @@ index 04b5604..c3dfc5a 100644
              internalPackageName, {}, uid, USE_CALLING_PID,
              API_1, /*shimUpdateOnly*/ true, /*oomScoreOffset*/ 0,
              /*targetSdkVersion*/ __ANDROID_API_FUTURE__, /*out*/ tmp)
-@@ -1534,8 +1559,36 @@
+@@ -1543,8 +1568,36 @@ Status CameraService::connect(
      String8 id = cameraIdIntToStr(api1CameraId);
      sp<Client> client = nullptr;
      ret = connectHelper<ICameraClient,Client>(cameraClient, id, api1CameraId,
@@ -2290,7 +2319,7 @@ index 04b5604..c3dfc5a 100644
  
      if(!ret.isOk()) {
          logRejected(id, CameraThreadState::getCallingPid(), String8(clientPackageName),
-@@ -1576,9 +1629,8 @@
+@@ -1585,9 +1638,8 @@ bool CameraService::shouldRejectSystemCameraConnection(const String8& cameraId)
      int cUid = CameraThreadState::getCallingUid();
      SystemCameraKind systemCameraKind = SystemCameraKind::PUBLIC;
      if (getSystemCameraKind(cameraId, &systemCameraKind) != OK) {
@@ -2302,7 +2331,7 @@ index 04b5604..c3dfc5a 100644
      }
  
      // (1) Cameraserver trying to connect, accept.
-@@ -1649,8 +1701,9 @@
+@@ -1658,8 +1710,9 @@ Status CameraService::connectDevice(
      }
  
      ret = connectHelper<hardware::camera2::ICameraDeviceCallbacks,CameraDeviceClient>(cameraCb, id,
@@ -2314,7 +2343,7 @@ index 04b5604..c3dfc5a 100644
              targetSdkVersion, /*out*/client);
  
      if(!ret.isOk()) {
-@@ -1680,7 +1733,7 @@
+@@ -1689,7 +1742,7 @@ Status CameraService::connectDevice(
  
  template<class CALLBACK, class CLIENT>
  Status CameraService::connectHelper(const sp<CALLBACK>& cameraCb, const String8& cameraId,
@@ -2323,7 +2352,7 @@ index 04b5604..c3dfc5a 100644
          const std::optional<String16>& clientFeatureId, int clientUid, int clientPid,
          apiLevel effectiveApiLevel, bool shimUpdateOnly, int oomScoreOffset, int targetSdkVersion,
          /*out*/sp<CLIENT>& device) {
-@@ -1690,8 +1743,9 @@
+@@ -1699,8 +1752,9 @@ Status CameraService::connectHelper(const sp<CALLBACK>& cameraCb, const String8&
  
      int originalClientPid = 0;
  
@@ -2334,7 +2363,7 @@ index 04b5604..c3dfc5a 100644
              static_cast<int>(effectiveApiLevel));
  
      nsecs_t openTimeNs = systemTime();
-@@ -1777,7 +1831,7 @@
+@@ -1786,7 +1840,7 @@ Status CameraService::connectHelper(const sp<CALLBACK>& cameraCb, const String8&
          if(!(ret = makeClient(this, cameraCb, clientPackageName, clientFeatureId,
                  cameraId, api1CameraId, facing, orientation,
                  clientPid, clientUid, getpid(),
@@ -2343,7 +2372,7 @@ index 04b5604..c3dfc5a 100644
                  /*out*/&tmp)).isOk()) {
              return ret;
          }
-@@ -4199,13 +4253,25 @@
+@@ -4231,13 +4285,25 @@ void CameraService::updateStatus(StatusInternal status, const String8& cameraId,
          ALOGE("%s: Invalid camera id %s, skipping", __FUNCTION__, cameraId.string());
          return;
      }
@@ -2370,7 +2399,7 @@ index 04b5604..c3dfc5a 100644
                          &logicalCameraIds]
              (const String8& cameraId, StatusInternal status) {
  
-@@ -4233,8 +4299,8 @@
+@@ -4265,8 +4331,8 @@ void CameraService::updateStatus(StatusInternal status, const String8& cameraId,
                  bool isVendorListener = listener->isVendorListener();
                  if (shouldSkipStatusUpdates(deviceKind, isVendorListener,
                          listener->getListenerPid(), listener->getListenerUid()) ||
@@ -2382,10 +2411,10 @@ index 04b5604..c3dfc5a 100644
                      continue;
                  }
 diff --git a/services/camera/libcameraservice/CameraService.h b/services/camera/libcameraservice/CameraService.h
-index bc2e347..0b2deb8 100644
+index 13bc96e7c8..5e572ff154 100644
 --- a/services/camera/libcameraservice/CameraService.h
 +++ b/services/camera/libcameraservice/CameraService.h
-@@ -72,6 +72,7 @@
+@@ -72,6 +72,7 @@ class CameraService :
      public virtual CameraProviderManager::StatusListener
  {
      friend class BinderService<CameraService>;
@@ -2393,7 +2422,7 @@ index bc2e347..0b2deb8 100644
      friend class CameraOfflineSessionClient;
  public:
      class Client;
-@@ -135,6 +136,12 @@
+@@ -143,6 +144,12 @@ public:
              /*out*/
              sp<hardware::ICamera>* device);
  
@@ -2406,7 +2435,7 @@ index bc2e347..0b2deb8 100644
      virtual binder::Status     connectDevice(
              const sp<hardware::camera2::ICameraDeviceCallbacks>& cameraCb, const String16& cameraId,
              const String16& clientPackageName, const std::optional<String16>& clientFeatureId,
-@@ -777,7 +784,7 @@
+@@ -788,7 +795,7 @@ private:
      // Single implementation shared between the various connect calls
      template<class CALLBACK, class CLIENT>
      binder::Status connectHelper(const sp<CALLBACK>& cameraCb, const String8& cameraId,
@@ -2415,7 +2444,7 @@ index bc2e347..0b2deb8 100644
              const std::optional<String16>& clientFeatureId, int clientUid, int clientPid,
              apiLevel effectiveApiLevel, bool shimUpdateOnly, int scoreOffset, int targetSdkVersion,
              /*out*/sp<CLIENT>& device);
-@@ -1146,7 +1153,7 @@
+@@ -1157,7 +1164,7 @@ private:
              const sp<IInterface>& cameraCb, const String16& packageName,
              const std::optional<String16>& featureId, const String8& cameraId, int api1CameraId,
              int facing, int sensorOrientation, int clientPid, uid_t clientUid, int servicePid,
@@ -2426,7 +2455,7 @@ index bc2e347..0b2deb8 100644
      status_t checkCameraAccess(const String16& opPackageName);
 diff --git a/services/camera/libcameraservice/api1/CameraClient.cpp b/services/camera/libcameraservice/api1/CameraClient.cpp
 new file mode 100644
-index 0000000..1d08b2a
+index 0000000000..1d08b2a6e1
 --- /dev/null
 +++ b/services/camera/libcameraservice/api1/CameraClient.cpp
 @@ -0,0 +1,1227 @@
@@ -3659,7 +3688,7 @@ index 0000000..1d08b2a
 +}; // namespace android
 diff --git a/services/camera/libcameraservice/api1/CameraClient.h b/services/camera/libcameraservice/api1/CameraClient.h
 new file mode 100644
-index 0000000..20e320a
+index 0000000000..20e320a00b
 --- /dev/null
 +++ b/services/camera/libcameraservice/api1/CameraClient.h
 @@ -0,0 +1,194 @@
@@ -3858,10 +3887,10 @@ index 0000000..20e320a
 +
 +#endif
 diff --git a/services/camera/libcameraservice/common/CameraProviderManager.cpp b/services/camera/libcameraservice/common/CameraProviderManager.cpp
-index 4f2b878..78fd046 100644
+index 8b483a55c8..8622f2e177 100644
 --- a/services/camera/libcameraservice/common/CameraProviderManager.cpp
 +++ b/services/camera/libcameraservice/common/CameraProviderManager.cpp
-@@ -417,6 +417,46 @@
+@@ -430,6 +430,46 @@ status_t CameraProviderManager::openSession(const std::string &id,
      return mapToStatusT(status);
  }
  
@@ -3908,7 +3937,7 @@ index 4f2b878..78fd046 100644
  void CameraProviderManager::saveRef(DeviceMode usageType, const std::string &cameraId,
          sp<provider::V2_4::ICameraProvider> provider) {
      if (!kEnableLazyHal) {
-@@ -1616,9 +1656,9 @@
+@@ -1647,9 +1687,9 @@ status_t CameraProviderManager::ProviderInfo::addDevice(const std::string& name,
      std::unique_ptr<DeviceInfo> deviceInfo;
      switch (major) {
          case 1:
@@ -3921,10 +3950,11 @@ index 4f2b878..78fd046 100644
          case 3:
              deviceInfo = initializeDeviceInfo<DeviceInfo3>(name, mProviderTagid,
                      id, minor);
-@@ -2192,6 +2232,35 @@
+@@ -2242,6 +2282,35 @@ CameraProviderManager::ProviderInfo::startDeviceInterface(const std::string &nam
+     return nullptr;
  }
  
- template<>
++template<>
 +sp<device::V1_0::ICameraDevice>
 +CameraProviderManager::ProviderInfo::startDeviceInterface
 +        <device::V1_0::ICameraDevice>(const std::string &name) {
@@ -3953,14 +3983,29 @@ index 4f2b878..78fd046 100644
 +    return cameraInterface;
 +}
 +
-+template<>
+ template<>
  sp<device::V3_2::ICameraDevice>
  CameraProviderManager::ProviderInfo::startDeviceInterface
-         <device::V3_2::ICameraDevice>(const std::string &name) {
-@@ -2244,6 +2313,130 @@
+@@ -2289,7 +2358,7 @@ sp<InterfaceT> CameraProviderManager::ProviderInfo::DeviceInfo::startDeviceInter
+ }
+ 
+ template<class InterfaceT>
+-status_t CameraProviderManager::ProviderInfo::DeviceInfo::setTorchMode(InterfaceT& interface,
++status_t CameraProviderManager::ProviderInfo::DeviceInfo3::setTorchMode(InterfaceT& interface,
+         bool enabled) {
+     int32_t flashStrength = property_get_int32("persist.sys.phh.flash_strength", 1);
+ 
+@@ -2311,6 +2380,137 @@ status_t CameraProviderManager::ProviderInfo::DeviceInfo::setTorchMode(Interface
      return mapToStatusT(s);
  }
  
++template<class InterfaceT>
++status_t CameraProviderManager::ProviderInfo::DeviceInfo1::setTorchMode(InterfaceT& interface,
++        bool enabled) {
++    Status s = interface->setTorchMode(enabled ? TorchMode::ON : TorchMode::OFF);
++    return mapToStatusT(s);
++}
++
 +CameraProviderManager::ProviderInfo::DeviceInfo1::DeviceInfo1(const std::string& name,
 +        const metadata_vendor_id_t tagId, const std::string &id,
 +        uint16_t minorVersion,
@@ -4089,10 +4134,10 @@ index 4f2b878..78fd046 100644
          const metadata_vendor_id_t tagId, const std::string &id,
          uint16_t minorVersion,
 diff --git a/services/camera/libcameraservice/common/CameraProviderManager.h b/services/camera/libcameraservice/common/CameraProviderManager.h
-index e3763a14c7..f858bf0d6d 100644
+index fdb2673481..5224958853 100644
 --- a/services/camera/libcameraservice/common/CameraProviderManager.h
 +++ b/services/camera/libcameraservice/common/CameraProviderManager.h
-@@ -282,6 +282,11 @@ public:
+@@ -285,6 +285,11 @@ public:
              /*out*/
              sp<hardware::camera::device::V3_2::ICameraDeviceSession> *session);
  
@@ -4104,7 +4149,25 @@ index e3763a14c7..f858bf0d6d 100644
      /**
       * Notify that the camera or torch is no longer being used by a camera client
       */
-@@ -544,6 +549,28 @@ private:
+@@ -522,17 +527,6 @@ private:
+             bool mHasFlashUnit; // const after constructor
+             bool mSupportNativeZoomRatio; // const after constructor
+             const std::vector<std::string>& mPublicCameraIds;
+-
+-            template<class InterfaceT>
+-            static status_t setTorchMode(InterfaceT& interface, bool enabled);
+-
+-            template<class InterfaceT>
+-            status_t setTorchModeForDevice(bool enabled) {
+-                // Don't save the ICameraProvider interface here because we assume that this was
+-                // called from CameraProviderManager::setTorchMode(), which does save it.
+-                const sp<InterfaceT> interface = startDeviceInterface<InterfaceT>();
+-                return DeviceInfo::setTorchMode(interface, enabled);
+-            }
+         };
+         std::vector<std::unique_ptr<DeviceInfo>> mDevices;
+         std::unordered_set<std::string> mUniqueCameraIds;
+@@ -545,6 +539,39 @@ private:
          // physical camera IDs.
          std::vector<std::string> mProviderPublicCameraIds;
  
@@ -4125,17 +4188,53 @@ index e3763a14c7..f858bf0d6d 100644
 +                    const std::vector<std::string>& publicCameraIds,
 +                    sp<InterfaceT> interface);
 +            virtual ~DeviceInfo1();
++        protected:
++            template<class InterfaceT>
++            status_t setTorchModeForDevice(bool enabled) {
++                // Don't save the ICameraProvider interface here because we assume that this was
++                // called from CameraProviderManager::setTorchMode(), which does save it.
++                const sp<InterfaceT> interface = startDeviceInterface<InterfaceT>();
++                return DeviceInfo1::setTorchMode(interface, enabled);
++            }
 +        private:
 +            CameraParameters2 mDefaultParameters;
 +            status_t cacheCameraInfo(sp<InterfaceT> interface);
++
++            template<class InterfaceT>
++            static status_t setTorchMode(InterfaceT& interface, bool enabled);
 +        };
 +
          // HALv3-specific camera fields, including the actual device interface
          struct DeviceInfo3 : public DeviceInfo {
              typedef hardware::camera::device::V3_2::ICameraDevice InterfaceT;
+@@ -573,6 +600,14 @@ private:
+                     sp<ProviderInfo> parentProvider,
+                     const std::vector<std::string>& publicCameraIds, sp<InterfaceT> interface);
+             virtual ~DeviceInfo3();
++        protected:
++            template<class InterfaceT>
++            status_t setTorchModeForDevice(bool enabled) {
++                // Don't save the ICameraProvider interface here because we assume that this was
++                // called from CameraProviderManager::setTorchMode(), which does save it.
++                const sp<InterfaceT> interface = startDeviceInterface<InterfaceT>();
++                return DeviceInfo3::setTorchMode(interface, enabled);
++            }
+         private:
+             CameraMetadata mCameraCharacteristics;
+             // Map device states to sensor orientations
+@@ -612,6 +647,9 @@ private:
+                     std::vector<int64_t>* stallDurations,
+                     const camera_metadata_entry& halStreamConfigs,
+                     const camera_metadata_entry& halStreamDurations);
++
++            template<class InterfaceT>
++            static status_t setTorchMode(InterfaceT& interface, bool enabled);
+         };
+ 
+     private:
 diff --git a/services/camera/libcameraservice/device1/CameraHardwareInterface.cpp b/services/camera/libcameraservice/device1/CameraHardwareInterface.cpp
 new file mode 100644
-index 0000000..62ef681
+index 0000000000..62ef681668
 --- /dev/null
 +++ b/services/camera/libcameraservice/device1/CameraHardwareInterface.cpp
 @@ -0,0 +1,818 @@
@@ -4959,7 +5058,7 @@ index 0000000..62ef681
 +}; // namespace android
 diff --git a/services/camera/libcameraservice/device1/CameraHardwareInterface.h b/services/camera/libcameraservice/device1/CameraHardwareInterface.h
 new file mode 100644
-index 0000000..e519b04
+index 0000000000..e519b04cdd
 --- /dev/null
 +++ b/services/camera/libcameraservice/device1/CameraHardwareInterface.h
 @@ -0,0 +1,488 @@
@@ -5451,3 +5550,6 @@ index 0000000..e519b04
 +};  // namespace android
 +
 +#endif
+-- 
+2.32.0
+

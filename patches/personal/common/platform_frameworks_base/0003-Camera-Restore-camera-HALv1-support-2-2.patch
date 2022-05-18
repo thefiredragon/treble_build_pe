@@ -1,7 +1,7 @@
 From 71b2988c90a62caa3a1e3c460f03abbbb72028dc Mon Sep 17 00:00:00 2001
 From: Kyle Harrison <khwebmail@gmail.com>
 Date: Thu, 28 Oct 2021 12:29:04 +0100
-Subject: [PATCH 3/5] Camera: Restore camera HALv1 support [2/2]
+Subject: [PATCH 3/4] Camera: Restore camera HALv1 support [2/2]
 
 Revert "Camera: Remove all camera HALv1 code"
 This reverts commit 7208d0af87dda3b6484e7a549d51751ae57d9a30.
@@ -10,12 +10,75 @@ Adapt to changes in camera2 api since the removal of HALv1 support.
 
 Change-Id: I765d2912f024f58ba369b72453817ddf8ebe2b2a
 ---
+ config/boot-image-profile.txt                 |    4 +
+ config/preloaded-classes                      |    4 +
+ core/java/android/hardware/Camera.java        |   84 +-
+ .../hardware/camera2/CameraManager.java       |  126 +-
+ .../hardware/camera2/legacy/BurstHolder.java  |   90 +
+ .../camera2/legacy/CameraDeviceState.java     |  362 ++++
+ .../camera2/legacy/CameraDeviceUserShim.java  |  805 +++++++++
+ .../camera2/legacy/CaptureCollector.java      |  673 ++++++++
+ .../camera2/legacy/GLThreadManager.java       |  264 +++
+ .../camera2/legacy/LegacyCameraDevice.java    |  886 ++++++++++
+ .../camera2/legacy/LegacyExceptionUtils.java  |  138 ++
+ .../legacy/LegacyFaceDetectMapper.java        |  265 +++
+ .../legacy/LegacyFocusStateMapper.java        |  321 ++++
+ .../camera2/legacy/LegacyMetadataMapper.java  | 1532 +++++++++++++++++
+ .../camera2/legacy/LegacyRequest.java         |   67 +
+ .../camera2/legacy/LegacyRequestMapper.java   |  688 ++++++++
+ .../camera2/legacy/LegacyResultMapper.java    |  529 ++++++
+ .../camera2/legacy/ParameterUtils.java        | 1099 ++++++++++++
+ .../camera2/legacy/PerfMeasurement.java       |  308 ++++
+ .../camera2/legacy/RequestHandlerThread.java  |  113 ++
+ .../camera2/legacy/RequestHolder.java         |  283 +++
+ .../hardware/camera2/legacy/RequestQueue.java |  174 ++
+ .../camera2/legacy/RequestThreadManager.java  | 1126 ++++++++++++
+ .../camera2/legacy/SizeAreaComparator.java    |   72 +
+ .../legacy/SurfaceTextureRenderer.java        |  882 ++++++++++
+ .../hardware/camera2/legacy/package.html      |    3 +
+ .../params/StreamConfigurationMap.java        |    5 +-
+ .../hardware/camera2/utils/SurfaceUtils.java  |  123 +-
+ core/jni/Android.bp                           |    3 +-
+ core/jni/AndroidRuntime.cpp                   |    6 +-
+ core/jni/android_hardware_Camera.cpp          |   17 +-
+ ...ware_camera2_legacy_LegacyCameraDevice.cpp |  841 +++++++++
+ ...ardware_camera2_legacy_PerfMeasurement.cpp |  335 ++++
+ ...id_hardware_camera2_utils_SurfaceUtils.cpp |  229 ---
+ .../integration/CameraBinderTest.java         |   28 +
+ .../unit/CameraOpenTest.java                  |   53 +
+ 36 files changed, 12168 insertions(+), 370 deletions(-)
+ create mode 100644 core/java/android/hardware/camera2/legacy/BurstHolder.java
+ create mode 100644 core/java/android/hardware/camera2/legacy/CameraDeviceState.java
+ create mode 100644 core/java/android/hardware/camera2/legacy/CameraDeviceUserShim.java
+ create mode 100644 core/java/android/hardware/camera2/legacy/CaptureCollector.java
+ create mode 100644 core/java/android/hardware/camera2/legacy/GLThreadManager.java
+ create mode 100644 core/java/android/hardware/camera2/legacy/LegacyCameraDevice.java
+ create mode 100644 core/java/android/hardware/camera2/legacy/LegacyExceptionUtils.java
+ create mode 100644 core/java/android/hardware/camera2/legacy/LegacyFaceDetectMapper.java
+ create mode 100644 core/java/android/hardware/camera2/legacy/LegacyFocusStateMapper.java
+ create mode 100644 core/java/android/hardware/camera2/legacy/LegacyMetadataMapper.java
+ create mode 100644 core/java/android/hardware/camera2/legacy/LegacyRequest.java
+ create mode 100644 core/java/android/hardware/camera2/legacy/LegacyRequestMapper.java
+ create mode 100644 core/java/android/hardware/camera2/legacy/LegacyResultMapper.java
+ create mode 100644 core/java/android/hardware/camera2/legacy/ParameterUtils.java
+ create mode 100644 core/java/android/hardware/camera2/legacy/PerfMeasurement.java
+ create mode 100644 core/java/android/hardware/camera2/legacy/RequestHandlerThread.java
+ create mode 100644 core/java/android/hardware/camera2/legacy/RequestHolder.java
+ create mode 100644 core/java/android/hardware/camera2/legacy/RequestQueue.java
+ create mode 100644 core/java/android/hardware/camera2/legacy/RequestThreadManager.java
+ create mode 100644 core/java/android/hardware/camera2/legacy/SizeAreaComparator.java
+ create mode 100644 core/java/android/hardware/camera2/legacy/SurfaceTextureRenderer.java
+ create mode 100644 core/java/android/hardware/camera2/legacy/package.html
+ create mode 100644 core/jni/android_hardware_camera2_legacy_LegacyCameraDevice.cpp
+ create mode 100644 core/jni/android_hardware_camera2_legacy_PerfMeasurement.cpp
+ delete mode 100644 core/jni/android_hardware_camera2_utils_SurfaceUtils.cpp
+ create mode 100644 media/tests/MediaFrameworkTest/src/com/android/mediaframeworktest/unit/CameraOpenTest.java
 
 diff --git a/config/boot-image-profile.txt b/config/boot-image-profile.txt
-index bb8b5dc..a139f76 100644
+index bb8b5dc53251..a139f76f96c1 100644
 --- a/config/boot-image-profile.txt
 +++ b/config/boot-image-profile.txt
-@@ -34859,6 +34859,10 @@
+@@ -34859,6 +34859,10 @@ Landroid/hardware/camera2/impl/CameraMetadataNative$Key;
  Landroid/hardware/camera2/impl/CameraMetadataNative;
  Landroid/hardware/camera2/impl/GetCommand;
  Landroid/hardware/camera2/impl/SetCommand;
@@ -27,10 +90,10 @@ index bb8b5dc..a139f76 100644
  Landroid/hardware/camera2/marshal/MarshalQueryable;
  Landroid/hardware/camera2/marshal/MarshalRegistry$MarshalToken;
 diff --git a/config/preloaded-classes b/config/preloaded-classes
-index 09e181d..529dc8d 100644
+index 09e181da0343..529dc8db76be 100644
 --- a/config/preloaded-classes
 +++ b/config/preloaded-classes
-@@ -2254,6 +2254,10 @@
+@@ -2254,6 +2254,10 @@ android.hardware.camera2.impl.CameraMetadataNative$Key
  android.hardware.camera2.impl.CameraMetadataNative
  android.hardware.camera2.impl.GetCommand
  android.hardware.camera2.impl.SetCommand
@@ -42,7 +105,7 @@ index 09e181d..529dc8d 100644
  android.hardware.camera2.marshal.MarshalQueryable
  android.hardware.camera2.marshal.MarshalRegistry$MarshalToken
 diff --git a/core/java/android/hardware/Camera.java b/core/java/android/hardware/Camera.java
-index 3bdd39f..d79ec64 100644
+index 1a1dd8248cac..6e755e10721c 100644
 --- a/core/java/android/hardware/Camera.java
 +++ b/core/java/android/hardware/Camera.java
 @@ -266,10 +266,14 @@ public class Camera {
@@ -178,7 +241,7 @@ index 3bdd39f..d79ec64 100644
      private native final void native_release();
  
 diff --git a/core/java/android/hardware/camera2/CameraManager.java b/core/java/android/hardware/camera2/CameraManager.java
-index 5833b3d..7c3c82b 100644
+index d20a164cae24..8095ee5d26de 100644
 --- a/core/java/android/hardware/camera2/CameraManager.java
 +++ b/core/java/android/hardware/camera2/CameraManager.java
 @@ -25,6 +25,7 @@ import android.annotation.SystemService;
@@ -198,7 +261,7 @@ index 5833b3d..7c3c82b 100644
  import android.hardware.camera2.params.SessionConfiguration;
  import android.hardware.camera2.params.StreamConfiguration;
  import android.hardware.camera2.utils.CameraIdAndSessionConfiguration;
-@@ -469,6 +472,10 @@ public final class CameraManager {
+@@ -560,6 +563,10 @@ public final class CameraManager {
              throw new IllegalArgumentException("No cameras available on device");
          }
          synchronized (mLock) {
@@ -209,7 +272,7 @@ index 5833b3d..7c3c82b 100644
              ICameraService cameraService = CameraManagerGlobal.get().getCameraService();
              if (cameraService == null) {
                  throw new CameraAccessException(CameraAccessException.CAMERA_DISCONNECTED,
-@@ -476,27 +483,42 @@ public final class CameraManager {
+@@ -567,27 +574,42 @@ public final class CameraManager {
              }
              try {
                  Size displaySize = getDisplaySize();
@@ -269,7 +332,7 @@ index 5833b3d..7c3c82b 100644
              } catch (ServiceSpecificException e) {
                  throwAsPublicException(e);
              } catch (RemoteException e) {
-@@ -588,15 +610,31 @@ public final class CameraManager {
+@@ -680,15 +702,31 @@ public final class CameraManager {
              ICameraDeviceCallbacks callbacks = deviceImpl.getCallbacks();
  
              try {
@@ -309,7 +372,7 @@ index 5833b3d..7c3c82b 100644
              } catch (ServiceSpecificException e) {
                  if (e.errorCode == ICameraService.ERROR_DEPRECATED_HAL) {
                      throw new AssertionError("Should've gone down the shim path");
-@@ -1191,6 +1229,44 @@ public final class CameraManager {
+@@ -1283,6 +1321,44 @@ public final class CameraManager {
          }
      }
  
@@ -354,10 +417,9 @@ index 5833b3d..7c3c82b 100644
      /**
       * Queries the camera service if a cameraId is a hidden physical camera that belongs to a
       * logical camera device.
-      *
 diff --git a/core/java/android/hardware/camera2/legacy/BurstHolder.java b/core/java/android/hardware/camera2/legacy/BurstHolder.java
 new file mode 100644
-index 0000000..23efe15
+index 000000000000..23efe15fc03b
 --- /dev/null
 +++ b/core/java/android/hardware/camera2/legacy/BurstHolder.java
 @@ -0,0 +1,90 @@
@@ -453,7 +515,7 @@ index 0000000..23efe15
 +}
 diff --git a/core/java/android/hardware/camera2/legacy/CameraDeviceState.java b/core/java/android/hardware/camera2/legacy/CameraDeviceState.java
 new file mode 100644
-index 0000000..89ecd5f
+index 000000000000..89ecd5f1ce63
 --- /dev/null
 +++ b/core/java/android/hardware/camera2/legacy/CameraDeviceState.java
 @@ -0,0 +1,362 @@
@@ -821,7 +883,7 @@ index 0000000..89ecd5f
 +}
 diff --git a/core/java/android/hardware/camera2/legacy/CameraDeviceUserShim.java b/core/java/android/hardware/camera2/legacy/CameraDeviceUserShim.java
 new file mode 100644
-index 0000000..74a8f57
+index 000000000000..74a8f5755446
 --- /dev/null
 +++ b/core/java/android/hardware/camera2/legacy/CameraDeviceUserShim.java
 @@ -0,0 +1,805 @@
@@ -1632,7 +1694,7 @@ index 0000000..74a8f57
 +}
 diff --git a/core/java/android/hardware/camera2/legacy/CaptureCollector.java b/core/java/android/hardware/camera2/legacy/CaptureCollector.java
 new file mode 100644
-index 0000000..113927c
+index 000000000000..113927c4c4b2
 --- /dev/null
 +++ b/core/java/android/hardware/camera2/legacy/CaptureCollector.java
 @@ -0,0 +1,673 @@
@@ -2311,7 +2373,7 @@ index 0000000..113927c
 +}
 diff --git a/core/java/android/hardware/camera2/legacy/GLThreadManager.java b/core/java/android/hardware/camera2/legacy/GLThreadManager.java
 new file mode 100644
-index 0000000..152d82d
+index 000000000000..152d82d5a6da
 --- /dev/null
 +++ b/core/java/android/hardware/camera2/legacy/GLThreadManager.java
 @@ -0,0 +1,264 @@
@@ -2581,7 +2643,7 @@ index 0000000..152d82d
 +}
 diff --git a/core/java/android/hardware/camera2/legacy/LegacyCameraDevice.java b/core/java/android/hardware/camera2/legacy/LegacyCameraDevice.java
 new file mode 100644
-index 0000000..081c97f
+index 000000000000..081c97ff83e8
 --- /dev/null
 +++ b/core/java/android/hardware/camera2/legacy/LegacyCameraDevice.java
 @@ -0,0 +1,886 @@
@@ -3473,7 +3535,7 @@ index 0000000..081c97f
 +}
 diff --git a/core/java/android/hardware/camera2/legacy/LegacyExceptionUtils.java b/core/java/android/hardware/camera2/legacy/LegacyExceptionUtils.java
 new file mode 100644
-index 0000000..55130c8
+index 000000000000..55130c8f2839
 --- /dev/null
 +++ b/core/java/android/hardware/camera2/legacy/LegacyExceptionUtils.java
 @@ -0,0 +1,138 @@
@@ -3617,7 +3679,7 @@ index 0000000..55130c8
 +}
 diff --git a/core/java/android/hardware/camera2/legacy/LegacyFaceDetectMapper.java b/core/java/android/hardware/camera2/legacy/LegacyFaceDetectMapper.java
 new file mode 100644
-index 0000000..b3b4549
+index 000000000000..b3b4549426f0
 --- /dev/null
 +++ b/core/java/android/hardware/camera2/legacy/LegacyFaceDetectMapper.java
 @@ -0,0 +1,265 @@
@@ -3888,7 +3950,7 @@ index 0000000..b3b4549
 +}
 diff --git a/core/java/android/hardware/camera2/legacy/LegacyFocusStateMapper.java b/core/java/android/hardware/camera2/legacy/LegacyFocusStateMapper.java
 new file mode 100644
-index 0000000..d33c09e
+index 000000000000..d33c09eac85d
 --- /dev/null
 +++ b/core/java/android/hardware/camera2/legacy/LegacyFocusStateMapper.java
 @@ -0,0 +1,321 @@
@@ -4215,7 +4277,7 @@ index 0000000..d33c09e
 +}
 diff --git a/core/java/android/hardware/camera2/legacy/LegacyMetadataMapper.java b/core/java/android/hardware/camera2/legacy/LegacyMetadataMapper.java
 new file mode 100644
-index 0000000..362ddfa
+index 000000000000..362ddfae67bf
 --- /dev/null
 +++ b/core/java/android/hardware/camera2/legacy/LegacyMetadataMapper.java
 @@ -0,0 +1,1532 @@
@@ -5753,7 +5815,7 @@ index 0000000..362ddfa
 +}
 diff --git a/core/java/android/hardware/camera2/legacy/LegacyRequest.java b/core/java/android/hardware/camera2/legacy/LegacyRequest.java
 new file mode 100644
-index 0000000..f13ac5c
+index 000000000000..f13ac5c881e0
 --- /dev/null
 +++ b/core/java/android/hardware/camera2/legacy/LegacyRequest.java
 @@ -0,0 +1,67 @@
@@ -5826,7 +5888,7 @@ index 0000000..f13ac5c
 +}
 diff --git a/core/java/android/hardware/camera2/legacy/LegacyRequestMapper.java b/core/java/android/hardware/camera2/legacy/LegacyRequestMapper.java
 new file mode 100644
-index 0000000..3a46379
+index 000000000000..3a46379477e9
 --- /dev/null
 +++ b/core/java/android/hardware/camera2/legacy/LegacyRequestMapper.java
 @@ -0,0 +1,688 @@
@@ -6520,7 +6582,7 @@ index 0000000..3a46379
 +}
 diff --git a/core/java/android/hardware/camera2/legacy/LegacyResultMapper.java b/core/java/android/hardware/camera2/legacy/LegacyResultMapper.java
 new file mode 100644
-index 0000000..09edf74
+index 000000000000..09edf74f0d4c
 --- /dev/null
 +++ b/core/java/android/hardware/camera2/legacy/LegacyResultMapper.java
 @@ -0,0 +1,529 @@
@@ -7055,7 +7117,7 @@ index 0000000..09edf74
 +}
 diff --git a/core/java/android/hardware/camera2/legacy/ParameterUtils.java b/core/java/android/hardware/camera2/legacy/ParameterUtils.java
 new file mode 100644
-index 0000000..eb43598
+index 000000000000..eb435989e9a0
 --- /dev/null
 +++ b/core/java/android/hardware/camera2/legacy/ParameterUtils.java
 @@ -0,0 +1,1099 @@
@@ -8160,7 +8222,7 @@ index 0000000..eb43598
 +}
 diff --git a/core/java/android/hardware/camera2/legacy/PerfMeasurement.java b/core/java/android/hardware/camera2/legacy/PerfMeasurement.java
 new file mode 100644
-index 0000000..53278c7
+index 000000000000..53278c7e4f97
 --- /dev/null
 +++ b/core/java/android/hardware/camera2/legacy/PerfMeasurement.java
 @@ -0,0 +1,308 @@
@@ -8474,7 +8536,7 @@ index 0000000..53278c7
 +}
 diff --git a/core/java/android/hardware/camera2/legacy/RequestHandlerThread.java b/core/java/android/hardware/camera2/legacy/RequestHandlerThread.java
 new file mode 100644
-index 0000000..e19ebf2
+index 000000000000..e19ebf2d616b
 --- /dev/null
 +++ b/core/java/android/hardware/camera2/legacy/RequestHandlerThread.java
 @@ -0,0 +1,113 @@
@@ -8593,7 +8655,7 @@ index 0000000..e19ebf2
 +}
 diff --git a/core/java/android/hardware/camera2/legacy/RequestHolder.java b/core/java/android/hardware/camera2/legacy/RequestHolder.java
 new file mode 100644
-index 0000000..98b761b
+index 000000000000..98b761b8a04f
 --- /dev/null
 +++ b/core/java/android/hardware/camera2/legacy/RequestHolder.java
 @@ -0,0 +1,283 @@
@@ -8882,7 +8944,7 @@ index 0000000..98b761b
 +}
 diff --git a/core/java/android/hardware/camera2/legacy/RequestQueue.java b/core/java/android/hardware/camera2/legacy/RequestQueue.java
 new file mode 100644
-index 0000000..fb44402
+index 000000000000..fb444022c6db
 --- /dev/null
 +++ b/core/java/android/hardware/camera2/legacy/RequestQueue.java
 @@ -0,0 +1,174 @@
@@ -9062,7 +9124,7 @@ index 0000000..fb44402
 +}
 diff --git a/core/java/android/hardware/camera2/legacy/RequestThreadManager.java b/core/java/android/hardware/camera2/legacy/RequestThreadManager.java
 new file mode 100644
-index 0000000..f9a5029
+index 000000000000..f9a5029bffaa
 --- /dev/null
 +++ b/core/java/android/hardware/camera2/legacy/RequestThreadManager.java
 @@ -0,0 +1,1126 @@
@@ -10194,7 +10256,7 @@ index 0000000..f9a5029
 +}
 diff --git a/core/java/android/hardware/camera2/legacy/SizeAreaComparator.java b/core/java/android/hardware/camera2/legacy/SizeAreaComparator.java
 new file mode 100644
-index 0000000..75a5bab
+index 000000000000..75a5bab94867
 --- /dev/null
 +++ b/core/java/android/hardware/camera2/legacy/SizeAreaComparator.java
 @@ -0,0 +1,72 @@
@@ -10272,7 +10334,7 @@ index 0000000..75a5bab
 +}
 diff --git a/core/java/android/hardware/camera2/legacy/SurfaceTextureRenderer.java b/core/java/android/hardware/camera2/legacy/SurfaceTextureRenderer.java
 new file mode 100644
-index 0000000..a4c65ae
+index 000000000000..a4c65aeb1050
 --- /dev/null
 +++ b/core/java/android/hardware/camera2/legacy/SurfaceTextureRenderer.java
 @@ -0,0 +1,882 @@
@@ -11160,7 +11222,7 @@ index 0000000..a4c65ae
 +}
 diff --git a/core/java/android/hardware/camera2/legacy/package.html b/core/java/android/hardware/camera2/legacy/package.html
 new file mode 100644
-index 0000000..db6f78b
+index 000000000000..db6f78bbf628
 --- /dev/null
 +++ b/core/java/android/hardware/camera2/legacy/package.html
 @@ -0,0 +1,3 @@
@@ -11169,10 +11231,10 @@ index 0000000..db6f78b
 +</body>
 \ No newline at end of file
 diff --git a/core/java/android/hardware/camera2/params/StreamConfigurationMap.java b/core/java/android/hardware/camera2/params/StreamConfigurationMap.java
-index a25ae60..6e96c12 100644
+index a25ae6041d77..6e96c126388b 100644
 --- a/core/java/android/hardware/camera2/params/StreamConfigurationMap.java
 +++ b/core/java/android/hardware/camera2/params/StreamConfigurationMap.java
-@@ -24,6 +24,7 @@
+@@ -24,6 +24,7 @@ import android.hardware.camera2.CameraCharacteristics;
  import android.hardware.camera2.CameraDevice;
  import android.hardware.camera2.CameraMetadata;
  import android.hardware.camera2.CaptureRequest;
@@ -11180,7 +11242,7 @@ index a25ae60..6e96c12 100644
  import android.hardware.camera2.utils.HashCodeHelpers;
  import android.hardware.camera2.utils.SurfaceUtils;
  import android.util.Range;
-@@ -68,8 +69,6 @@
+@@ -68,8 +69,6 @@ public final class StreamConfigurationMap {
  
      private static final String TAG = "StreamConfigurationMap";
  
@@ -11189,7 +11251,7 @@ index a25ae60..6e96c12 100644
      /**
       * Create a new {@link StreamConfigurationMap}.
       *
-@@ -569,7 +568,7 @@
+@@ -569,7 +568,7 @@ public final class StreamConfigurationMap {
                  if (config.getSize().equals(surfaceSize)) {
                      return true;
                  } else if (isFlexible &&
@@ -11199,7 +11261,7 @@ index a25ae60..6e96c12 100644
                  }
              }
 diff --git a/core/java/android/hardware/camera2/utils/SurfaceUtils.java b/core/java/android/hardware/camera2/utils/SurfaceUtils.java
-index fd1a331..c730259 100644
+index fd1a33161740..c730259568e2 100644
 --- a/core/java/android/hardware/camera2/utils/SurfaceUtils.java
 +++ b/core/java/android/hardware/camera2/utils/SurfaceUtils.java
 @@ -16,14 +16,10 @@
@@ -11219,7 +11281,7 @@ index fd1a331..c730259 100644
  import android.hardware.camera2.params.StreamConfigurationMap;
  import android.util.Range;
  import android.util.Size;
-@@ -39,15 +35,6 @@
+@@ -39,15 +35,6 @@ import java.util.List;
   */
  public class SurfaceUtils {
  
@@ -11235,7 +11297,7 @@ index fd1a331..c730259 100644
      /**
       * Check if a surface is for preview consumer based on consumer end point Gralloc usage flags.
       *
-@@ -55,17 +42,7 @@
+@@ -55,17 +42,7 @@ public class SurfaceUtils {
       * @return true if the surface is for preview consumer, false otherwise.
       */
      public static boolean isSurfaceForPreview(Surface surface) {
@@ -11254,7 +11316,7 @@ index fd1a331..c730259 100644
      }
  
      /**
-@@ -76,17 +53,7 @@
+@@ -76,17 +53,7 @@ public class SurfaceUtils {
       * @return true if the surface is for hardware video encoder consumer, false otherwise.
       */
      public static boolean isSurfaceForHwVideoEncoder(Surface surface) {
@@ -11273,7 +11335,7 @@ index fd1a331..c730259 100644
      }
  
      /**
-@@ -96,10 +63,9 @@
+@@ -96,10 +63,9 @@ public class SurfaceUtils {
       * @return the native object id of the surface, 0 if surface is not backed by a native object.
       */
      public static long getSurfaceId(Surface surface) {
@@ -11286,7 +11348,7 @@ index fd1a331..c730259 100644
              return 0;
          }
      }
-@@ -111,12 +77,7 @@
+@@ -111,12 +77,7 @@ public class SurfaceUtils {
       * @return the native object id of the surface, 0 if surface is not backed by a native object.
       */
      public static long getSurfaceUsage(Surface surface) {
@@ -11300,7 +11362,7 @@ index fd1a331..c730259 100644
      }
      /**
       * Get the Surface size.
-@@ -128,13 +89,11 @@
+@@ -128,13 +89,11 @@ public class SurfaceUtils {
       */
      @UnsupportedAppUsage
      public static Size getSurfaceSize(Surface surface) {
@@ -11319,7 +11381,7 @@ index fd1a331..c730259 100644
      }
  
      /**
-@@ -146,17 +105,11 @@
+@@ -146,17 +105,11 @@ public class SurfaceUtils {
       * @throws IllegalArgumentException if the surface is already abandoned.
       */
      public static int getSurfaceFormat(Surface surface) {
@@ -11341,7 +11403,7 @@ index fd1a331..c730259 100644
      }
  
      /**
-@@ -166,14 +119,13 @@
+@@ -166,14 +119,13 @@ public class SurfaceUtils {
       * @param surface The surface to be queried for format.
       * @return format of the surface.
       *
@@ -11361,7 +11423,7 @@ index fd1a331..c730259 100644
      }
  
      /**
-@@ -185,10 +137,11 @@
+@@ -185,10 +137,11 @@ public class SurfaceUtils {
       * @throws IllegalArgumentException if the surface is already abandoned.
       */
      public static int getSurfaceDataspace(Surface surface) {
@@ -11377,7 +11439,7 @@ index fd1a331..c730259 100644
      }
  
      /**
-@@ -197,21 +150,9 @@
+@@ -197,21 +150,9 @@ public class SurfaceUtils {
       *
       */
      public static boolean isFlexibleConsumer(Surface output) {
@@ -11400,7 +11462,7 @@ index fd1a331..c730259 100644
      /**
       * A high speed output surface can only be preview or hardware encoder surface.
       *
-@@ -293,14 +234,4 @@
+@@ -293,14 +234,4 @@ public class SurfaceUtils {
          }
      }
  
@@ -11416,10 +11478,10 @@ index fd1a331..c730259 100644
 -    private static native long nativeGetSurfaceId(Surface surface);
  }
 diff --git a/core/jni/Android.bp b/core/jni/Android.bp
-index 6b9d375..f373e73 100644
+index 4f27d218f05c..760d9efedb82 100644
 --- a/core/jni/Android.bp
 +++ b/core/jni/Android.bp
-@@ -180,9 +180,10 @@
+@@ -180,9 +180,10 @@ cc_library_shared {
                  "android_media_ToneGenerator.cpp",
                  "android_hardware_Camera.cpp",
                  "android_hardware_camera2_CameraMetadata.cpp",
@@ -11432,10 +11494,10 @@ index 6b9d375..f373e73 100644
                  "android_hardware_display_DisplayViewport.cpp",
                  "android_hardware_HardwareBuffer.cpp",
 diff --git a/core/jni/AndroidRuntime.cpp b/core/jni/AndroidRuntime.cpp
-index 2fd1e54..52bfade 100644
+index c18d227fa674..1c3f226454c3 100644
 --- a/core/jni/AndroidRuntime.cpp
 +++ b/core/jni/AndroidRuntime.cpp
-@@ -74,9 +74,10 @@
+@@ -74,9 +74,10 @@ extern int register_android_opengl_jni_GLES32(JNIEnv* env);
  
  extern int register_android_hardware_Camera(JNIEnv *env);
  extern int register_android_hardware_camera2_CameraMetadata(JNIEnv *env);
@@ -11447,7 +11509,7 @@ index 2fd1e54..52bfade 100644
  extern int register_android_hardware_display_DisplayManagerGlobal(JNIEnv* env);
  extern int register_android_hardware_HardwareBuffer(JNIEnv *env);
  extern int register_android_hardware_SensorManager(JNIEnv *env);
-@@ -1586,9 +1587,10 @@
+@@ -1587,9 +1588,10 @@ static const RegJNIRec gRegJNI[] = {
          REG_JNI(register_com_android_internal_util_VirtualRefBasePtr),
          REG_JNI(register_android_hardware_Camera),
          REG_JNI(register_android_hardware_camera2_CameraMetadata),
@@ -11460,10 +11522,10 @@ index 2fd1e54..52bfade 100644
          REG_JNI(register_android_hardware_HardwareBuffer),
          REG_JNI(register_android_hardware_SensorManager),
 diff --git a/core/jni/android_hardware_Camera.cpp b/core/jni/android_hardware_Camera.cpp
-index 365a18d..d60db2b 100644
+index 7000d9803060..e041d5a82056 100644
 --- a/core/jni/android_hardware_Camera.cpp
 +++ b/core/jni/android_hardware_Camera.cpp
-@@ -556,7 +556,7 @@
+@@ -606,7 +606,7 @@ static void android_hardware_Camera_getCameraInfo(JNIEnv *env, jobject thiz,
  
  // connect to camera service
  static jint android_hardware_Camera_native_setup(JNIEnv *env, jobject thiz,
@@ -11472,7 +11534,7 @@ index 365a18d..d60db2b 100644
  {
      // Convert jstring to String16
      const char16_t *rawClientName = reinterpret_cast<const char16_t*>(
-@@ -567,8 +567,19 @@
+@@ -617,8 +617,19 @@ static jint android_hardware_Camera_native_setup(JNIEnv *env, jobject thiz,
                              reinterpret_cast<const jchar*>(rawClientName));
  
      int targetSdkVersion = android_get_application_target_sdk_version();
@@ -11493,7 +11555,7 @@ index 365a18d..d60db2b 100644
      if (camera == NULL) {
          return -EACCES;
      }
-@@ -1058,7 +1069,7 @@
+@@ -1126,7 +1137,7 @@ static const JNINativeMethod camMethods[] = {
      "(ILandroid/hardware/Camera$CameraInfo;)V",
      (void*)android_hardware_Camera_getCameraInfo },
    { "native_setup",
@@ -11504,7 +11566,7 @@ index 365a18d..d60db2b 100644
      "()V",
 diff --git a/core/jni/android_hardware_camera2_legacy_LegacyCameraDevice.cpp b/core/jni/android_hardware_camera2_legacy_LegacyCameraDevice.cpp
 new file mode 100644
-index 0000000..8cf1d2c
+index 000000000000..8cf1d2cbfaae
 --- /dev/null
 +++ b/core/jni/android_hardware_camera2_legacy_LegacyCameraDevice.cpp
 @@ -0,0 +1,841 @@
@@ -12351,7 +12413,7 @@ index 0000000..8cf1d2c
 +}
 diff --git a/core/jni/android_hardware_camera2_legacy_PerfMeasurement.cpp b/core/jni/android_hardware_camera2_legacy_PerfMeasurement.cpp
 new file mode 100644
-index 0000000..fac243a
+index 000000000000..fac243a70415
 --- /dev/null
 +++ b/core/jni/android_hardware_camera2_legacy_PerfMeasurement.cpp
 @@ -0,0 +1,335 @@
@@ -12692,7 +12754,7 @@ index 0000000..fac243a
 +}
 diff --git a/core/jni/android_hardware_camera2_utils_SurfaceUtils.cpp b/core/jni/android_hardware_camera2_utils_SurfaceUtils.cpp
 deleted file mode 100644
-index 2437a51..0000000
+index 2437a511238c..000000000000
 --- a/core/jni/android_hardware_camera2_utils_SurfaceUtils.cpp
 +++ /dev/null
 @@ -1,229 +0,0 @@
@@ -12926,10 +12988,10 @@ index 2437a51..0000000
 -                                NELEM(gCameraSurfaceUtilsMethods));
 -}
 diff --git a/media/tests/MediaFrameworkTest/src/com/android/mediaframeworktest/integration/CameraBinderTest.java b/media/tests/MediaFrameworkTest/src/com/android/mediaframeworktest/integration/CameraBinderTest.java
-index 6dc05ad..621dc4b 100644
+index 6dc05ad010e6..621dc4b915c9 100644
 --- a/media/tests/MediaFrameworkTest/src/com/android/mediaframeworktest/integration/CameraBinderTest.java
 +++ b/media/tests/MediaFrameworkTest/src/com/android/mediaframeworktest/integration/CameraBinderTest.java
-@@ -168,6 +168,34 @@
+@@ -168,6 +168,34 @@ public class CameraBinderTest extends AndroidTestCase {
          }
      }
  
@@ -12966,7 +13028,7 @@ index 6dc05ad..621dc4b 100644
          /*
 diff --git a/media/tests/MediaFrameworkTest/src/com/android/mediaframeworktest/unit/CameraOpenTest.java b/media/tests/MediaFrameworkTest/src/com/android/mediaframeworktest/unit/CameraOpenTest.java
 new file mode 100644
-index 0000000..14bbe44
+index 000000000000..14bbe44c1516
 --- /dev/null
 +++ b/media/tests/MediaFrameworkTest/src/com/android/mediaframeworktest/unit/CameraOpenTest.java
 @@ -0,0 +1,53 @@
@@ -13023,3 +13085,6 @@ index 0000000..14bbe44
 +        }
 +    }
 +}
+-- 
+2.32.0
+
