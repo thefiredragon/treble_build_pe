@@ -1,7 +1,7 @@
 From 3d83d79046db5392c43498bc4d61a6c344c0850b Mon Sep 17 00:00:00 2001
 From: jhenrique09 <jhsv09@gmail.com>
 Date: Thu, 7 Apr 2022 22:42:57 +0000
-Subject: [PATCH 4/5] SystemUI: Remove colorSurfaceHeader dependency from framework
+Subject: [PATCH 9/10] SystemUI: Remove colorSurfaceHeader dependency from framework
 
 * This also fixes color issues on Pixel Launcher app drawer
 
