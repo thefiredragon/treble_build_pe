@@ -50,13 +50,13 @@ index 819df0e..f93c240 100644
          removeTelephonyPref!!.setOnPreferenceClickListener {
  
 diff --git a/app/src/main/res/xml/pref_misc.xml b/app/src/main/res/xml/pref_misc.xml
-index e5ac34e..c93dbb7 100644
+index 96ceac6..1b0f140 100644
 --- a/app/src/main/res/xml/pref_misc.xml
 +++ b/app/src/main/res/xml/pref_misc.xml
-@@ -139,8 +139,6 @@
- 				android:key="key_misc_dt2w"
-             android:title="Double tap to wake"
-             android:summary="Unlikely to work for you" />
+@@ -145,8 +145,6 @@
+ 		    android:entryValues="@array/pref_misc_fod_color_values"
+ 		    android:key="key_misc_fod_color"
+             android:title="Under-display fp color" />
 -		<Preference android:title="Securize"
 -            android:key="key_misc_securize" />
  		<Preference android:title="@string/remove_telephony_subsystem"

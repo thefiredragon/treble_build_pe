@@ -1,7 +1,7 @@
 From 5077f0af48a861d61e3c9d8aab82dc2c8a7711bd Mon Sep 17 00:00:00 2001
 From: Danny Lin <danny@kdrag0n.dev>
 Date: Tue, 14 Dec 2021 19:01:33 -0800
-Subject: [PATCH 5/6] Revert "[DO NOT MERGE] Make sure WiFi and Cell tiles are not
+Subject: [PATCH 5/5] Revert "[DO NOT MERGE] Make sure WiFi and Cell tiles are not
  created in Provider Model"
 
 This reverts commit 8bb5148906138b09505b85aa04755f1ec8befdb8.

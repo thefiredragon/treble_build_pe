@@ -14,24 +14,44 @@ Way less than FOD, but reverting them nonetheless to keep in line with PHH AOSP
 - Revert "udfps: Allow devices to pulse onFingerDown instead of waking the screen"
 - Revert "udfps: Implement default udfps hbm provider"
 - Revert "udfps: Implement framework dimming support"
+- Revert "base: Allow toggling screen off FOD [1/2]"
 
 Change-Id: Ib02631a6f84a049732bd243320938a62f483223e
 ---
+ .../display/AmbientDisplayConfiguration.java  |   3 +-
  .../fingerprint/IUdfpsOverlayController.aidl  |   3 -
+ core/java/android/provider/Settings.java      |   8 --
+ core/res/res/values/custom_config.xml         |   3 -
+ core/res/res/values/custom_symbols.xml        |   3 -
+ .../validators/SecureSettingsValidators.java  |   1 -
  packages/SystemUI/proguard.flags              |   3 -
  .../res/drawable-nodpi/udfps_icon_pressed.png | Bin 108 -> 0 bytes
- .../SystemUI/res/values/custom_config.xml     |  44 ---------
+ .../SystemUI/res/values/custom_config.xml     |  44 -------
  .../biometrics/AuthContainerView.java         |   2 +-
- .../biometrics/DummyUdfpsHbmProvider.kt       |  32 ------
- .../systemui/biometrics/UdfpsController.java  |  91 +-----------------
+ .../biometrics/DummyUdfpsHbmProvider.kt       |  32 -----
+ .../systemui/biometrics/UdfpsController.java  | 121 +-----------------
  .../systemui/biometrics/UdfpsSurfaceView.java |  16 +--
  .../systemui/biometrics/UdfpsView.java        |   3 +-
- .../systemui/dagger/SystemUIModule.java       |  14 +--
+ .../systemui/dagger/SystemUIModule.java       |  14 +-
  .../hidl/FingerprintAuthenticationClient.java |   9 --
- 11 files changed, 8 insertions(+), 209 deletions(-)
+ 16 files changed, 10 insertions(+), 255 deletions(-)
  delete mode 100644 packages/SystemUI/res/drawable-nodpi/udfps_icon_pressed.png
  delete mode 100644 packages/SystemUI/src/com/android/systemui/biometrics/DummyUdfpsHbmProvider.kt
 
+diff --git a/core/java/android/hardware/display/AmbientDisplayConfiguration.java b/core/java/android/hardware/display/AmbientDisplayConfiguration.java
+index 79643e32c35c..0b1ed65ef937 100644
+--- a/core/java/android/hardware/display/AmbientDisplayConfiguration.java
++++ b/core/java/android/hardware/display/AmbientDisplayConfiguration.java
+@@ -118,8 +118,7 @@ public class AmbientDisplayConfiguration {
+     /** {@hide} */
+     public boolean screenOffUdfpsEnabled(int user) {
+         return !TextUtils.isEmpty(udfpsLongPressSensorType())
+-            && boolSettingDefaultOff("screen_off_udfps_enabled", user)
+-            && mContext.getResources().getBoolean(R.bool.config_supportsScreenOffUdfps);
++            && boolSettingDefaultOff("screen_off_udfps_enabled", user);
+     }
+ 
+     /** {@hide} */
 diff --git a/core/java/android/hardware/fingerprint/IUdfpsOverlayController.aidl b/core/java/android/hardware/fingerprint/IUdfpsOverlayController.aidl
 index f5d9a76e50e3..648edda62171 100644
 --- a/core/java/android/hardware/fingerprint/IUdfpsOverlayController.aidl
@@ -43,6 +63,60 @@ index f5d9a76e50e3..648edda62171 100644
 -
 -    // Useful for Legacy devices not having dedicated aod sensor
 -    void onAcquired(int sensorId, int acquiredInfo, int vendorCode);
+ }
+diff --git a/core/java/android/provider/Settings.java b/core/java/android/provider/Settings.java
+index 9f44d15bde07..8a9b6fb3bdce 100644
+--- a/core/java/android/provider/Settings.java
++++ b/core/java/android/provider/Settings.java
+@@ -10511,14 +10511,6 @@ public final class Settings {
+          */
+         public static final String FACE_UNLOCK_METHOD = "face_unlock_method";
+ 
+-        /**
+-         * Enable udfps detection even when screen is off
+-         * Default value is 0
+-         * @hide
+-         */
+-        @Readable
+-        public static final String SCREEN_OFF_UDFPS_ENABLED = "screen_off_udfps_enabled";
+-
+         /**
+          * These entries are considered common between the personal and the managed profile,
+          * since the managed profile doesn't get to change them.
+diff --git a/core/res/res/values/custom_config.xml b/core/res/res/values/custom_config.xml
+index 949cd912178f..c02a06edaacb 100644
+--- a/core/res/res/values/custom_config.xml
++++ b/core/res/res/values/custom_config.xml
+@@ -144,7 +144,4 @@
+     <!-- Enable face auth only when swiping security view -->
+     <bool name="config_faceAuthOnlyOnSecurityView">false</bool>
+ 
+-    <!-- Whether devices suports in-display fingerprint when screen is off -->
+-    <bool name="config_supportsScreenOffUdfps">true</bool>
+-
+ </resources>
+diff --git a/core/res/res/values/custom_symbols.xml b/core/res/res/values/custom_symbols.xml
+index 58cbb723f4c7..672aa30dd45a 100644
+--- a/core/res/res/values/custom_symbols.xml
++++ b/core/res/res/values/custom_symbols.xml
+@@ -55,7 +55,4 @@
+     <!-- Enable face auth only when swiping security view -->
+     <java-symbol type="bool" name="config_faceAuthOnlyOnSecurityView" />
+ 
+-    <!-- Whether devices suports in-display fingerprint when screen is off -->
+-    <java-symbol type="bool" name="config_supportsScreenOffUdfps" />
+-
+ </resources>
+diff --git a/packages/SettingsProvider/src/android/provider/settings/validators/SecureSettingsValidators.java b/packages/SettingsProvider/src/android/provider/settings/validators/SecureSettingsValidators.java
+index 768603b70e19..cc8aa87faf90 100644
+--- a/packages/SettingsProvider/src/android/provider/settings/validators/SecureSettingsValidators.java
++++ b/packages/SettingsProvider/src/android/provider/settings/validators/SecureSettingsValidators.java
+@@ -323,6 +323,5 @@ public class SecureSettingsValidators {
+         VALIDATORS.put(Secure.FEATURE_TOUCH_HOVERING, BOOLEAN_VALIDATOR);
+         VALIDATORS.put(Secure.SWAP_CAPACITIVE_KEYS, BOOLEAN_VALIDATOR);
+         VALIDATORS.put(Secure.FACE_UNLOCK_METHOD, BOOLEAN_VALIDATOR);
+-        VALIDATORS.put(Secure.SCREEN_OFF_UDFPS_ENABLED, BOOLEAN_VALIDATOR);
+     }
  }
 diff --git a/packages/SystemUI/proguard.flags b/packages/SystemUI/proguard.flags
 index dc3db8d1538a..031678229bbd 100644
@@ -189,10 +263,31 @@ index a1ec9c2bb76e..000000000000
 -    }
 -}
 diff --git a/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsController.java b/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsController.java
-index 3fa74dd67d20..3e9d6b0fa362 100644
+index 36b7f0887089..3e9d6b0fa362 100644
 --- a/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsController.java
 +++ b/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsController.java
-@@ -47,8 +47,6 @@ import android.os.RemoteException;
+@@ -29,20 +29,17 @@ import android.content.BroadcastReceiver;
+ import android.content.Context;
+ import android.content.Intent;
+ import android.content.IntentFilter;
+-import android.database.ContentObserver;
+ import android.graphics.PixelFormat;
+ import android.graphics.Point;
+ import android.graphics.RectF;
+ import android.hardware.biometrics.BiometricOverlayConstants;
+ import android.hardware.biometrics.SensorLocationInternal;
+-import android.hardware.display.AmbientDisplayConfiguration;
+ import android.hardware.display.DisplayManager;
+ import android.hardware.fingerprint.FingerprintManager;
+ import android.hardware.fingerprint.FingerprintSensorPropertiesInternal;
+ import android.hardware.fingerprint.IUdfpsOverlayController;
+ import android.hardware.fingerprint.IUdfpsOverlayControllerCallback;
+ import android.media.AudioAttributes;
+-import android.net.Uri;
+ import android.os.Handler;
+ import android.os.PowerManager;
+ import android.os.Process;
+@@ -50,8 +47,6 @@ import android.os.RemoteException;
  import android.os.Trace;
  import android.os.VibrationEffect;
  import android.os.Vibrator;
@@ -201,7 +296,15 @@ index 3fa74dd67d20..3e9d6b0fa362 100644
  import android.util.Log;
  import android.view.Gravity;
  import android.view.LayoutInflater;
-@@ -104,7 +102,6 @@ import kotlin.Unit;
+@@ -83,7 +78,6 @@ import com.android.systemui.statusbar.policy.KeyguardStateController;
+ import com.android.systemui.util.concurrency.DelayableExecutor;
+ import com.android.systemui.util.concurrency.Execution;
+ import com.android.systemui.util.time.SystemClock;
+-import com.android.systemui.util.settings.SecureSettings;
+ 
+ import java.util.HashSet;
+ import java.util.Optional;
+@@ -108,7 +102,6 @@ import kotlin.Unit;
  @SysUISingleton
  public class UdfpsController implements DozeReceiver {
      private static final String TAG = "UdfpsController";
@@ -209,20 +312,22 @@ index 3fa74dd67d20..3e9d6b0fa362 100644
      private static final long AOD_INTERRUPT_TIMEOUT_MILLIS = 1000;
      private static final long DEFAULT_VIBRATION_DURATION = 1000; // milliseconds
  
-@@ -167,12 +164,8 @@ public class UdfpsController implements DozeReceiver {
+@@ -171,14 +164,7 @@ public class UdfpsController implements DozeReceiver {
      private Runnable mAodInterruptRunnable;
      private boolean mOnFingerDown;
      private boolean mAttemptedToDismissKeyguard;
 -    private final int mUdfpsVendorCode;
      private Set<Callback> mCallbacks = new HashSet<>();
- 
+-    private final AmbientDisplayConfiguration mAmbientDisplayConfiguration;
+-    private final SecureSettings mSecureSettings;
+-    private boolean mScreenOffFod;
+-
 -    private boolean mFrameworkDimming;
 -    private int[][] mBrightnessAlphaArray;
--
+ 
      @VisibleForTesting
      public static final AudioAttributes VIBRATION_SONIFICATION_ATTRIBUTES =
-             new AudioAttributes.Builder()
-@@ -327,24 +320,6 @@ public class UdfpsController implements DozeReceiver {
+@@ -334,26 +320,6 @@ public class UdfpsController implements DozeReceiver {
                  mView.setDebugMessage(message);
              });
          }
@@ -230,7 +335,9 @@ index 3fa74dd67d20..3e9d6b0fa362 100644
 -        @Override
 -        public void onAcquired(int sensorId, int acquiredInfo, int vendorCode) {
 -            mFgExecutor.execute(() -> {
--                if (acquiredInfo == 6 && (mStatusBarStateController.isDozing() || !mScreenOn)) {
+-                final boolean isAodEnabled = mAmbientDisplayConfiguration.alwaysOnEnabled(UserHandle.USER_CURRENT);
+-                final boolean isShowingAmbientDisplay = mStatusBarStateController.isDozing() && mScreenOn;
+-                if (acquiredInfo == 6 && ((mScreenOffFod && !mScreenOn) || (isAodEnabled && isShowingAmbientDisplay))) {
 -                    if (vendorCode == mUdfpsVendorCode) {
 -                        if (mContext.getResources().getBoolean(R.bool.config_pulseOnFingerDown)) {
 -                            mContext.sendBroadcastAsUser(new Intent(PULSE_ACTION),
@@ -247,7 +354,7 @@ index 3fa74dd67d20..3e9d6b0fa362 100644
      }
  
      /**
-@@ -451,12 +426,7 @@ public class UdfpsController implements DozeReceiver {
+@@ -460,12 +426,7 @@ public class UdfpsController implements DozeReceiver {
                      // We need to persist its ID to track it during ACTION_MOVE that could include
                      // data for many other pointers because of multi-touch support.
                      mActivePointerId = event.getPointerId(0);
@@ -260,7 +367,7 @@ index 3fa74dd67d20..3e9d6b0fa362 100644
                      handled = true;
                  }
                  if ((withinSensorArea || fromUdfpsView) && shouldTryToDismissKeyguard()) {
-@@ -577,7 +547,7 @@ public class UdfpsController implements DozeReceiver {
+@@ -586,7 +547,7 @@ public class UdfpsController implements DozeReceiver {
              @NonNull ScreenLifecycle screenLifecycle,
              @Nullable Vibrator vibrator,
              @NonNull UdfpsHapticsSimulator udfpsHapticsSimulator,
@@ -269,7 +376,17 @@ index 3fa74dd67d20..3e9d6b0fa362 100644
              @NonNull KeyguardStateController keyguardStateController,
              @NonNull KeyguardBypassController keyguardBypassController,
              @NonNull DisplayManager displayManager,
-@@ -606,7 +576,7 @@ public class UdfpsController implements DozeReceiver {
+@@ -594,8 +555,7 @@ public class UdfpsController implements DozeReceiver {
+             @NonNull ConfigurationController configurationController,
+             @NonNull SystemClock systemClock,
+             @NonNull UnlockedScreenOffAnimationController unlockedScreenOffAnimationController,
+-            @NonNull SystemUIDialogManager dialogManager,
+-            @NonNull SecureSettings secureSettings) {
++            @NonNull SystemUIDialogManager dialogManager) {
+         mContext = context;
+         mExecution = execution;
+         mVibrator = vibrator;
+@@ -616,7 +576,7 @@ public class UdfpsController implements DozeReceiver {
          mPowerManager = powerManager;
          mAccessibilityManager = accessibilityManager;
          mLockscreenShadeTransitionController = lockscreenShadeTransitionController;
@@ -278,7 +395,7 @@ index 3fa74dd67d20..3e9d6b0fa362 100644
          screenLifecycle.addObserver(mScreenObserver);
          mScreenOn = screenLifecycle.getScreenState() == ScreenLifecycle.SCREEN_ON;
          mKeyguardBypassController = keyguardBypassController;
-@@ -628,7 +598,7 @@ public class UdfpsController implements DozeReceiver {
+@@ -638,7 +598,7 @@ public class UdfpsController implements DozeReceiver {
                  });
  
          mCoreLayoutParams = new WindowManager.LayoutParams(
@@ -287,7 +404,7 @@ index 3fa74dd67d20..3e9d6b0fa362 100644
                  0 /* flags set in computeLayoutParams() */,
                  PixelFormat.TRANSLUCENT);
          mCoreLayoutParams.setTitle(TAG);
-@@ -637,11 +607,6 @@ public class UdfpsController implements DozeReceiver {
+@@ -647,11 +607,6 @@ public class UdfpsController implements DozeReceiver {
          mCoreLayoutParams.layoutInDisplayCutoutMode =
                  WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS;
          mCoreLayoutParams.privateFlags = WindowManager.LayoutParams.PRIVATE_FLAG_TRUSTED_OVERLAY;
@@ -299,17 +416,35 @@ index 3fa74dd67d20..3e9d6b0fa362 100644
  
          mFingerprintManager.setUdfpsOverlayController(new UdfpsOverlayController());
  
-@@ -650,9 +615,6 @@ public class UdfpsController implements DozeReceiver {
+@@ -660,27 +615,6 @@ public class UdfpsController implements DozeReceiver {
          context.registerReceiver(mBroadcastReceiver, filter);
  
          udfpsHapticsSimulator.setUdfpsController(this);
 -
 -        mUdfpsVendorCode = mContext.getResources().getInteger(R.integer.config_udfps_vendor_code);
+-        mAmbientDisplayConfiguration = new AmbientDisplayConfiguration(mContext);
+-        mSecureSettings = secureSettings;
+-        updateScreenOffFodState();
+-        mSecureSettings.registerContentObserver(Settings.Secure.SCREEN_OFF_UDFPS_ENABLED,
+-            new ContentObserver(mainHandler) {
+-                @Override
+-                public void onChange(boolean selfChange, Uri uri) {
+-                    if (uri.getLastPathSegment().equals(Settings.Secure.SCREEN_OFF_UDFPS_ENABLED)) {
+-                        updateScreenOffFodState();
+-                    }
+-                }
+-            }
+-        );
+-    }
 -
+-    private void updateScreenOffFodState() {
+-        boolean isSupported = mContext.getResources().getBoolean(
+-                com.android.internal.R.bool.config_supportsScreenOffUdfps);
+-        mScreenOffFod = isSupported && mSecureSettings.getInt(Settings.Secure.SCREEN_OFF_UDFPS_ENABLED, 1) == 1;
      }
  
      /**
-@@ -733,7 +695,6 @@ public class UdfpsController implements DozeReceiver {
+@@ -761,7 +695,6 @@ public class UdfpsController implements DozeReceiver {
          final int paddingY = animation != null ? animation.getPaddingY() : 0;
  
          mCoreLayoutParams.flags = Utils.FINGERPRINT_OVERLAY_LAYOUT_PARAM_FLAGS
@@ -317,7 +452,7 @@ index 3fa74dd67d20..3e9d6b0fa362 100644
                  | WindowManager.LayoutParams.FLAG_SPLIT_TOUCH;
          if (animation != null && animation.listenForTouchesOutsideView()) {
              mCoreLayoutParams.flags |= WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH;
-@@ -1016,8 +977,6 @@ public class UdfpsController implements DozeReceiver {
+@@ -1044,8 +977,6 @@ public class UdfpsController implements DozeReceiver {
              return;
          }
  
@@ -326,7 +461,7 @@ index 3fa74dd67d20..3e9d6b0fa362 100644
          if (mView.getAnimationViewController() instanceof UdfpsKeyguardViewController
                  && !mStatusBarStateController.isDozing()) {
              mKeyguardBypassController.setUserHasDeviceEntryIntent(true);
-@@ -1062,7 +1021,6 @@ public class UdfpsController implements DozeReceiver {
+@@ -1090,7 +1021,6 @@ public class UdfpsController implements DozeReceiver {
          if (mView.isIlluminationRequested()) {
              mView.stopIllumination();
          }
@@ -334,7 +469,7 @@ index 3fa74dd67d20..3e9d6b0fa362 100644
      }
  
      private void updateTouchListener() {
-@@ -1079,49 +1037,6 @@ public class UdfpsController implements DozeReceiver {
+@@ -1107,49 +1037,6 @@ public class UdfpsController implements DozeReceiver {
          }
      }
  
