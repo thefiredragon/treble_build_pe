@@ -115,8 +115,8 @@ applyPatches
 setupEnv
 buildTrebleApp
 buildVariant
-buildSlimVariant
-buildVndkliteVariant
+#buildSlimVariant
+#buildVndkliteVariant
 generatePackages
 
 END=`date +%s`
