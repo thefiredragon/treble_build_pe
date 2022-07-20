@@ -211,7 +211,7 @@ index dcc3a54d0f97..cc8f14385ce0 100644
 -          -->
 -    </string-array>
 -
- </resources>
+     <!-- Body font family -->
 diff --git a/packages/SystemUI/src/com/android/systemui/biometrics/AuthContainerView.java b/packages/SystemUI/src/com/android/systemui/biometrics/AuthContainerView.java
 index fb5a948c6716..fd37b3509a4e 100644
 --- a/packages/SystemUI/src/com/android/systemui/biometrics/AuthContainerView.java

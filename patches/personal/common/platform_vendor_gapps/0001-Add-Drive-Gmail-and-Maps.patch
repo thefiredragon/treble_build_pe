@@ -1,7 +1,7 @@
 From 590788fc4b110d103a86c67f21b4fafb5fe56ef7 Mon Sep 17 00:00:00 2001
 From: Alberto Ponces <ponces26@gmail.com>
 Date: Sun, 31 Oct 2021 21:09:42 +0000
-Subject: [PATCH] Add Drive, Gmail, Maps and drop Android Auto
+Subject: [PATCH] Add Drive, Gmail and Maps
 
 ---
  config.mk | 4 +++-
@@ -33,14 +33,6 @@ index 29df6bc..a1768b7 100644
      PrebuiltGoogleTelemetryTvp \
      SoundAmplifierPrebuilt \
      SoundPickerPrebuilt \
-@@ -74,7 +77,6 @@ PRODUCT_PACKAGES += \
- # product/priv-app
- PRODUCT_PACKAGES += \
-     AmbientSensePrebuilt \
--    AndroidAutoStubPrebuilt \
-     AppDirectedSMSService \
-     BetterBug \
-     CarrierLocation \
 -- 
 2.32.0
 

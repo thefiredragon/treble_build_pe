@@ -1,4 +1,4 @@
-From 351b3f78905991635142c317676e3a403f84a8f5 Mon Sep 17 00:00:00 2001
+From 6c80836fac4e8da375300756b35ab641dc52a165 Mon Sep 17 00:00:00 2001
 From: Pierre-Hugues Husson <phh@phh.me>
 Date: Sun, 19 Dec 2021 17:08:22 -0500
 Subject: [PATCH 26/35] Add UDFPS support for various devices

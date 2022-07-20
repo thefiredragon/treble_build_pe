@@ -11,8 +11,8 @@ diff --git a/main.cpp b/main.cpp
 index 1f85fb5..52aa896 100644
 --- a/main.cpp
 +++ b/main.cpp
-@@ -257,7 +257,7 @@ static int process_config(VolumeManager* vm, VoldConfigs* configs) {
-             std::string nickname(entry.label);
+@@ -263,7 +263,7 @@ static int process_config(VolumeManager* vm, VoldConfigs* configs) {
+             int partnum = entry.partnum;
              int flags = 0;
  
 -            if (entry.is_encryptable()) {

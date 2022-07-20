@@ -1,4 +1,4 @@
-From c53b58bb69f8296e31b31572460655a36c5e594c Mon Sep 17 00:00:00 2001
+From edadeb2e5f79726a42549e1d3a9b3fc628d70559 Mon Sep 17 00:00:00 2001
 From: Pierre-Hugues Husson <phh@phh.me>
 Date: Mon, 2 May 2022 18:02:40 -0400
 Subject: [PATCH 34/35] Support samsung ultrasonic udfps
