@@ -15,15 +15,15 @@ diff --git a/packages/SystemUI/src/com/android/systemui/qs/QuickStatusBarHeader.
 index 7400a75e755f..99534baaf956 100644
 --- a/packages/SystemUI/src/com/android/systemui/qs/QuickStatusBarHeader.java
 +++ b/packages/SystemUI/src/com/android/systemui/qs/QuickStatusBarHeader.java
-@@ -22,6 +22,7 @@ import android.content.res.Configuration;
+@@ -23,6 +23,7 @@ import android.content.res.Configuration;
  import android.content.res.Resources;
  import android.graphics.Color;
  import android.graphics.Rect;
 +import android.os.SystemProperties;
  import android.provider.Settings;
+ import android.provider.AlarmClock;
  import android.util.AttributeSet;
- import android.util.Pair;
-@@ -269,8 +270,10 @@ public class QuickStatusBarHeader extends FrameLayout implements TunerService.Tu
+@@ -281,8 +282,10 @@ public class QuickStatusBarHeader extends FrameLayout implements TunerService.Tu
  
          mConfigShowBatteryEstimate = resources.getBoolean(R.bool.config_showBatteryEstimateQSBH);
  
